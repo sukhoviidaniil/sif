@@ -16,7 +16,6 @@
 
 #include "sif/asset/AssetRegistry.h"
 #include "sif/internal/Delta_Timer.h"
-#include "sif/internal/Random.h"
 #include "sif/layout_engine/Parser.h"
 #include "sif/layout_engine/elements/Animation.h"
 #include "sif/layout_engine/elements/Sprite.h"
@@ -311,9 +310,4 @@ SIF_TEST(delta_timer_is_a_single_non_copyable_instance) {
     // Ticking twice in a row must not go backwards in time.
     intrnl::Delta_Timer::instance().tick();
     SIF_CHECK(intrnl::Delta_Timer::instance().tick() >= 0.f);
-}
-
-SIF_TEST(random_is_a_single_non_copyable_instance) {
-    SIF_CHECK(&intrnl::Random::instance() == &intrnl::Random::instance());
-    SIF_CHECK(!std::is_copy_constructible_v<intrnl::Random>);
 }

@@ -51,6 +51,10 @@ namespace sif::intrnl {
     inline GUID generate_guid(const std::unordered_set<GUID, GUIDHash>& existing) {
         GUID g;
         do {
+            // Drawn as uint32_t, not as int: casting the uint32_t
+            // maximum to int yielded -1, so the range handed to the
+            // distribution was [1, -1] - an empty range, which is
+            // undefined behaviour rather than an error.
             g = GUID{
                 Random::instance().next_int<std::uint32_t>(
                     1,
