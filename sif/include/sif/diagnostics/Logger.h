@@ -1,7 +1,4 @@
 /***************************************************************
-* Project:          Render_Engine
-* File:             Logger.h
-*
 * Author:           Daniil Sukhovii
 * Email:            sukhovii.daniil@gmail.com
 * Created:          2025-12-10
@@ -14,6 +11,7 @@
 #define RENDER_ENGINE_LOGGER_H
 
 #include <fstream>
+#include <mutex>
 #include <string>
 
 #ifdef _DEBUG
@@ -33,6 +31,26 @@ namespace sif::diag {
      *
      * Writes formatted messages to a log file and supports
      * indentation-based depth tracking for structured logs.
+     *
+     * @par Thread safety
+     * Every LOG() in this project can be reached from a background
+     * asset-loader thread as well as from the main thread, so both
+     * pieces of shared state are protected:
+     *
+     *  - the output stream is guarded by a mutex, and one message is
+     *    written with a single stream operation. std::ofstream is not
+     *    safe for concurrent writes: two threads inside xsputn() race
+     *    on the same put area, which shows up first as interleaved
+     *    half-lines in debug.log and eventually as a segfault.
+     *  - the indentation depth is thread_local. Depth describes the
+     *    call nesting of *one* thread, so a LOG_SCOPE() opened on the
+     *    main thread must not indent (or, worse, be closed by) a loader
+     *    thread. Sharing one counter made unbalanced add/lower pairs
+     *    across threads unavoidable.
+     *
+     * Messages coming from a thread other than the first one to log are
+     * prefixed with a short thread tag, so an interleaved log can still
+     * be read.
      */
     class Logger {
     public:
@@ -65,9 +83,12 @@ namespace sif::diag {
         void add_depth();
 
         /**
-         * @brief Decreases the indentation depth.
+         * @brief Decreases the indentation depth of the calling thread.
          *
-         * @note behavior if depth becomes negative -> depth == 0;
+         * Saturates at 0. The previous implementation decremented an
+         * unsigned counter unconditionally despite this very note, so
+         * one unbalanced scope wrapped the depth to ~4e9 and the next
+         * message tried to build a four-billion-level indent string.
          */
         void lower_depth();
     private:
@@ -75,9 +96,26 @@ namespace sif::diag {
          * @brief Constructs the logger and opens the log file.
          */
         Logger();
-        std::ofstream logfile_; ///< Output log file stream
-        unsigned int depth_; ///< Current indentation depth
-        std::string indent_str_ = "\t"; ///< String used for one indentation level
+
+        /**
+         * @brief Indentation depth of the calling thread.
+         *
+         * A function-local thread_local rather than a data member:
+         * depth is per-thread state that merely happens to be reported
+         * through a shared object.
+         */
+        static unsigned int& depth();
+
+        /// @brief Short marker identifying the calling thread ("" for the first one).
+        static const std::string& thread_tag();
+
+        mutable std::mutex mtx_;    ///< Guards logfile_
+        std::ofstream logfile_;     ///< Output log file stream
+        std::string indent_str_ = "  "; ///< String used for one indentation level
+
+        /// @brief Upper bound on indentation, so a runaway depth cannot
+        /// turn one log line into a gigabyte-sized string.
+        static constexpr unsigned int max_depth = 32;
 
         /**
          * @brief Applies indentation to a message.

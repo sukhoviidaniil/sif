@@ -1,7 +1,4 @@
 /***************************************************************
- * Project:       Render_Engine (application layer)
- * File:          App.h
- *
  * Author:        Sukhovii Daniil
  * Email:         sukhovii.daniil@gmail.com
  * Created:       2026-02-25
