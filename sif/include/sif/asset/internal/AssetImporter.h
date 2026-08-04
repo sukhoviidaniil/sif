@@ -13,11 +13,46 @@
 #include <shared_mutex>
 #include <unordered_map>
 
+#include <string_view>
+
 #include "sif/internal/GUID.h"
 #include "AssetDesc.h"
 #include "AssetRecord.h"
 
 namespace sif::asset {
+
+    /**
+     * @brief The mandatory suffix of a registry file: <name>.rgst.json
+     *
+     * Registries are generated artefacts that sit next to hand-authored
+     * *.asset.json descriptors and ordinary *.json data. A dedicated,
+     * unambiguous suffix is what lets a build script, a .gitignore rule
+     * or a human tell at a glance which files are generated and safe to
+     * delete - and it stops a mistyped argument from quietly
+     * overwriting an asset descriptor with a registry.
+     */
+    inline constexpr std::string_view registry_extension = ".rgst.json";
+
+    /**
+     * @brief Checks that a path names a registry file.
+     *
+     * @return true only if the *filename* is <name>.rgst.json with a
+     * non-empty <name>. Directories are not inspected, so any location
+     * is acceptable.
+     */
+    [[nodiscard]] bool is_registry_filename(const std::string& filepath);
+
+    /**
+     * @brief Proposes a conforming name for a path that fails
+     * is_registry_filename.
+     *
+     * Used to make the diagnostics actionable ("did you mean ...?")
+     * rather than merely correct. Any trailing .json / .rgst is
+     * replaced, never stacked, so registry.json and registry.rgst both
+     * suggest registry.rgst.json.
+     */
+    [[nodiscard]] std::string suggested_registry_filename(const std::string& filepath);
+
     class AssetImporter {
     public:
 

@@ -20,6 +20,7 @@ set(SIF_TEST_SRC
     UIElementTests.cpp
     SpriteAnimationElementTests.cpp
     CameraTests.cpp
+    RegistryNamingTests.cpp
 )
 
 add_executable(sif_tests ${SIF_TEST_SRC})

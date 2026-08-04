@@ -2,24 +2,12 @@
     "asset_name": "DemoIcons",
     "expected_load_time_seconds": 5.0,
     "guid": "2000002",
-    "record_id_to_name": [
-        [
-            0,
-            "heart"
-        ],
-        [
-            1,
-            "gem"
-        ],
-        [
-            2,
-            "coin"
-        ],
-        [
-            3,
-            "shield"
-        ]
-    ],
+    "record_id_to_name": {
+        "0": "heart",
+        "1": "gem",
+        "2": "coin",
+        "3": "shield"
+    },
     "rects": [
         {
             "height": 64.0,

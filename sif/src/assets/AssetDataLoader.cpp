@@ -14,6 +14,39 @@
 
 namespace sif::asset::data {
 
+
+    namespace {
+        /**
+         * @brief Writes the GUID/name (and, where meaningful, the record
+         * table) back into a hand-authored *.asset.json.
+         *
+         * All six save_Meta_* overloads used to repeat this block
+         * verbatim; the only difference was whether record names were
+         * included, which is now a parameter. Everything else - reading
+         * the file, patching two or three keys, writing it back - was
+         * identical, and duplicated bugs with it (non-atomic truncation,
+         * and a record table serialized in a different shape than the
+         * registry uses).
+         */
+        void patch_meta_in_file(const std::filesystem::path& path,
+                                const data::AssetMetaData& meta,
+                                const bool with_record_names) {
+            nlohmann::json j = io::get_json_data(path);
+
+            j["guid"] = meta.guid.string();
+            j["asset_name"] = meta.asset_name;
+
+            if (with_record_names) {
+                // Same object form the registry uses, and sorted, so a
+                // second run of the tool produces a byte-identical file
+                // instead of a random-order diff.
+                j["record_id_to_name"] = write_record_names(meta.record_id_to_name);
+            }
+
+            io::write_json_file(path, j);
+        }
+    }
+
     AssetDataLoader & AssetDataLoader::instance() {
         static AssetDataLoader instance;
         return instance;
@@ -73,17 +106,7 @@ namespace sif::asset::data {
     }
 
     void AssetDataLoader::save_Meta_Font(const std::filesystem::path &path, data::AssetMetaData& meta) {
-        nlohmann::json j = io::get_json_data(path);
-
-        j["guid"] = meta.guid.string();
-        j["asset_name"] = meta.asset_name;
-
-        std::ofstream out(path, std::ios::binary | std::ios::trunc);
-        if (!out) {
-            throw std::runtime_error("Failed to open file for writing: " + path.string());
-        }
-
-        out << j.dump(4);
+        patch_meta_in_file(path, meta, false);
     }
 
     std::unique_ptr<SpriteSingleNode> AssetDataLoader::load_SpriteSingle_from_file(const std::filesystem::path &path) {
@@ -94,17 +117,7 @@ namespace sif::asset::data {
     }
 
     void AssetDataLoader::save_Meta_SpriteSingle(const std::filesystem::path &path, data::AssetMetaData& meta) {
-        nlohmann::json j = io::get_json_data(path);
-
-        j["guid"] = meta.guid.string();
-        j["asset_name"] = meta.asset_name;
-
-        std::ofstream out(path, std::ios::binary | std::ios::trunc);
-        if (!out) {
-            throw std::runtime_error("Failed to open file for writing: " + path.string());
-        }
-
-        out << j.dump(4);
+        patch_meta_in_file(path, meta, false);
     }
 
     std::unique_ptr<SpriteAtlasNode> AssetDataLoader::load_SpriteAtlas_from_file(const std::filesystem::path &path) {
@@ -115,18 +128,7 @@ namespace sif::asset::data {
     }
 
     void AssetDataLoader::save_Meta_SpriteAtlas(const std::filesystem::path &path, data::AssetMetaData& meta) {
-        nlohmann::json j = io::get_json_data(path);
-
-        j["guid"] = meta.guid.string();
-        j["asset_name"] = meta.asset_name;
-        j["record_id_to_name"] = meta.record_id_to_name;
-
-        std::ofstream out(path, std::ios::binary | std::ios::trunc);
-        if (!out) {
-            throw std::runtime_error("Failed to open file for writing: " + path.string());
-        }
-
-        out << j.dump(4);
+        patch_meta_in_file(path, meta, true);
     }
 
     std::unique_ptr<SpriteGridNode> AssetDataLoader::load_SpriteGrid_from_file(const std::filesystem::path &path) {
@@ -137,18 +139,7 @@ namespace sif::asset::data {
     }
 
     void AssetDataLoader::save_Meta_SpriteGrid(const std::filesystem::path &path, data::AssetMetaData& meta) {
-        nlohmann::json j = io::get_json_data(path);
-
-        j["guid"] = meta.guid.string();
-        j["asset_name"] = meta.asset_name;
-        j["record_id_to_name"] = meta.record_id_to_name;
-
-        std::ofstream out(path, std::ios::binary | std::ios::trunc);
-        if (!out) {
-            throw std::runtime_error("Failed to open file for writing: " + path.string());
-        }
-
-        out << j.dump(4);
+        patch_meta_in_file(path, meta, true);
     }
 
     std::unique_ptr<PrimitiveAnimationNode> AssetDataLoader::load_PrimitiveAnimation_from_file(const std::filesystem::path &path) {
@@ -159,18 +150,7 @@ namespace sif::asset::data {
     }
 
     void AssetDataLoader::save_Meta_PrimitiveAnimation(const std::filesystem::path &path, data::AssetMetaData& meta) {
-        nlohmann::json j = io::get_json_data(path);
-
-        j["guid"] = meta.guid.string();
-        j["asset_name"] = meta.asset_name;
-        j["record_id_to_name"] = meta.record_id_to_name;
-
-        std::ofstream out(path, std::ios::binary | std::ios::trunc);
-        if (!out) {
-            throw std::runtime_error("Failed to open file for writing: " + path.string());
-        }
-
-        out << j.dump(4);
+        patch_meta_in_file(path, meta, true);
     }
 
     std::unique_ptr<SoundNode> AssetDataLoader::load_Sound_from_file(const std::filesystem::path &path) {
@@ -181,17 +161,7 @@ namespace sif::asset::data {
     }
 
     void AssetDataLoader::save_Meta_Sound(const std::filesystem::path &path, data::AssetMetaData& meta) {
-        nlohmann::json j = io::get_json_data(path);
-
-        j["guid"] = meta.guid.string();
-        j["asset_name"] = meta.asset_name;
-
-        std::ofstream out(path, std::ios::binary | std::ios::trunc);
-        if (!out) {
-            throw std::runtime_error("Failed to open file for writing: " + path.string());
-        }
-
-        out << j.dump(4);
+        patch_meta_in_file(path, meta, false);
     }
 
     AssetDataLoader::AssetDataLoader() = default;

@@ -18,9 +18,31 @@
 #include "sif/asset/internal/AssetImporter.h"
 #include "sif/layout_engine/Token.h"
 
+#include <stdexcept>
+
 namespace sif {
-    inline void reference_serialization(const std::string& dir, const std::string& serialized_dir) {
+    /**
+     * @brief Rewrites authoring scenes (asset_name="...") into runtime
+     * scenes (guid="...").
+     *
+     * @return How many files failed. Failures are logged per file and
+     * do not stop the run, but they must not be reported as success
+     * either - the caller turns a non-zero result into a non-zero exit
+     * code, so a broken asset reference cannot slip through CI.
+     */
+    inline size_t reference_serialization(const std::string& dir, const std::string& serialized_dir) {
         namespace fs = std::filesystem;
+
+        if (!fs::exists(dir)) {
+            throw std::runtime_error("Scenes directory does not exist: " + dir);
+        }
+        if (!fs::is_directory(dir)) {
+            throw std::runtime_error("Scenes directory is not a directory: " + dir);
+        }
+
+        size_t failed = 0;
+        size_t processed = 0;
+
         for (auto &entry : fs::recursive_directory_iterator(dir)) {
             if (!entry.is_regular_file()) continue;
 
@@ -49,12 +71,20 @@ namespace sif {
                 }
 
                 sif::ui::Tokenizer::save_tokens(target_path.string(), tokens);
-            }catch (const std::exception &e) {
-                std::string err =  "Reference Serialization - Failed to process file '" + path + "': " + e.what();
+                ++processed;
+            } catch (const std::exception &e) {
+                ++failed;
+                const std::string err =
+                    "Reference Serialization - Failed to process file '" + path + "': " + e.what();
                 LOG(err);
-                std::cerr << err << "\n" << std::endl;
+                std::cerr << err << std::endl;
             }
         }
+
+        LOG("Reference Serialization - processed " + std::to_string(processed) +
+            " scene(s), " + std::to_string(failed) + " failed");
+
+        return failed;
     }
 }
 

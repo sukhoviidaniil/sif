@@ -79,3 +79,4 @@ external/json/
 # Tooling / IDE
 .idea/
 .vscode/
+/data/bin/

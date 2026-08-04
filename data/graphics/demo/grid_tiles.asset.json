@@ -5,7 +5,7 @@
     "cols": 4,
     "expected_load_time_seconds": 5.0,
     "guid": "2000003",
-    "record_id_to_name": [],
+    "record_id_to_name": {},
     "rows": 2,
     "source": "graphics/demo/grid_tiles.png",
     "type": "SpriteGrid"

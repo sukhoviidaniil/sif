@@ -11,7 +11,10 @@
 #include "TestFramework.h"
 
 #include <cmath>
+#include <filesystem>
+#include <fstream>
 
+#include "sif/io/from_JSON.h"
 #include "sif/render/Camera.h"
 
 using namespace sif;
@@ -194,4 +197,81 @@ SIF_TEST(camera_without_a_target_degrades_instead_of_dividing_by_zero) {
     // screen_to_world has no inverse here, so it answers with the centre.
     SIF_CHECK(near_eq(camera.screen_to_world({123.f, 456.f}), math::Point2(0.f, 0.f)));
     SIF_CHECK(!camera.is_visible({-1.f, -1.f, 2.f, 2.f}));
+}
+
+// ---------------------------------------------------------------------
+// Atomic JSON writing (io::write_json_file)
+//
+// The registry and every *.asset.json go through this one function, and
+// each of these cases used to be a real failure: an aborted tool, a
+// silently truncated source file, or a "success" that wrote nothing.
+// ---------------------------------------------------------------------
+
+SIF_TEST(write_json_file_creates_missing_parent_directories) {
+    const std::filesystem::path dir = std::filesystem::temp_directory_path() / "sif_json_test" / "deep";
+    const std::filesystem::path file = dir / "out.json";
+    std::filesystem::remove_all(std::filesystem::temp_directory_path() / "sif_json_test");
+
+    nlohmann::json j = nlohmann::json::array();
+    j.push_back(42);
+    io::write_json_file(file, j);
+
+    SIF_CHECK(std::filesystem::exists(file));
+
+    std::ifstream in(file);
+    nlohmann::json read;
+    in >> read;
+    SIF_CHECK(read.is_array() && read[0] == 42);
+
+    std::filesystem::remove_all(std::filesystem::temp_directory_path() / "sif_json_test");
+}
+
+SIF_TEST(write_json_file_leaves_no_temp_file_behind) {
+    const std::filesystem::path file = std::filesystem::temp_directory_path() / "sif_json_tmp.json";
+    std::filesystem::path tmp = file;
+    tmp += ".tmp";
+    std::filesystem::remove(file);
+    std::filesystem::remove(tmp);
+
+    io::write_json_file(file, nlohmann::json::object());
+
+    SIF_CHECK(std::filesystem::exists(file));
+    SIF_CHECK(!std::filesystem::exists(tmp));
+
+    std::filesystem::remove(file);
+}
+
+SIF_TEST(write_json_file_replaces_an_existing_file_atomically) {
+    const std::filesystem::path file = std::filesystem::temp_directory_path() / "sif_json_replace.json";
+
+    nlohmann::json first = nlohmann::json::object();
+    first["v"] = 1;
+    io::write_json_file(file, first);
+
+    nlohmann::json second = nlohmann::json::object();
+    second["v"] = 2;
+    io::write_json_file(file, second);
+
+    std::ifstream in(file);
+    nlohmann::json read;
+    in >> read;
+    SIF_CHECK(read["v"] == 2);
+
+    std::filesystem::remove(file);
+}
+
+SIF_TEST(write_json_file_reports_an_unusable_path) {
+    bool threw = false;
+    try {
+        // A path whose "directory" is an existing regular file cannot
+        // be created; this must be an error, not a silent no-op.
+        const std::filesystem::path blocker = std::filesystem::temp_directory_path() / "sif_json_blocker";
+        { std::ofstream(blocker) << "x"; }
+        io::write_json_file(blocker / "inside" / "out.json", nlohmann::json::object());
+        std::filesystem::remove(blocker);
+    } catch (const std::exception&) {
+        threw = true;
+        std::filesystem::remove(std::filesystem::temp_directory_path() / "sif_json_blocker");
+    }
+    SIF_CHECK(threw);
 }

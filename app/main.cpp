@@ -63,7 +63,7 @@ namespace {
 
 int main(const int argc, char* argv[]) {
     const std::string demo_id = argc > 1 ? argv[1] : "all";
-    const std::string data_dir = argc > 2 ? argv[2] : "../data/";
+    const std::string data_dir = argc > 2 ? argv[2] : "data/";
 
     if (demo_id == "-h" || demo_id == "--help" || demo_id == "help") {
         print_usage(argv[0]);

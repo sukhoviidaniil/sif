@@ -11,6 +11,7 @@
 #define RENDER_ENGINE_IO_FROM_JSON_H
 
 #include <filesystem>
+#include <system_error>
 #include <fstream>
 
 #include "json.hpp"
@@ -113,6 +114,64 @@ namespace sif::io {
             throw;
         }
     }
+
+    /**
+     * @brief Writes JSON to a file without ever leaving a half-written one.
+     *
+     * Three things the naive `ofstream out(path, trunc); out << j;` got
+     * wrong, each of which has bitten this project:
+     *
+     *  1. It fails if the parent directory does not exist yet, so
+     *     writing a generated registry into data/bin/ aborted on a
+     *     fresh checkout. Directories are created here instead.
+     *  2. `trunc` empties the target *before* the write, so a failure
+     *     mid-way destroys the file that was there - and for the
+     *     *.asset.json files that file is hand-authored source. We
+     *     write to a sibling temp file and rename it into place, which
+     *     is atomic on every platform we target.
+     *  3. Nothing checked the stream *after* writing, so a full disk
+     *     silently produced a truncated file. The stream state is
+     *     verified before the rename.
+     *
+     * @throws std::runtime_error with the path in the message.
+     */
+    inline void write_json_file(const std::filesystem::path& path, const nlohmann::json& j, const int indent = 4) {
+        const std::filesystem::path parent = path.parent_path();
+        if (!parent.empty()) {
+            std::error_code ec;
+            std::filesystem::create_directories(parent, ec);
+            if (ec) {
+                throw std::runtime_error(
+                    "Cannot create directory '" + parent.string() + "': " + ec.message());
+            }
+        }
+
+        std::filesystem::path tmp = path;
+        tmp += ".tmp";
+
+        {
+            std::ofstream out(tmp, std::ios::binary | std::ios::trunc);
+            if (!out) {
+                throw std::runtime_error("Failed to open file for writing: " + tmp.string());
+            }
+
+            out << j.dump(indent);
+            out.flush();
+
+            if (!out) {
+                throw std::runtime_error("Failed to write file: " + tmp.string());
+            }
+        }
+
+        std::error_code ec;
+        std::filesystem::rename(tmp, path, ec);
+        if (ec) {
+            std::filesystem::remove(tmp, ec);
+            throw std::runtime_error(
+                "Failed to replace '" + path.string() + "': " + ec.message());
+        }
+    }
+
 }
 
 

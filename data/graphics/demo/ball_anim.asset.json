@@ -54,7 +54,7 @@
     ],
     "guid": "2000004",
     "loop": true,
-    "record_id_to_name": [],
+    "record_id_to_name": {},
     "source": "graphics/demo/ball_anim.png",
     "type": "PrimitiveAnimation"
 }
