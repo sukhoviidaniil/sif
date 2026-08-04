@@ -1,0 +1,160 @@
+@startuml backends
+!ifndef SIF_BACKENDS
+!define SIF_BACKENDS
+
+title sif - engine interfaces and their two backends
+
+package "sif (engine, links no graphics/audio library)" {
+    package asset {
+        abstract class Sprite {
+            +{abstract} size() : Vector2
+        }
+        abstract class SpriteAtlas {
+            +rect(RecordID) : Rect
+            +{abstract} texture_size() : Vector2
+        }
+        abstract class SpriteGrid {
+            +cell(row, col) : Rect
+            +{abstract} texture_size() : Vector2
+        }
+        abstract class PrimitiveAnimation {
+            +frame_index_at(seconds) : size_t
+            +frame_at(seconds) : Rect
+            +{abstract} texture_size() : Vector2
+        }
+        abstract class Sound {
+            +{abstract} duration_seconds() : float
+        }
+        abstract class Font {
+            +{abstract} measure_text(str, size) : Vector2
+        }
+        interface IAssetLoader {
+            +try_load(record, dir)
+            -{abstract} load_asset(record, dir, token)
+        }
+        class AssetRegistry <<singleton>> {
+            +request(GUID)
+            +get<T>(GUID) : AssetHandle<T>
+            +type_of(GUID) : AssetType
+            +record_id_of(GUID, name) : RecordID
+        }
+    }
+
+    package ui {
+        class UIElement
+        class Sprite as UISprite {
+            -kind : AssetType
+            -record_id : RecordID
+            +append_render_items()
+        }
+        class Animation as UIAnimation {
+            -elapsed_seconds
+            +update(dt)
+            +current_frame() : size_t
+        }
+        UIElement <|-- UISprite
+        UIElement <|-- UIAnimation
+    }
+
+    package rnd {
+        interface Renderer {
+            +{abstract} render(RenderFrame)
+            +{abstract} screen_size() : Vector2
+        }
+        struct RenderSprite <<render item>> {
+            +asset : AssetHandle<void>
+            +kind : AssetType
+            +src_rect : Rect
+        }
+    }
+
+    package audio {
+        interface AudioPlayer {
+            +{abstract} play(handle, volume, loop) : VoiceId
+            +{abstract} stop(VoiceId)
+        }
+    }
+}
+
+package "app (the only SFML consumer)" {
+    class Graphics_Factory <<abstract factory>> {
+        +make_Renderer(RB_Config)
+        +make_Event_Collector(EC_Config)
+        +make_AudioPlayer(RB_Config)
+        +register_asset_loaders(RB_Config, registry)
+    }
+
+    package sfml {
+        class SFML_Renderer
+        class SFML_AudioPlayer
+        class SFMLSpriteAsset
+        class SFMLPrimitiveAnimationAsset
+        class SFMLSoundAsset
+        class "SFML_*_AssetLoader" as SFMLLoaders
+    }
+
+    package headless {
+        class HeadlessSpriteAsset
+        class HeadlessPrimitiveAnimationAsset
+        class HeadlessSoundAsset
+        class "Headless loaders" as HeadlessLoaders
+    }
+
+    package demos {
+        abstract class Demo {
+            +{abstract} build_ui() : UIElement
+            +on_start(Context)
+            +update(Context, dt)
+            +on_key(Context, Key)
+        }
+        class SpritesDemo
+        class AnimationDemo
+        class SoundDemo
+        class AllDemo
+        Demo <|-- SpritesDemo
+        Demo <|-- AnimationDemo
+        Demo <|-- SoundDemo
+        Demo <|-- AllDemo
+    }
+
+    class App {
+        +run()
+    }
+}
+
+Renderer <|.. SFML_Renderer
+AudioPlayer <|.. SFML_AudioPlayer
+asset.Sprite <|-- SFMLSpriteAsset
+asset.Sprite <|-- HeadlessSpriteAsset
+PrimitiveAnimation <|-- SFMLPrimitiveAnimationAsset
+PrimitiveAnimation <|-- HeadlessPrimitiveAnimationAsset
+asset.Sound <|-- SFMLSoundAsset
+asset.Sound <|-- HeadlessSoundAsset
+IAssetLoader <|.. SFMLLoaders
+IAssetLoader <|.. HeadlessLoaders
+
+Graphics_Factory ..> SFML_Renderer : creates
+Graphics_Factory ..> SFML_AudioPlayer : creates
+Graphics_Factory ..> SFMLLoaders : installs
+Graphics_Factory ..> HeadlessLoaders : installs
+
+App --> Graphics_Factory
+App --> Demo
+App --> Renderer
+App --> AudioPlayer
+
+UISprite ..> RenderSprite : emits
+UIAnimation ..> RenderSprite : emits
+UISprite --> AssetRegistry
+UIAnimation --> AssetRegistry
+
+note right of RenderSprite
+  The UI element resolves *which* sub-rect to show
+  (atlas entry / grid cell / animation frame) inside
+  the engine. The backend only answers "give me the
+  texture behind this handle", which is why neither
+  backend contains any animation or atlas logic.
+end note
+
+!endif
+@enduml

@@ -1,0 +1,43 @@
+<VBox padding="16" spacing="10" name="root">
+    <Text asset_name="Arial" color="240|240|255" fontSize="26" height="PX|34" name="title">
+        Demo 4 - Everything together: sprites + animation + sound
+    </Text>
+
+    <HBox spacing="16" flex="5" align="Center" name="stage">
+        <VBox spacing="8" flex="2" align="Center" name="left">
+            <Sprite asset_name="DemoBadge" width="PX|128" height="PX|128"/>
+            <Text asset_name="Times" color="200|200|220" fontSize="16" height="PX|22">
+                SpriteSingle
+            </Text>
+        </VBox>
+
+        <VBox spacing="8" flex="3" align="Center" name="middle">
+            <Animation asset_name="DemoBall" speed="1.0" width="PX|192" height="PX|192" name="ball"/>
+            <Text asset_name="Times" color="200|200|220" fontSize="16" height="PX|22" name="beat">
+                a sound plays on every loop
+            </Text>
+        </VBox>
+
+        <VBox spacing="8" flex="2" align="Center" name="right">
+            <Sprite asset_name="DemoIcons" record_name="coin" width="PX|96" height="PX|96" name="pulse"/>
+            <Text asset_name="Times" color="200|200|220" fontSize="16" height="PX|22">
+                SpriteAtlas
+            </Text>
+        </VBox>
+    </HBox>
+
+    <HBox spacing="8" flex="1" align="Stretch" name="strip">
+        <Sprite asset_name="DemoTiles" record_id="0" flex="1" name="t0"/>
+        <Sprite asset_name="DemoTiles" record_id="1" flex="1" name="t1"/>
+        <Sprite asset_name="DemoTiles" record_id="2" flex="1" name="t2"/>
+        <Sprite asset_name="DemoTiles" record_id="3" flex="1" name="t3"/>
+        <Sprite asset_name="DemoTiles" record_id="4" flex="1" name="t4"/>
+        <Sprite asset_name="DemoTiles" record_id="5" flex="1" name="t5"/>
+        <Sprite asset_name="DemoTiles" record_id="6" flex="1" name="t6"/>
+        <Sprite asset_name="DemoTiles" record_id="7" flex="1" name="t7"/>
+    </HBox>
+
+    <Text asset_name="Arial" color="150|220|150" fontSize="18" height="PX|26" name="status">
+        SPACE - pause/resume, 1/2/3 - play a sound manually, ESC - quit
+    </Text>
+</VBox>

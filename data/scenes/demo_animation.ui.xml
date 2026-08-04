@@ -1,0 +1,19 @@
+<VBox padding="16" spacing="12" name="root">
+    <Text asset_name="Arial" color="240|240|255" fontSize="26" height="PX|34" name="title">
+        Demo 2 - Animation: one PrimitiveAnimation asset, three cursors
+    </Text>
+
+    <HBox spacing="24" flex="4" align="Center" name="row">
+        <Animation asset_name="DemoBall" speed="0.5" width="PX|160" height="PX|160" name="slow"/>
+        <Animation asset_name="DemoBall" speed="1.0" width="PX|160" height="PX|160" name="normal"/>
+        <Animation asset_name="DemoBall" speed="2.5" width="PX|160" height="PX|160" name="fast"/>
+        <Animation asset_name="DemoBall" speed="1.0" width="PX|160" height="PX|160" playing="false" name="paused"/>
+    </HBox>
+
+    <Text asset_name="Arial" color="200|200|220" fontSize="18" height="PX|24" name="frames">
+        frames: -
+    </Text>
+    <Text asset_name="Times" color="150|220|150" fontSize="18" height="PX|26" name="status">
+        SPACE - pause/resume the 4th cursor, R - restart all
+    </Text>
+</VBox>

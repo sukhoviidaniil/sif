@@ -1,0 +1,7 @@
+{
+    "asset_name": "DemoChime",
+    "expected_load_time_seconds": 5.0,
+    "guid": "2000011",
+    "source": "audio/chime.wav",
+    "type": "Sound"
+}

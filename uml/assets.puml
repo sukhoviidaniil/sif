@@ -1,0 +1,54 @@
+@startuml
+!ifndef RB_ASSETS
+!define RB_ASSETS
+
+
+package rb <<Render Backend>> {
+
+    package assets <<Assets>>{
+        dataclass Font
+        dataclass Sprite
+        class AssetHandle<T>
+
+        dataclass AssetMetaData
+        struct AssetDesc
+        class AssetRecord
+
+        interface IAssetLoader
+    }
+}
+
+rb.intr.GUID --* rb.assets.AssetMetaData
+rb.assets.AssetMetaData --* rb.assets.AssetDesc
+rb.assets.AssetDesc --* rb.assets.AssetRecord
+
+
+rb.assets.AssetRecord --o rb.assets.AssetHandle
+
+rb.assets.IAssetLoader --> AssetRecord : fills
+rb.assets.Sprite .. AssetRecord
+rb.assets.Font .. AssetRecord
+
+
+!ifdef SHOW_COMMENTS
+package rb <<Render Backend>> {
+    package assets <<Assets>>{
+        note left of AssetMetaData
+            Provides information about what this asset is, its GUID, and the mapping of the formal name to the record ID.
+        end note
+        note left of AssetDesc
+            Provides information on how to obtain complete asset data.
+        end note
+        note left of AssetRecord
+            Contains a pointer to the asset and its status
+        end note
+        note left of AssetHandle
+            Secure wrapper for transferring points to an asset.
+        end note
+
+    }
+}
+!endif
+
+!endif
+@enduml

@@ -1,0 +1,8 @@
+{
+    "asset_name": "Times",
+    "critical": true,
+    "expected_load_time_seconds": 5.0,
+    "guid": "1910091263",
+    "source": "graphics/font/times.ttf",
+    "type": "Font"
+}

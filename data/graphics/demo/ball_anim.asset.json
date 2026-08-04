@@ -1,0 +1,60 @@
+{
+    "asset_name": "DemoBall",
+    "expected_load_time_seconds": 5.0,
+    "frame_duration_seconds": 0.09,
+    "frames": [
+        {
+            "height": 64.0,
+            "width": 64.0,
+            "x": 0.0,
+            "y": 0.0
+        },
+        {
+            "height": 64.0,
+            "width": 64.0,
+            "x": 64.0,
+            "y": 0.0
+        },
+        {
+            "height": 64.0,
+            "width": 64.0,
+            "x": 128.0,
+            "y": 0.0
+        },
+        {
+            "height": 64.0,
+            "width": 64.0,
+            "x": 192.0,
+            "y": 0.0
+        },
+        {
+            "height": 64.0,
+            "width": 64.0,
+            "x": 256.0,
+            "y": 0.0
+        },
+        {
+            "height": 64.0,
+            "width": 64.0,
+            "x": 320.0,
+            "y": 0.0
+        },
+        {
+            "height": 64.0,
+            "width": 64.0,
+            "x": 384.0,
+            "y": 0.0
+        },
+        {
+            "height": 64.0,
+            "width": 64.0,
+            "x": 448.0,
+            "y": 0.0
+        }
+    ],
+    "guid": "2000004",
+    "loop": true,
+    "record_id_to_name": [],
+    "source": "graphics/demo/ball_anim.png",
+    "type": "PrimitiveAnimation"
+}

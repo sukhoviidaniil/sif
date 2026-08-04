@@ -1,0 +1,51 @@
+{
+    "asset_name": "DemoIcons",
+    "expected_load_time_seconds": 5.0,
+    "guid": "2000002",
+    "record_id_to_name": [
+        [
+            0,
+            "heart"
+        ],
+        [
+            1,
+            "gem"
+        ],
+        [
+            2,
+            "coin"
+        ],
+        [
+            3,
+            "shield"
+        ]
+    ],
+    "rects": [
+        {
+            "height": 64.0,
+            "width": 64.0,
+            "x": 0.0,
+            "y": 0.0
+        },
+        {
+            "height": 64.0,
+            "width": 64.0,
+            "x": 64.0,
+            "y": 0.0
+        },
+        {
+            "height": 64.0,
+            "width": 64.0,
+            "x": 128.0,
+            "y": 0.0
+        },
+        {
+            "height": 64.0,
+            "width": 64.0,
+            "x": 192.0,
+            "y": 0.0
+        }
+    ],
+    "source": "graphics/demo/atlas_icons.png",
+    "type": "SpriteAtlas"
+}

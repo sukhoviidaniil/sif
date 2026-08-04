@@ -1,0 +1,12 @@
+<VBox spacing="12" name="root" padding="16">
+    <Text inner_text="Demo 3 - Sound: three Sound assets through audio::AudioPlayer" height="PX|34" guid="1000001" name="title" fontSize="26" color="240|240|255"></Text>
+
+    <HBox name="bars" align="Stretch" flex="3" spacing="16">
+        <Rectangle name="bar1" flex="1" fill_color="60|60|80"/>
+        <Rectangle name="bar2" flex="1" fill_color="60|60|80"/>
+        <Rectangle name="bar3" flex="1" fill_color="60|60|80"/>
+    </HBox>
+
+    <Text inner_text="active voices: 0" height="PX|26" guid="1000001" name="voices" fontSize="20" color="200|200|220"></Text>
+    <Text inner_text="1 - blip, 2 - chime (looping toggle), 3 - thud, 0 - stop all" height="PX|26" guid="1910091263" name="status" fontSize="18" color="150|220|150"></Text>
+</VBox>

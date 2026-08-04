@@ -15,6 +15,7 @@
 *.ilk
 
 # Debugger Files
+debug.log
 *.pdb
 
 # Compiled Dynamic libraries
@@ -43,6 +44,9 @@
 build/
 Build/
 build-*/
+build*/
+cmake-build-*/
+out/
 
 # CMake generated files
 CMakeFiles/
@@ -67,3 +71,11 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+
+# Vendored third-party trees (fetched or unpacked locally)
+external/SFML-*/
+external/json/
+
+# Tooling / IDE
+.idea/
+.vscode/

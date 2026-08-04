@@ -1,0 +1,32 @@
+<VBox padding="16" spacing="12" name="root">
+    <Text asset_name="Arial" color="240|240|255" fontSize="26" height="PX|34" name="title">
+        Demo 1 - Sprites: SpriteSingle, SpriteAtlas, SpriteGrid
+    </Text>
+
+    <HBox spacing="16" flex="3" align="Center" name="row_single">
+        <Sprite asset_name="DemoBadge" width="PX|160" height="PX|160" name="badge"/>
+        <Sprite asset_name="DemoIcons" record_name="heart"  width="PX|96" height="PX|96"/>
+        <Sprite asset_name="DemoIcons" record_name="gem"    width="PX|96" height="PX|96"/>
+        <Sprite asset_name="DemoIcons" record_name="coin"   width="PX|96" height="PX|96"/>
+        <Sprite asset_name="DemoIcons" record_name="shield" width="PX|96" height="PX|96"/>
+    </HBox>
+
+    <Text asset_name="Arial" color="200|200|220" fontSize="18" height="PX|24">
+        SpriteGrid (2 x 4), addressed by flat record id:
+    </Text>
+
+    <HBox spacing="8" flex="2" align="Center" name="row_grid">
+        <Sprite asset_name="DemoTiles" record_id="0" width="PX|72" height="PX|72"/>
+        <Sprite asset_name="DemoTiles" record_id="1" width="PX|72" height="PX|72"/>
+        <Sprite asset_name="DemoTiles" record_id="2" width="PX|72" height="PX|72"/>
+        <Sprite asset_name="DemoTiles" record_id="3" width="PX|72" height="PX|72"/>
+        <Sprite asset_name="DemoTiles" record_id="4" width="PX|72" height="PX|72"/>
+        <Sprite asset_name="DemoTiles" record_id="5" width="PX|72" height="PX|72"/>
+        <Sprite asset_name="DemoTiles" record_id="6" width="PX|72" height="PX|72"/>
+        <Sprite asset_name="DemoTiles" record_id="7" width="PX|72" height="PX|72"/>
+    </HBox>
+
+    <Text asset_name="Times" color="150|220|150" fontSize="18" height="PX|26" name="status">
+        loading...
+    </Text>
+</VBox>

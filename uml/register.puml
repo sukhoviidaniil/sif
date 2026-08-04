@@ -1,0 +1,53 @@
+@startuml
+
+!ifndef RB_REGISTER
+!define RB_REGISTER
+
+
+!include assets.puml
+
+
+package files <<External files and configurations>>{
+    circle registry_cache
+    circle configuration
+    circle serialized_configuration
+}
+
+package rb <<Render Backend>> {
+    package rgst <<Asset register>>{
+        class AssetRegistry
+        class AssetImporter
+    }
+}
+
+files.configuration --> rb.rgst.AssetImporter #line:red;text:red : consumed by
+files.registry_cache --> rb.rgst.AssetImporter #line:red;text:red : consumed by
+rb.rgst.AssetImporter --> files.serialized_configuration #line:red;text:red : make
+
+
+rb.assets.AssetDesc --o rb.rgst.AssetImporter
+rb.rgst.AssetImporter ..> rb.rgst.AssetRegistry : fills
+
+rb.assets.AssetRecord --o rb.rgst.AssetRegistry
+rb.rgst.AssetRegistry --> rb.assets.IAssetLoader : call
+rb.rgst.AssetRegistry --> rb.assets.AssetHandle : make
+
+
+!ifdef SHOW_COMMENTS
+
+package rb <<Render Backend>> {
+    package rgst <<Asset register>>{
+        note left of AssetImporter
+            Acts as a meta data collector for assets, initiator of reference serialization in configuration
+        end note
+        note left of AssetRegistry
+            Acts as an active registry of all assets currently available in the system
+        end note
+
+    }
+}
+
+!endif
+
+!endif
+@enduml

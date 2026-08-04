@@ -1,0 +1,84 @@
+# ---------------------------------------------------------------------------
+# CI for the sif render engine.
+#
+# Two jobs:
+#
+#   engine  - configures with -DSIF_BUILD_DEMO_APP=OFF and builds only the
+#             engine plus its test suite. This is the job that proves the
+#             claim the assignment cares about: the logic/engine library
+#             compiles and passes its tests with no SFML installed at all.
+#
+#   demo    - installs SFML and builds everything, then runs the headless
+#             asset check. That check uses the CPU-only backend, so it
+#             verifies that sprites, atlases, grids, animations and sounds
+#             really load and really produce the expected geometry/timing
+#             on a machine with no display and no sound card.
+# ---------------------------------------------------------------------------
+version: 2.1
+
+jobs:
+  engine:
+    docker:
+      - image: ubuntu:24.04
+    steps:
+      - checkout
+      - run:
+          name: Install a toolchain (deliberately without SFML)
+          command: |
+            apt-get update -qq
+            DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \
+              build-essential cmake git nlohmann-json3-dev
+      - run:
+          name: Provide nlohmann/json where the build expects it
+          command: |
+            mkdir -p external/json
+            cp /usr/include/nlohmann/json.hpp external/json/json.hpp
+      - run:
+          name: Configure (engine only)
+          command: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DSIF_BUILD_DEMO_APP=OFF
+      - run:
+          name: Build
+          command: cmake --build build -j4
+      - run:
+          name: Unit tests
+          command: ./build/sif/test/sif_tests
+
+  demo:
+    docker:
+      - image: ubuntu:24.04
+    steps:
+      - checkout
+      - run:
+          name: Install the toolchain and SFML 2.6
+          command: |
+            apt-get update -qq
+            DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \
+              build-essential cmake git libsfml-dev nlohmann-json3-dev
+      - run:
+          name: Provide nlohmann/json where the build expects it
+          command: |
+            mkdir -p external/json
+            cp /usr/include/nlohmann/json.hpp external/json/json.hpp
+      - run:
+          name: Configure (engine + demo application)
+          command: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+      - run:
+          name: Build
+          command: cmake --build build -j4
+      - run:
+          name: Unit tests
+          command: ./build/sif/test/sif_tests
+      - run:
+          name: Regenerate the asset registry and serialize the scenes
+          command: |
+            ./build/sif/Asset_GUID_Assignment data/ data/bin/registry.rgst.json
+            ./build/sif/Asset_Reference_Serialization data/bin/registry.rgst.json data/scenes data/bin/scenes
+      - run:
+          name: Headless asset + animation + sound verification
+          command: ./build/app/sif_demo headless data/
+
+workflows:
+  build_and_test:
+    jobs:
+      - engine
+      - demo

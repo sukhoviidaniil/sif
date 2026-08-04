@@ -1,0 +1,33 @@
+<VBox spacing="10" name="root" padding="16">
+    <Text inner_text="Demo 4 - Everything together: sprites + animation + sound" height="PX|34" guid="1000001" name="title" fontSize="26" color="240|240|255"></Text>
+
+    <HBox name="stage" align="Center" flex="5" spacing="16">
+        <VBox name="left" align="Center" flex="2" spacing="8">
+            <Sprite guid="2000001" height="PX|128" width="PX|128"/>
+            <Text inner_text="SpriteSingle" height="PX|22" guid="1910091263" fontSize="16" color="200|200|220"></Text>
+        </VBox>
+
+        <VBox name="middle" align="Center" flex="3" spacing="8">
+            <Animation guid="2000004" name="ball" height="PX|192" width="PX|192" speed="1.0"/>
+            <Text inner_text="a sound plays on every loop" height="PX|22" guid="1910091263" name="beat" fontSize="16" color="200|200|220"></Text>
+        </VBox>
+
+        <VBox name="right" align="Center" flex="2" spacing="8">
+            <Sprite guid="2000002" name="pulse" height="PX|96" width="PX|96" record_name="coin"/>
+            <Text inner_text="SpriteAtlas" height="PX|22" guid="1910091263" fontSize="16" color="200|200|220"></Text>
+        </VBox>
+    </HBox>
+
+    <HBox name="strip" align="Stretch" flex="1" spacing="8">
+        <Sprite guid="2000003" name="t0" flex="1" record_id="0"/>
+        <Sprite guid="2000003" name="t1" flex="1" record_id="1"/>
+        <Sprite guid="2000003" name="t2" flex="1" record_id="2"/>
+        <Sprite guid="2000003" name="t3" flex="1" record_id="3"/>
+        <Sprite guid="2000003" name="t4" flex="1" record_id="4"/>
+        <Sprite guid="2000003" name="t5" flex="1" record_id="5"/>
+        <Sprite guid="2000003" name="t6" flex="1" record_id="6"/>
+        <Sprite guid="2000003" name="t7" flex="1" record_id="7"/>
+    </HBox>
+
+    <Text inner_text="SPACE - pause/resume, 1/2/3 - play a sound manually, ESC - quit" height="PX|26" guid="1000001" name="status" fontSize="18" color="150|220|150"></Text>
+</VBox>

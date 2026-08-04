@@ -1,0 +1,7 @@
+{
+    "asset_name": "DemoBlip",
+    "expected_load_time_seconds": 5.0,
+    "guid": "2000010",
+    "source": "audio/blip.wav",
+    "type": "Sound"
+}

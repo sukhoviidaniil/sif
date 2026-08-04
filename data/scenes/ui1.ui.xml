@@ -1,0 +1,14 @@
+<VBox padding="10" spacing="5">
+    <HBox spacing="8">
+        <Rectangle fill_color="0|0|255"  width = "PX|100" height = "PX|100"/>
+        <Text asset_name="Times" color = "255|255|255">
+            Let's assume...
+        </Text>
+    </HBox>
+    <HBox spacing="8">
+        <Text asset_name="Arial" color = "255|255|255">
+            ...it works.
+        </Text>
+        <Rectangle fill_color="255|0|0"  width = "PX|100" height = "PX|100"/>
+    </HBox>
+</VBox>

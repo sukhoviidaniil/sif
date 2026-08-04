@@ -1,0 +1,61 @@
+@startuml
+!ifndef RB_RENDER
+!define RB_RENDER
+
+
+!include ui.puml
+!include assets.puml
+
+
+circle data
+package rb <<Render Backend>> {
+    dataclass Context
+    interface Renderer
+
+    package rnd <<Render>>{
+        dataclass RenderFrame
+        abstract class RenderNode
+        class Text
+        class Ractangle
+        class Sprite
+    }
+
+}
+data --* rb.Context #line:blue;text:blue : consumed by
+rb.Context --> rb.ui.elements.UIElement #line:blue;text:blue : consumed by
+
+rb.ui.elements.UIElement --> rb.rnd.RenderFrame #line:blue;text:blue : interpreted
+rb.rnd.RenderFrame --> rb.Renderer #line:blue;text:blue : being drawn
+
+
+rb.rnd.RenderNode <|-- rb.rnd.Text
+rb.rnd.RenderNode <|-- rb.rnd.Ractangle
+rb.rnd.RenderNode <|-- rb.rnd.Sprite
+rb.rnd.RenderFrame *-- rb.rnd.RenderNode
+
+rb.assets.AssetHandle --* rb.rnd.Text
+rb.assets.AssetHandle --* rb.rnd.Sprite
+
+
+!ifdef SHOW_COMMENTS
+package rb  {
+
+    note left of Context
+        Collection of static data for user interface elements
+    end note
+    note left of Renderer
+        Interprets each node that comes to it and draws it.
+    end note
+
+    package rnd{
+        note left of RenderFrame
+            Assembly nodes for interpretation by the renderer.
+            May have several render levels.
+        end note
+    }
+}
+!endif
+
+
+!endif
+@enduml

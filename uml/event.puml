@@ -1,0 +1,84 @@
+@startuml
+!ifndef INFRA_EVENT
+!define INFRA_EVENT
+
+
+
+package infra <<Infrastructure>>{
+    package event{
+        enum EventMask
+        class Event <<concept>>{
+            + mask : EventMask
+        }
+        abstract class EventConcept{
+            + infra::event::EventMask mask()
+            + std::type_index type()
+            + const void* data()
+            + std::unique_ptr<EventConcept> clone()
+        }
+        class EventInstance<T>{
+            + value : Event
+        }
+        class Event_Bus{
+            - handlers_ : std::unordered_map<std::type_index, std::vector<Handler>>
+        }
+        package _Event_Bus{
+            class Subscription{
+                - bus_ : std::shared_ptr<Event_Bus>
+                - type_ : std::type_index
+                - id_ : std::uint64_t
+            }
+            struct Handler{
+                + id : std::uint64_t
+                + priority : int
+                + mask : EventMask
+                + handler_callback : std::function<void(const EventConcept&)>
+            }
+        }
+        class Event_Store{
+            - events_ : std::vector<std::unique_ptr<EventConcept>>
+        }
+        class Event_Collector{
+            + event_store : Event_Store
+        }
+
+        class Observer{
+            - subs_ : std::vector<Event_Bus::Subscription>
+        }
+    }
+}
+
+infra.event.Event --*  infra.event.EventMask
+infra.event.EventInstance --* infra.event.Event
+infra.event.EventInstance --|> infra.event.EventConcept
+infra.event.EventConcept --> infra.event.Event_Bus: emit
+infra.event.Event_Collector --* infra.event.Event_Store
+infra.event.Event_Store -- infra.event.EventConcept : store & return
+infra.event.Observer --o infra.event._Event_Bus.Subscription
+infra.event._Event_Bus.Handler --> infra.event._Event_Bus.Subscription : distributes event
+infra.event.Event_Bus --* infra.event._Event_Bus.Handler
+
+
+!ifdef SHOW_COMMENTS
+package infra <<Infrastructure>>{
+    package event{
+        note top of _Event_Bus
+            Inside the Event_Bus structure
+        end note
+
+        note right of EventInstance
+            Accepts only those classes that have EventMask (can return it).
+        end note
+
+        note top of Event_Bus
+            Acts as a distributor of events for subscribers.
+        end note
+        }
+}
+!endif
+
+
+
+
+!endif
+@enduml

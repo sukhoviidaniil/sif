@@ -1,0 +1,7 @@
+{
+    "asset_name": "DemoBadge",
+    "expected_load_time_seconds": 5.0,
+    "guid": "2000001",
+    "source": "graphics/demo/single_badge.png",
+    "type": "SpriteSingle"
+}
