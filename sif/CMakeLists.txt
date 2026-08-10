@@ -110,6 +110,13 @@ set(ASSET_REFERENCE_SERIALIZATION "Asset_Reference_Serialization")
 add_executable(${ASSET_REFERENCE_SERIALIZATION} ${CMAKE_CURRENT_SOURCE_DIR}/src/Asset_Reference_Serialization.cpp)
 target_link_libraries(${ASSET_REFERENCE_SERIALIZATION} PRIVATE sif_lib)
 
+# ========== Asset tools ==========
+# Kept in their own directory because sif_sprite_packer needs SFML for image
+# I/O, while everything above this line links nothing graphical.
+if(SIF_BUILD_TOOLS)
+    add_subdirectory(tools)
+endif()
+
 # ========== Tests ==========
 # See sif/test/CMakeLists.txt: a separate, optional target so consumers
 # that only want the engine itself are not forced to build tests.

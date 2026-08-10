@@ -24,6 +24,11 @@ message(STATUS "nlohmann/json include dir: ${JSON_DIR}")
 # graphics stack at all (which is how CI verifies the engine).
 option(SIF_BUILD_DEMO_APP "Build the SFML demo application" ON)
 
+# The asset tools are useful to *consumers* of the engine, so they are built
+# independently of the demo application. sif_sprite_packer needs SFML for
+# image I/O and skips itself when SFML is absent; the rest need nothing.
+option(SIF_BUILD_TOOLS "Build the sif asset tools" ON)
+
 add_subdirectory(sif)
 
 # add_subdirectory(app) used to appear twice - once guarded, once not -

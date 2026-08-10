@@ -1,0 +1,8 @@
+
+<Element width="PERCENT|100" height="PERCENT|100">
+    <Menu name="main_menu" spacing="4">
+        <Button id="1" name="btn_play" width="PX|100" height="PX|30"/>
+        <Button id="2" name="btn_quit" width="PX|100" height="PX|30"/>
+    </Menu>
+    <Rectangle name="bg" fill_color="10|10|10"/>
+</Element>
