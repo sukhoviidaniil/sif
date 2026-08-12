@@ -25,6 +25,7 @@ namespace sif::event::input {
         Space,
         Left, Right, Up, Down,
         Num1, Num2, Num3,
+        Backspace,
     };
 
     struct KeyPressed {
@@ -34,6 +35,29 @@ namespace sif::event::input {
         bool control;
         bool shift;
         bool system;
+    };
+
+    /**
+     * @brief A character the user typed.
+     *
+     * Separate from KeyPressed on purpose. A key is a *position* on the
+     * keyboard; a character is what the OS produced from it after the
+     * layout, the modifiers and any compose sequence. Deriving one from
+     * the other in the engine would mean re-implementing the platform's
+     * keyboard layout handling - and getting it wrong for every layout
+     * that is not the developer's own.
+     *
+     * Backspace and Enter arrive as KeyPressed, not here: they are
+     * editing commands rather than text.
+     */
+    struct TextEntered {
+        static constexpr EventMask mask = EventMask::Input;
+        char32_t unicode = 0;
+
+        /// @brief True for characters that make sense in a text field.
+        [[nodiscard]] bool printable() const {
+            return unicode >= 32 && unicode != 127;
+        }
     };
 
     struct KeyReleased {

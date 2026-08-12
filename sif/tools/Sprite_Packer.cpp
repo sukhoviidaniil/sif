@@ -1,4 +1,5 @@
 /***************************************************************
+
  * Author:        Sukhovii Daniil
  * Email:       sukhovii.daniil@gmail.com
  * Created:       2026-08-10

@@ -28,8 +28,14 @@ namespace sif::event {
             throw std::out_of_range("Event_Store is empty");
         }
 
-        auto ptr = std::move(events_.back());
-        events_.pop_back();
+        // Front, not back. Input is a *sequence*: typing "Daniil" and
+        // reading the frame's events back to front spells "Dnalii", and
+        // the same reversal silently reorders a click that follows a key
+        // press. The erase is O(n) in the batch, and a batch is a handful
+        // of events per frame - a deque would trade that for an allocation
+        // pattern nobody has measured a need for.
+        auto ptr = std::move(events_.front());
+        events_.erase(events_.begin());
         return ptr;
     }
 

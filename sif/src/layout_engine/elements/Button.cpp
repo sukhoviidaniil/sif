@@ -57,7 +57,14 @@ namespace sif::ui {
         item->rect = result.rect;
         item->color = blend(unselected_color, selected_color, transition_);
 
-        frame.constant_items.push_back(std::move(item));
+        // temp_items, not constant_items: the two buckets are a *caching*
+        // distinction (rebuilt every frame vs. not), and the renderer
+        // happens to draw the constant ones first. Using them as a z-order
+        // means every animated entity is painted on top of every label -
+        // a pause overlay ends up underneath the bombs it is supposed to
+        // cover. Everything that participates in normal layering goes in
+        // one bucket, so draw order is submission order.
+        frame.temp_items.push_back(std::move(item));
 
         // Buttons are leaf elements as far as rendering goes, but still
         // let any (unusual) children render themselves.

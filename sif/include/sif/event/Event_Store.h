@@ -21,7 +21,7 @@ namespace sif::event {
     /**
      * @brief Container for storing events in a type-erased form.
      *
-     * Provides stack-like access to events and utilities for
+     * Provides first-in-first-out access to events and utilities for
      * type and mask-based inspection.
      */
     class Event_Store {

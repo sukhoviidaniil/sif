@@ -35,6 +35,7 @@ namespace sif::sfml {
                 case K::Num1:   return I::Num1;
                 case K::Num2:   return I::Num2;
                 case K::Num3:   return I::Num3;
+                case K::Backspace: return I::Backspace;
                 default:        return I::Unknown;
             }
         }
@@ -105,6 +106,17 @@ namespace sif::sfml {
                 // KeyPressed.
                 event_store_.push(input::KeyReleased{
                     to_key(e.key.code)
+                });
+                break;
+
+            // ---------- Text ----------
+            case sf::Event::TextEntered:
+                // SFML has already applied the keyboard layout and the
+                // modifiers, so this is the character the user meant -
+                // whatever their keyboard looks like. Deriving it from a
+                // key code here would mean re-implementing that badly.
+                event_store_.push(input::TextEntered{
+                    static_cast<char32_t>(e.text.unicode)
                 });
                 break;
 

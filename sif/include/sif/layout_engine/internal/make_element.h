@@ -46,8 +46,17 @@ namespace sif::ui {
         return intrnl::GUID{}; // unreachable: invalid_attribute always throws
     }
 
-    inline std::unique_ptr<UIElement> make_Element(const Node& /*n*/) {
-        return std::make_unique<UIElement>();
+    inline std::unique_ptr<UIElement> make_Element(const Node& n) {
+        static std::string from = "Element node";
+        auto e = std::make_unique<UIElement>();
+
+        add_attribute_width(n, from, e.get());
+        add_attribute_height(n, from, e.get());
+        add_attribute_flex(n, from, e.get());
+        add_attribute_name(n, e.get());
+        add_attribute_id(n, from, e.get());
+
+        return e;
     }
 
     inline std::unique_ptr<UIElement> make_VBox(const Node& n) {
@@ -62,6 +71,8 @@ namespace sif::ui {
         add_attribute_spacing(n, from, ep);
         add_attribute_align(n, from, ep);
         add_attribute_flex(n, from, ep);
+        add_attribute_name(n, ep);
+        add_attribute_id(n, from, ep);
 
         return e;
     }
@@ -78,6 +89,8 @@ namespace sif::ui {
         add_attribute_spacing(n, from, ep);
         add_attribute_align(n, from, ep);
         add_attribute_flex(n, from, ep);
+        add_attribute_name(n, ep);
+        add_attribute_id(n, from, ep);
 
         return e;
     }
@@ -89,6 +102,8 @@ namespace sif::ui {
         add_attribute_width(n, from, e.get());
         add_attribute_height(n, from, e.get());
         add_attribute_flex(n, from, e.get());
+        add_attribute_name(n, e.get());
+        add_attribute_id(n, from, e.get());
         // ReSharper disable once CppJoinDeclarationAndAssignment
         std::string attrbt;
 
@@ -136,6 +151,8 @@ namespace sif::ui {
         add_attribute_width(n, from, e.get());
         add_attribute_height(n, from, e.get());
         add_attribute_flex(n, from, e.get());
+        add_attribute_name(n, e.get());
+        add_attribute_id(n, from, e.get());
 
         attrbt = "inner_text";
         if (n.attributes.contains(attrbt)) {
@@ -195,6 +212,8 @@ namespace sif::ui {
         add_attribute_width(n, from, ep);
         add_attribute_height(n, from, ep);
         add_attribute_flex(n, from, ep);
+        add_attribute_name(n, ep);
+        add_attribute_id(n, from, ep);
 
         if (n.attributes.contains("tint")) {
             try {
@@ -229,6 +248,8 @@ namespace sif::ui {
         add_attribute_width(n, from, ep);
         add_attribute_height(n, from, ep);
         add_attribute_flex(n, from, ep);
+        add_attribute_name(n, ep);
+        add_attribute_id(n, from, ep);
 
         if (n.attributes.contains("speed")) {
             try {
@@ -261,6 +282,8 @@ namespace sif::ui {
         add_attribute_width(n, from, ep);
         add_attribute_height(n, from, ep);
         add_attribute_flex(n, from, ep);
+        add_attribute_name(n, ep);
+        add_attribute_id(n, from, ep);
 
         std::string attrbt;
 
@@ -311,6 +334,8 @@ namespace sif::ui {
         add_attribute_spacing(n, from, ep);
         add_attribute_align(n, from, ep);
         add_attribute_flex(n, from, ep);
+        add_attribute_name(n, ep);
+        add_attribute_id(n, from, ep);
 
         return e;
     }

@@ -12,6 +12,8 @@
 ***************************************************************/
 #pragma once
 
+#include <stdexcept>
+
 #include "Event_Store.h"
 
 namespace sif::event {
@@ -30,11 +32,18 @@ namespace sif::event {
 
     template<typename Event>
     Event Event_Store::pop() {
-        auto& e = *events_.back();
+        if (events_.empty()) {
+            throw std::out_of_range("Event_Store is empty");
+        }
+
+        // First in, first out - the same order as pop_concept(). Two pop
+        // functions on one container that disagree about which end they
+        // work from would be a trap for whoever used the other one.
+        auto& e = *events_.front();
         auto* inst = static_cast<EventInstance<Event>*>(&e);
 
         Event value = std::move(inst->value);
-        events_.pop_back();
+        events_.erase(events_.begin());
         return value;
     }
 
