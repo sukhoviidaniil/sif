@@ -33,6 +33,17 @@ namespace sif::asset {
          */
         [[nodiscard]] std::weak_ptr<AssetRecord> record() const;
 
+        /**
+         * @brief Returns an owning pointer to the loaded asset.
+         *
+         * The safe counterpart of get(): while the returned shared_ptr is
+         * alive the asset cannot be freed, whatever a background loader
+         * does to the record in the meantime.
+         *
+         * @return nullptr if the asset is not Ready.
+         */
+        [[nodiscard]] std::shared_ptr<T> lock() const;
+
         [[nodiscard]] bool ready() const;
 
         T* get() const;

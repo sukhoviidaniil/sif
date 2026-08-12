@@ -33,15 +33,29 @@ namespace sif::asset {
     }
 
     template<class T>
-    T * AssetHandle<T>::get() const {
-        auto r = record_.lock();
-        if (!r || r->get_state() != AssetState::Ready || !r->get_data()) {
+    std::shared_ptr<T> AssetHandle<T>::lock() const {
+        const auto r = record_.lock();
+        if (!r || r->get_state() != AssetState::Ready) {
             return nullptr;
         }
-        // r->get_data() returns std::shared_ptr<void>
-        auto typed = std::static_pointer_cast<T>(r->get_data());
-        // raw pointer
-        return typed.get();
+
+        // One call, not three. The old code asked get_data() twice and
+        // checked the state separately, so a reload landing between the
+        // checks could hand back a pointer into data that had just been
+        // replaced - and the caller would be dereferencing freed memory.
+        std::shared_ptr<void> data = r->get_data();
+        if (!data) {
+            return nullptr;
+        }
+        return std::static_pointer_cast<T>(std::move(data));
+    }
+
+    template<class T>
+    T * AssetHandle<T>::get() const {
+        // Deliberately drops the ownership the temporary held: see the
+        // warning on the declaration. Callers that need the pointer to
+        // outlive the expression use lock() instead.
+        return lock().get();
     }
 
     template<class T>
