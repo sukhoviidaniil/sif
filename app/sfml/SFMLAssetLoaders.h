@@ -18,6 +18,30 @@
 
 namespace sif::sfml {
     /**
+     * @brief Base of every loader in this backend: all of them run on the
+     * main thread.
+     *
+     * Not a policy choice - a constraint of the libraries underneath.
+     * sf::Texture and sf::Font need an OpenGL context and take SFML's
+     * TransientContextLock, which races with the main thread's rendering;
+     * sf::SoundBuffer goes through OpenAL, which races with its own mixer
+     * thread. ThreadSanitizer catches both inside the libraries, and what
+     * a player sees is heap corruption: "double free or corruption",
+     * "malloc(): unaligned tcache chunk detected", or a segfault with a
+     * stack that has nothing to do with assets. Pressing a key during
+     * start-up is enough, because that plays a sound while the rest of
+     * the assets are still being decoded.
+     *
+     * The registry hands these to AssetRegistry::pump() instead of a
+     * worker thread. The parallelism is lost for this backend; the
+     * headless backend keeps it, because sf::Image and sf::InputSoundFile
+     * are pure CPU decoding and touch no device.
+     */
+    class SFML_MainThreadLoader : public asset::IAssetLoader {
+        [[nodiscard]] bool runs_on_main_thread() const final { return true; }
+    };
+
+    /**
      * @brief IAssetLoader implementations, one per AssetType.
      *
      * Each of them does exactly three things: read the *.asset.json
@@ -28,27 +52,27 @@ namespace sif::sfml {
      * time.
      */
 
-    class SFML_Font_AssetLoader final : public asset::IAssetLoader {
+    class SFML_Font_AssetLoader final : public SFML_MainThreadLoader {
         void load_asset(asset::AssetRecord& record, const std::string& asset_dir, uint64_t attempt_token) override;
     };
 
-    class SFML_SpriteSingle_AssetLoader final : public asset::IAssetLoader {
+    class SFML_SpriteSingle_AssetLoader final : public SFML_MainThreadLoader {
         void load_asset(asset::AssetRecord& record, const std::string& asset_dir, uint64_t attempt_token) override;
     };
 
-    class SFML_SpriteAtlas_AssetLoader final : public asset::IAssetLoader {
+    class SFML_SpriteAtlas_AssetLoader final : public SFML_MainThreadLoader {
         void load_asset(asset::AssetRecord& record, const std::string& asset_dir, uint64_t attempt_token) override;
     };
 
-    class SFML_SpriteGrid_AssetLoader final : public asset::IAssetLoader {
+    class SFML_SpriteGrid_AssetLoader final : public SFML_MainThreadLoader {
         void load_asset(asset::AssetRecord& record, const std::string& asset_dir, uint64_t attempt_token) override;
     };
 
-    class SFML_PrimitiveAnimation_AssetLoader final : public asset::IAssetLoader {
+    class SFML_PrimitiveAnimation_AssetLoader final : public SFML_MainThreadLoader {
         void load_asset(asset::AssetRecord& record, const std::string& asset_dir, uint64_t attempt_token) override;
     };
 
-    class SFML_Sound_AssetLoader final : public asset::IAssetLoader {
+    class SFML_Sound_AssetLoader final : public SFML_MainThreadLoader {
         void load_asset(asset::AssetRecord& record, const std::string& asset_dir, uint64_t attempt_token) override;
     };
 

@@ -16,6 +16,10 @@
 namespace sif::asset {
     IAssetLoader::~IAssetLoader() = default;
 
+    bool IAssetLoader::runs_on_main_thread() const {
+        return false;
+    }
+
     void IAssetLoader::try_load(AssetRecord &record, const std::string &asset_dir) {
         const std::string& asset_name = record.get_meta().asset_name;
 

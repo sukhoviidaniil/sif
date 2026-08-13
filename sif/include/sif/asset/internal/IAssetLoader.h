@@ -45,6 +45,26 @@ namespace sif::asset {
          * @param asset_dir Root directory assets are loaded from.
          */
         void try_load(AssetRecord& record, const std::string& asset_dir);
+
+        /**
+         * @brief Must this loader run on the main thread?
+         *
+         * Most loaders are pure file decoding and are happy on any
+         * thread, which is why loads are dispatched to a pool by default.
+         * Some are not: OpenAL (behind sf::SoundBuffer) races with its
+         * own mixer thread when buffers are created from an arbitrary
+         * thread while something is already playing, and the damage is
+         * heap corruption - "double free", "unaligned tcache chunk", or
+         * a segfault somewhere entirely unrelated a moment later.
+         *
+         * A loader that returns true is queued for
+         * AssetRegistry::pump() instead of being given a thread, so it
+         * runs on whichever thread drives the frame loop. That costs the
+         * parallelism for those assets and buys correctness; sound files
+         * are small, so the trade is not close.
+         */
+        [[nodiscard]] virtual bool runs_on_main_thread() const;
+
     private:
 
         /**

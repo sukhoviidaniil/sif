@@ -133,6 +133,25 @@ namespace sif::asset {
          */
         bool wait_for_idle(std::chrono::milliseconds timeout = std::chrono::seconds(30)) const;
 
+        /**
+         * @brief Runs the loads that must not happen on a worker thread.
+         *
+         * Call once per frame from the thread that owns the window and
+         * the audio device. Loaders that report runs_on_main_thread()
+         * are queued rather than dispatched, and this is where they are
+         * executed - see IAssetLoader::runs_on_main_thread for why some
+         * have to be.
+         *
+         * Doing nothing when there is nothing queued is the common case,
+         * so calling it every frame is cheap. Not calling it at all
+         * leaves those assets permanently Queued, which shows up as a
+         * sound that never plays rather than as a crash.
+         *
+         * @param budget Stop after this long and finish the rest next
+         * frame, so a burst of queued loads cannot stall a frame.
+         */
+        void pump(std::chrono::milliseconds budget = std::chrono::milliseconds(4));
+
     private:
         AssetRegistry();
 
@@ -187,7 +206,10 @@ namespace sif::asset {
          */
         mutable std::mutex mtx_;
         std::queue<intrnl::GUID> critical_queue_; ///< Critical assets waiting for a free load slot
-        std::queue<intrnl::GUID> normal_queue_; ///< Non-critical assets waiting for a free load slot
+        std::queue<intrnl::GUID> normal_queue_;  ///< Non-critical assets waiting for a free load slot
+
+        /// Loads that pump() must run; see IAssetLoader::runs_on_main_thread.
+        std::queue<intrnl::GUID> main_thread_queue_;
         size_t active_loads_ = 0; ///< Number of loads currently in flight
         size_t max_concurrent_loads_ = 2; ///< Configurable cap on simultaneous loads
         mutable std::condition_variable idle_cv_; ///< Signalled whenever a load finishes
