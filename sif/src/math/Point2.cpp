@@ -13,9 +13,6 @@
 
 namespace sif::math {
 
-    constexpr Point2::Point2() = default;
-
-
     Point2 Point2::operator*(const float scalar) const {
         return {x * scalar, y * scalar};
     }

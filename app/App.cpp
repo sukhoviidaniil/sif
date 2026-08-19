@@ -50,7 +50,7 @@ namespace app {
             )
         );
 
-        Graphics_Factory& factory = Graphics_Factory::instance();
+        backend::Graphics_Factory& factory = backend::Graphics_Factory::instance();
 
         renderer_ = factory.make_Renderer(render_config);
         renderer_->track_global(bus_);

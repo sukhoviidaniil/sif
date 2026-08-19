@@ -57,7 +57,7 @@ namespace {
         registry.set_asset_dir(data_dir);
         registry.set_max_concurrent_loads(4);
 
-        app::Graphics_Factory::instance().register_asset_loaders(config, registry);
+        sif::backend::Graphics_Factory::instance().register_asset_loaders(config, registry);
     }
 }
 

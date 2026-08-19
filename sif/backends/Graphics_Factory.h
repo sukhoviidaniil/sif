@@ -1,7 +1,4 @@
 /***************************************************************
- * Project:       Render_Engine (application layer)
- * File:          Graphics_Factory.h
- *
  * Author:        Sukhovii Daniil
  * Email:         sukhovii.daniil@gmail.com
  * Created:       2026-02-25
@@ -21,7 +18,16 @@
 #include "sif/render/RB_Config.h"
 #include "sif/render/Renderer.h"
 
-namespace app {
+/**
+ * @brief Abstract Factory over one whole rendering/audio backend.
+ *
+ * Lives in sif::backend (not in a bare `app` namespace) because it ships
+ * with sif itself now, as part of the promoted sif_sfml target - a
+ * consumer such as Bomberman links one library and gets a renderer, an
+ * event collector, an audio player and every asset loader, instead of
+ * hand-compiling sif's app/sfml and app/headless sources itself.
+ */
+namespace sif::backend {
     /**
      * @brief Abstract Factory over one whole rendering/audio backend.
      *

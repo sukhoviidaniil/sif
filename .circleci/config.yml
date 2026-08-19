@@ -3,16 +3,25 @@
 #
 # Two jobs:
 #
-#   engine  - configures with -DSIF_BUILD_DEMO_APP=OFF and builds only the
-#             engine plus its test suite. This is the job that proves the
-#             claim the assignment cares about: the logic/engine library
-#             compiles and passes its tests with no SFML installed at all.
+#   engine  - configures with every SFML-consuming target off (the default
+#             for the demo app and backend already reflect "on demand", but
+#             this job spells it out) and builds only the engine plus its
+#             test suite. This is the job that proves the claim the
+#             assignment cares about: the logic/engine library compiles and
+#             passes its tests with no SFML installed at all.
 #
-#   demo    - installs SFML and builds everything, then runs the headless
-#             asset check. That check uses the CPU-only backend, so it
-#             verifies that sprites, atlases, grids, animations and sounds
-#             really load and really produce the expected geometry/timing
-#             on a machine with no display and no sound card.
+#   demo    - installs SFML and builds everything (engine, tools, the
+#             sif_sfml backend, and - since it is off by default - the demo
+#             app explicitly opted back in), then runs the headless asset
+#             check. That check uses the CPU-only backend, so it verifies
+#             that sprites, atlases, grids, animations and sounds really
+#             load and really produce the expected geometry/timing on a
+#             machine with no display and no sound card.
+#
+# All of sif's own build output - libraries, tools, the demo, the tests -
+# lands under build/lib and build/bin regardless of which source
+# subdirectory it came from (see the root CMakeLists.txt), which is why
+# every path below is that flat and not per-subdirectory.
 # ---------------------------------------------------------------------------
 version: 2.1
 
@@ -34,14 +43,16 @@ jobs:
             mkdir -p external/json
             cp /usr/include/nlohmann/json.hpp external/json/json.hpp
       - run:
-          name: Configure (engine only)
-          command: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DSIF_BUILD_DEMO_APP=OFF
+          name: Configure (engine only - no SFML-consuming target enabled)
+          command: |
+            cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
+              -DSIF_BUILD_TOOLS=OFF -DSIF_BUILD_SFML_BACKEND=OFF -DSIF_BUILD_DEMO_APP=OFF
       - run:
           name: Build
           command: cmake --build build -j4
       - run:
           name: Unit tests
-          command: ./build/sif/test/sif_tests
+          command: ./build/bin/sif_tests
 
   demo:
     docker:
@@ -60,22 +71,22 @@ jobs:
             mkdir -p external/json
             cp /usr/include/nlohmann/json.hpp external/json/json.hpp
       - run:
-          name: Configure (engine + demo application)
-          command: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+          name: Configure (engine + tools + backend + demo)
+          command: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DSIF_BUILD_DEMO_APP=ON
       - run:
           name: Build
           command: cmake --build build -j4
       - run:
           name: Unit tests
-          command: ./build/sif/test/sif_tests
+          command: ./build/bin/sif_tests
       - run:
           name: Regenerate the asset registry and serialize the scenes
           command: |
-            ./build/sif/Asset_GUID_Assignment data/ data/bin/registry.rgst.json
-            ./build/sif/Asset_Reference_Serialization data/bin/registry.rgst.json data/scenes data/bin/scenes
+            ./build/bin/Asset_GUID_Assignment data/ data/bin/registry.rgst.json
+            ./build/bin/Asset_Reference_Serialization data/bin/registry.rgst.json data/scenes data/bin/scenes
       - run:
           name: Headless asset + animation + sound verification
-          command: ./build/app/sif_demo headless data/
+          command: ./build/bin/sif_demo headless data/
 
 workflows:
   build_and_test:

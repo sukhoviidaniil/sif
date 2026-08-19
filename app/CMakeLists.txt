@@ -1,54 +1,34 @@
 # ---------------------------------------------------------------------------
-# Demo application: the SFML backend plus the demo scenarios.
+# sif_demo - the reference demo application.
 #
-# This is the only target that is allowed to know SFML exists. sif_lib
-# itself links nothing graphical, which is what lets the engine and its
-# tests build on a machine without SFML installed.
+# Everything SFML-specific now lives in sif_sfml (sif/backends/); this
+# target compiles only the demo's own sources and links that one library -
+# renderer, audio player, event collector, every asset loader and SFML
+# itself all come along transitively.
 # ---------------------------------------------------------------------------
 
-# Prefer a vendored SFML if one is present, but fall back to the system
-# package (which is what the reference platform provides). The previous
-# version *overwrote* CMAKE_PREFIX_PATH with a hard-coded path, so a
-# checkout without external/SFML-2.6.1 could not configure at all.
-set(SFML_RELATIVE_DIR "external/SFML-2.6.1")
-if(WIN32)
-    set(SFML_RELATIVE_DIR "${SFML_RELATIVE_DIR}/windows")
-elseif(UNIX)
-    set(SFML_RELATIVE_DIR "${SFML_RELATIVE_DIR}/linux")
-endif()
-set(SFML_ROOT "${CMAKE_SOURCE_DIR}/${SFML_RELATIVE_DIR}")
-if(EXISTS "${SFML_ROOT}/lib/cmake/SFML")
-    list(PREPEND CMAKE_PREFIX_PATH "${SFML_ROOT}/lib/cmake/SFML")
-    message(STATUS "Using vendored SFML from ${SFML_ROOT}")
+# SFML is located exactly once, at the root CMakeLists.txt, whenever
+# SIF_BUILD_DEMO_APP (this option) is enabled - see the comment there.
+if(NOT TARGET sfml-graphics)
+    message(STATUS "sif: SFML not found, skipping sif_demo (pass -DSIF_FETCH_SFML=ON or install it to build the demo)")
+    return()
 endif()
 
-find_package(SFML 2.6 COMPONENTS graphics window system audio REQUIRED)
+if(NOT TARGET sif_sfml)
+    message(FATAL_ERROR
+            "sif: SIF_BUILD_DEMO_APP is ON but sif_sfml is not - the demo needs the "
+            "reference backend. Enable it with -DSIF_BUILD_SFML_BACKEND=ON.")
+endif()
 
 set(SFML_SIF_DEMO_APP "sif_demo")
 
-set(SFML_SIF_DEMO_SRC
+add_executable(${SFML_SIF_DEMO_APP}
         main.cpp
         App.cpp
-        Graphics_Factory.cpp
         demos/DemoSupport.cpp
         demos/Demos.cpp
         demos/HeadlessCheck.cpp
-        headless/HeadlessBackend.cpp
-        sfml/SFMLAssetLoaders.cpp
-        sfml/SFML_AudioPlayer.cpp
-        sfml/SFML_Event_Collector.cpp
-        sfml/SFML_Renderer.cpp
 )
-
-add_executable(${SFML_SIF_DEMO_APP} ${SFML_SIF_DEMO_SRC})
 
 target_include_directories(${SFML_SIF_DEMO_APP} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-
-target_link_libraries(${SFML_SIF_DEMO_APP}
-        PRIVATE
-        sif_lib
-        sfml-graphics
-        sfml-window
-        sfml-system
-        sfml-audio
-)
+target_link_libraries(${SFML_SIF_DEMO_APP} PRIVATE sif_lib sif_sfml)

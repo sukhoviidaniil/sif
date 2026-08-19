@@ -18,7 +18,7 @@
 #include "sfml/SFML_Event_Collector.h"
 #include "sfml/SFML_Renderer.h"
 
-namespace app {
+namespace sif::backend {
     using namespace sif;
 
     Graphics_Factory & Graphics_Factory::instance() {

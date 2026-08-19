@@ -8,60 +8,120 @@ an XML-driven UI layout engine, a retained-free render pipeline and an audio
 interface — plus one SFML backend and one CPU-only (headless) backend that implement
 those interfaces.
 
-The engine itself links **no graphics or audio library**. Only the demo application
-under `app/` knows SFML exists, which is what makes `-DSIF_BUILD_DEMO_APP=OFF` a
-complete, testable build on a machine with no graphics stack at all.
+The engine itself links **no graphics or audio library**. `sif_lib` is the only target
+built unconditionally; every SFML-consuming target (the reference backend, the asset
+tools, the demo) is opt-in and finds SFML for itself, lazily, only when actually enabled.
 
 ---
 
 ## Layout
 
+Every target sif defines lives under one of two top-level folders — the way SFML's own
+repository keeps `sfml-system`, `sfml-window`, `sfml-graphics`, `sfml-audio` and
+`sfml-network` together under `src/SFML/` regardless of which one you're building:
+
 ```
-sif/            the engine (no SFML anywhere)
+sif/                     everything that IS sif
   include/sif/
-    asset/      AssetRegistry, AssetRecord, AssetHandle, per-type asset interfaces
-    audio/      AudioPlayer interface
-    diagnostics/Logger, include-cycle analysis (PlantUML export)
-    event/      Event_Bus, Observer, Event_Store, event definitions
-    internal/   GUID, RecordID, Rect, Color, Size, Random, Delta_Timer
-    io/         JSON helpers
-    layout_engine/  Tokenizer -> Parser -> UIFactory -> UIElement tree
-    math/       Vector, Matrix, Vector2, Point2, DirectedGraph
-    render/     RenderFrame, RenderNode visitor tree, Renderer interface,
-                Camera (normalized world [-1,1] -> pixels), RB_Config
-  src/          implementations
-  test/         self-registering test suite (no external framework)
+    asset/                AssetRegistry, AssetRecord, AssetHandle, per-type asset interfaces
+    audio/                AudioPlayer interface
+    diagnostics/          Logger, include-cycle analysis (PlantUML export)
+    event/                Event_Bus, Observer, Event_Store, event definitions
+    internal/             GUID, RecordID, Rect, Color, Size, Random, Delta_Timer
+    io/                   JSON helpers
+    layout_engine/        Tokenizer -> Parser -> UIFactory -> UIElement tree
+    math/                 Vector, Matrix, Vector2, Point2, DirectedGraph
+    render/               RenderFrame, RenderNode visitor tree, Renderer interface,
+                          Camera (normalized world [-1,1] -> pixels), RB_Config
+  src/                    implementations
+  test/                   self-registering test suite (no external framework, target sif_tests)
+  tools/                  sif_sprite_packer (needs SFML for image I/O; Asset_GUID_Assignment
+                          and Asset_Reference_Serialization live in sif/ itself - no SFML)
+  backends/               sif_sfml: the reference SFML backend (renderer, audio player,
+                          event collector, one asset loader per asset type) plus the
+                          CPU-only headless variant and the Graphics_Factory that
+                          switches between them by ast::RB_Type
 
-app/            demo application (the only SFML consumer)
-  sfml/         SFML backend: renderer, audio player, event collector, asset loaders
-  headless/     CPU-only backend: decodes assets, draws nothing, opens no device
-  demos/        four windowed demos + the headless verification run
+app/                      sif_demo - a *consumer* of sif, not part of it (like an
+                          "examples/" folder in most libraries): four windowed demos
+                          plus the headless verification run, linking sif_sfml
 
-data/           assets, asset descriptors, authoring scenes and serialized scenes
-uml/            PlantUML diagrams of the subsystems
+cmake/GetSFML.cmake       finds/fetches SFML 2.6 for sif's own targets only (see below)
+data/                     assets, asset descriptors, authoring scenes and serialized scenes
+uml/                      PlantUML diagrams of the subsystems
 ```
+
+All of it also lands in one place at *build* time: `CMAKE_ARCHIVE_OUTPUT_DIRECTORY`,
+`CMAKE_LIBRARY_OUTPUT_DIRECTORY` and `CMAKE_RUNTIME_OUTPUT_DIRECTORY` are set once, in the
+root `CMakeLists.txt`, so every library ends up in `build/lib/` and every executable in
+`build/bin/` regardless of which source subdirectory produced it — again exactly how
+building SFML gives you one `lib/` folder, not one per `src/SFML/*` subdirectory.
 
 ---
 
 ## Building
 
-Requirements: CMake ≥ 3.20, a C++20 compiler, `nlohmann/json` at `external/json/json.hpp`,
-and (for the demo application only) SFML 2.6 with the `audio` component.
+Requirements: CMake ≥ 3.20, a C++20 compiler, `nlohmann/json` at `external/json/json.hpp`.
+SFML 2.6 is needed only for the targets that ask for it (see below) and, if none of them
+are enabled, is never searched for at all.
 
 Verified on the reference platform: **Ubuntu 24.04, GCC 13, SFML 2.6.1, CMake 3.28**.
 
 ```bash
-# engine + tests only — no SFML required
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DSIF_BUILD_DEMO_APP=OFF
+# engine + tests only - no SFML search happens at all
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
+    -DSIF_BUILD_TOOLS=OFF -DSIF_BUILD_SFML_BACKEND=OFF -DSIF_BUILD_DEMO_APP=OFF
 cmake --build build -j
-./build/sif/test/sif_tests
+./build/bin/sif_tests
 
-# everything, including the demo application
+# the usual case: engine + asset tools + the reference backend (sif_sfml) - what a
+# consumer like a game built on sif actually needs; still no demo window
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j
+
+# everything, including the demo application
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DSIF_BUILD_DEMO_APP=ON
+cmake --build build -j
+./build/bin/sif_demo headless data/
 ```
 
 The build is warning-clean under `-Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion`.
+
+### What gets built, and how it finds SFML
+
+| Option | Default | What it controls | If SFML can't be found/fetched |
+|---|---|---|---|
+| `SIF_BUILD_TOOLS` | `ON` | `Asset_GUID_Assignment`, `Asset_Reference_Serialization` (no SFML), `sif_sprite_packer` (needs SFML) | `sif_sprite_packer` is skipped with a `STATUS` message; the other two are unaffected |
+| `SIF_BUILD_SFML_BACKEND` | `ON` | `sif_sfml` - the reference backend a consumer actually links against | configure fails with `FATAL_ERROR` and a clear message - this target is not optional once requested |
+| `SIF_BUILD_DEMO_APP` | `OFF` | `sif_demo` | skipped with a `STATUS` message |
+
+Enabling none of the three means `cmake/GetSFML.cmake` is never even `include()`-d - a pure
+engine build touches no graphics library, searches for none, and fetches none.
+
+### Consuming sif from another project (e.g. via `FetchContent`)
+
+A project that only wants `sif_sfml` needs nothing beyond `FetchContent_MakeAvailable(sif)`
+and `target_link_libraries(your_target PRIVATE sif_sfml)` - SFML comes along transitively.
+**No SFML target has to be prepared or passed in beforehand**: sif finds or fetches its own,
+using only sif-prefixed inputs (`SIF_SFML_DIR`, not the generic `SFML_DIR`) and a directory
+search that never consults `CMAKE_PREFIX_PATH` or environment variables a consumer might have
+set for an unrelated purpose.
+
+That isolation is deliberately two-way and holds even when the *same* configure also searches
+for a different SFML version for the consumer's own, separate use (SFML 2 for sif's backend,
+SFML 3 for the consumer's own code, say) — verified directly: a sibling project with its own
+`find_package(SFML 3...)` and sif's own search were run in the same configure, with the
+generic `SFML_DIR` cache variable already pointing at the 3.x install; sif still resolved its
+own 2.6.1 correctly, and the sibling's `SFML_DIR` cache entry came out the other side
+untouched. The one thing this cannot cover — CMake's own limitation, not a gap left
+unfixed — is if the *consumer's own* search runs at a CMake scope that is an **ancestor** of
+sif's (e.g. the consumer's own root `CMakeLists.txt`, before it fetches sif): a target named
+`sfml-graphics` created there is then visible to sif's search the same way it is to
+everything else the consumer's root goes on to configure, and sif's own module detects this
+specific situation and prints a `WARNING` naming it rather than silently linking against a
+possibly-incompatible version. Keeping a consumer's own SFML search inside one of its own
+subdirectories (a sibling of wherever it fetches sif, not its root) avoids this entirely, and
+is the pattern used by the Bomberman project this engine was built alongside.
 
 ---
 
@@ -72,10 +132,10 @@ Two command-line tools turn those into what the runtime consumes:
 
 ```bash
 # 1. scan data/, assign/collect GUIDs, write the registry
-./build/sif/Asset_GUID_Assignment data/ data/bin/registry.rgst.json
+./build/bin/Asset_GUID_Assignment data/ data/bin/registry.rgst.json
 
 # 2. rewrite authoring scenes (asset_name="...") into serialized ones (guid="...")
-./build/sif/Asset_Reference_Serialization data/bin/registry.rgst.json data/scenes data/bin/scenes
+./build/bin/Asset_Reference_Serialization data/bin/registry.rgst.json data/scenes data/bin/scenes
 ```
 
 Authoring files stay human-readable (`asset_name="DemoBall"`); the runtime only ever sees
@@ -84,14 +144,18 @@ stable numeric GUIDs, so renaming an asset cannot silently break a scene.
 Supported asset types: `Font`, `SpriteSingle`, `SpriteAtlas`, `SpriteGrid`,
 `PrimitiveAnimation`, `Sound`.
 
+If per-frame artwork needs packing into strips (`PrimitiveAnimation` addresses frames as
+rectangles inside one texture), `sif_sprite_packer` does that from a small JSON description -
+see `sif/tools/Sprite_Packer.cpp` for the format.
+
 ---
 
 ## Running the demos
 
-From the build directory:
+Requires `-DSIF_BUILD_DEMO_APP=ON` (see above; off by default).
 
 ```bash
-./app/sif_demo <demo-id> [data-dir]     # data-dir defaults to ../data/
+./build/bin/sif_demo <demo-id> [data-dir]     # data-dir defaults to ../data/
 ```
 
 | id | what it shows |
@@ -112,7 +176,7 @@ From the build directory:
 in any `*Tests.cpp`, with nothing to wire up elsewhere.
 
 ```bash
-./build/sif/test/sif_tests
+./build/bin/sif_tests
 ```
 
 Covered: asset registry queueing/concurrency/stale-attempt handling, `Rect` arithmetic,
@@ -137,5 +201,7 @@ both: world content goes through `Camera`, UI content does not.
 
 ## CI
 
-`.circleci/config.yml` runs two jobs: one builds and tests the engine **without SFML
-installed**, the other builds everything and runs the headless asset verification.
+`.circleci/config.yml` runs two jobs: one builds and tests the engine with every
+SFML-consuming target explicitly disabled (**no SFML installed at all** on that machine),
+the other installs SFML, builds everything including the opt-in demo, and runs the
+headless asset + animation + sound verification.

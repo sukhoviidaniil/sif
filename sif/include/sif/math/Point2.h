@@ -23,8 +23,17 @@ namespace sif::math {
 
         /**
          * @brief Default constructor initializing point to (0, 0).
+         *
+         * Defined right here rather than out-of-line: a constexpr
+         * function has to be defined in every translation unit that
+         * uses it, and a definition living in a .cpp is only visible to
+         * that one .cpp. Every other translation unit still declares it
+         * constexpr and then never sees a body for it, which used to
+         * produce a "used but never defined" warning in each of them
+         * and made `Point2{}` unusable in a constant expression anywhere
+         * outside Point2.cpp.
          */
-        [[nodiscard]] constexpr Point2();
+        [[nodiscard]] constexpr Point2() = default;
 
         /**
          * @brief Constructs a point with specified coordinates.

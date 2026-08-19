@@ -1,7 +1,4 @@
 /***************************************************************
- * Project:       Render_Engine (SFML backend)
- * File:          SFML_Renderer.h
- *
  * Author:        Sukhovii Daniil
  * Email:         sukhovii.daniil@gmail.com
  * Created:       2025-12-06
