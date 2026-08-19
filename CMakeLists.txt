@@ -36,9 +36,13 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 # outermost project's root, which - once sif is fetched as a subproject -
 # is the *consumer's* source tree, not sif's own. That mismatch used to
 # make sif look for nlohmann/json inside whichever project embedded it,
-# rather than in its own external/json/.
-set(JSON_DIR "${PROJECT_SOURCE_DIR}/external/json")
-message(STATUS "nlohmann/json include dir: ${JSON_DIR}")
+# rather than in its own external/json/ - and that directory used to have
+# to be populated by hand (or by a consumer's own workaround) before this
+# file could do anything with it. cmake/GetJSON.cmake now gets it itself,
+# fetching the header from its own upstream release the first time nothing
+# is found there, so a fresh clone with nothing but this repository builds
+# on its own.
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/GetJSON.cmake")
 
 # ---------------------------------------------------------------------------
 # What gets built, and how eagerly each of them reaches for SFML.

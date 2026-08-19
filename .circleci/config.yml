@@ -36,14 +36,14 @@ jobs:
           command: |
             apt-get update -qq
             DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \
-              build-essential cmake git nlohmann-json3-dev
-      - run:
-          name: Provide nlohmann/json where the build expects it
-          command: |
-            mkdir -p external/json
-            cp /usr/include/nlohmann/json.hpp external/json/json.hpp
+              build-essential cmake git ca-certificates
       - run:
           name: Configure (engine only - no SFML-consuming target enabled)
+          # nlohmann/json is not staged by hand here: cmake/GetJSON.cmake
+          # fetches it itself on first configure (verified against a
+          # pinned SHA-256), and this job is what actually exercises that
+          # path continuously rather than only when someone remembers to
+          # test it by hand.
           command: |
             cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
               -DSIF_BUILD_TOOLS=OFF -DSIF_BUILD_SFML_BACKEND=OFF -DSIF_BUILD_DEMO_APP=OFF
@@ -64,12 +64,7 @@ jobs:
           command: |
             apt-get update -qq
             DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \
-              build-essential cmake git libsfml-dev nlohmann-json3-dev
-      - run:
-          name: Provide nlohmann/json where the build expects it
-          command: |
-            mkdir -p external/json
-            cp /usr/include/nlohmann/json.hpp external/json/json.hpp
+              build-essential cmake git ca-certificates libsfml-dev
       - run:
           name: Configure (engine + tools + backend + demo)
           command: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DSIF_BUILD_DEMO_APP=ON

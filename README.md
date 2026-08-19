@@ -61,9 +61,18 @@ building SFML gives you one `lib/` folder, not one per `src/SFML/*` subdirectory
 
 ## Building
 
-Requirements: CMake ≥ 3.20, a C++20 compiler, `nlohmann/json` at `external/json/json.hpp`.
-SFML 2.6 is needed only for the targets that ask for it (see below) and, if none of them
-are enabled, is never searched for at all.
+Requirements: CMake ≥ 3.20, a C++20 compiler, and network access on the *first* configure
+only. `nlohmann/json` is not something you provide: `cmake/GetJSON.cmake` fetches the
+single header itself, straight from nlohmann/json's own GitHub release assets, verified
+against a pinned SHA-256, the first time `external/json/json.hpp` is not already there —
+after that first configure it is reused with no further network access. SFML 2.6 is needed
+only for the targets that ask for it (see below) and, if none of them are enabled, is never
+searched for at all.
+
+If you already have a copy (vendored, or from a package manager) you would rather use
+instead of fetching one, either drop it at `external/json/json.hpp` yourself, or point at
+it with `-DSIF_JSON_SOURCE=/path/to/json.hpp` (skips both the download and the hash check —
+it is your copy at that point).
 
 Verified on the reference platform: **Ubuntu 24.04, GCC 13, SFML 2.6.1, CMake 3.28**.
 
