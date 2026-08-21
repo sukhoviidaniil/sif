@@ -2,9 +2,9 @@
 
 **Author:** Daniil Sukhovii
 **Student number:** s0240228
-**Repository:** ADD_GITHUB_LINK_HERE
+**Repository:** [click](https://github.com/sukhoviidaniil/sif)
 
-Used by [Bomberman](ADD_GITHUB_LINK_HERE) (Advanced Programming 2025-2026), fetched
+Used by [Bomberman](https://github.com/sukhoviidaniil/Bomberman_2025_2026) (Advanced Programming 2025-2026), fetched
 automatically at configure time - see that repository for the game itself.
 
 A backend-agnostic C++20 engine: an asset system (loading, queueing, hot references),
