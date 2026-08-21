@@ -137,6 +137,7 @@ function(sif_find_sfml2_dir out_dir out_rejected)
             "$ENV{HOME}/SFML*/lib/cmake/SFML"
             "/usr/lib/cmake/SFML"
             "/usr/lib/*/cmake/SFML"
+            "/opt/sfml2/lib/cmake/SFML"
     )
     list(APPEND candidates ${system_candidates})
     list(REMOVE_DUPLICATES candidates)

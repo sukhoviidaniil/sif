@@ -22,6 +22,8 @@ set(SIF_TEST_SRC
     CameraTests.cpp
     RegistryNamingTests.cpp
     RandomTests.cpp
+    AssetLifetimeTests.cpp
+    AssetThreadingTests.cpp
 )
 
 add_executable(sif_tests ${SIF_TEST_SRC})

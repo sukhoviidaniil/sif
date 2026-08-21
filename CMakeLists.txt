@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # We force the compiler to disable all extensions and strictly follow the standard
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_compile_options(-Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion)
+add_compile_options(-Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Werror)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-D_DEBUG)
@@ -78,7 +78,7 @@ option(SIF_BUILD_SFML_BACKEND "Build the sif_sfml reference backend" ON)
 # if SFML cannot be found or fetched rather than failing the whole configure
 # - building the demo is a request for a nice-to-have reference program, not
 # a precondition for anything else in this repository.
-option(SIF_BUILD_DEMO_APP "Build the SFML demo application" OFF)
+option(SIF_BUILD_DEMO_APP "Build the SFML demo application" ON)
 
 # Included exactly once, here, rather than separately from sif/tools,
 # sif/backends and app/. SFML's own Config-mode package files declare their

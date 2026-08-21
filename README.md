@@ -2,6 +2,10 @@
 
 **Author:** Daniil Sukhovii
 **Student number:** s0240228
+**Repository:** ADD_GITHUB_LINK_HERE
+
+Used by [Bomberman](ADD_GITHUB_LINK_HERE) (Advanced Programming 2025-2026), fetched
+automatically at configure time - see that repository for the game itself.
 
 A backend-agnostic C++20 engine: an asset system (loading, queueing, hot references),
 an XML-driven UI layout engine, a retained-free render pipeline and an audio
