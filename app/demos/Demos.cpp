@@ -271,6 +271,7 @@ namespace app::demo {
             pulse_ = ctx.root.find_by_name<ui::Sprite>("pulse");
             thud_ = request_sound("DemoThud");
             blip_ = request_sound("DemoBlip");
+            chime_ = request_sound("DemoChime");
 
             for (int i = 0; i < 8; ++i) {
                 tiles_.push_back(ctx.root.find_by_name<ui::Sprite>("t" + std::to_string(i)));
@@ -328,7 +329,13 @@ namespace app::demo {
                     break;
                 case Key::Num1: ctx.audio.play(blip_, 0.9f, false); break;
                 case Key::Num2: ctx.audio.play(thud_, 0.9f, false); break;
-                case Key::Num3: ctx.audio.stop_all(); break;
+                // Was ctx.audio.stop_all() - the on-screen hint promises
+                // "1/2/3 - play a sound manually", matching SoundDemo's own
+                // three-key pattern (blip/chime/thud), but this demo only
+                // ever loaded two sounds, so pressing 3 silently stopped
+                // everything instead of playing anything. DemoChime is the
+                // third sound SoundDemo already uses for exactly this slot.
+                case Key::Num3: ctx.audio.play(chime_, 0.7f, false); break;
                 default: break;
             }
         }
@@ -339,6 +346,7 @@ namespace app::demo {
         std::vector<ui::Sprite*> tiles_;
         asset::AssetHandle<asset::Sound> thud_;
         asset::AssetHandle<asset::Sound> blip_;
+        asset::AssetHandle<asset::Sound> chime_;
         size_t last_frame_ = 0;
         unsigned int loops_ = 0;
     };
