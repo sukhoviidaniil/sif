@@ -112,6 +112,16 @@ namespace app {
             const float delta = intrnl::Delta_Timer::instance().tick();
             total_seconds_ += delta;
 
+            // Runs the asset loads that must not happen on a worker thread -
+            // every SFML loader (fonts, sprites, sounds), because OpenGL and
+            // OpenAL both race with the main thread if touched from
+            // anywhere else. Without this call those loads sit queued
+            // forever: they never reach Ready, so every asset-backed
+            // element quietly skips drawing itself and the window shows
+            // nothing but the clear colour - which is exactly the "black
+            // demo" symptom this fixes.
+            asset::AssetRegistry::instance().pump();
+
             demo::Context ctx{*root_, *audio_, total_seconds_};
 
             // 1. Time-based state: animation cursors, button
