@@ -1,22 +1,22 @@
 /***************************************************************
-* Project:          Render_Engine
-* File:             Events.h
-*
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2025-12-17
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Project:          Render_Engine
+ * File:             Events.h
+ *
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2025-12-17
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_EVENTS_H
 #define RENDER_ENGINE_EVENTS_H
 
 #include <cstdint>
+#include <memory>
 #include <typeindex>
 #include <utility>
-#include <memory>
 
 namespace sif::event {
     /**
@@ -26,13 +26,12 @@ namespace sif::event {
      * (input, window system, game logic, etc.).
      */
     enum class EventMask : std::uint32_t {
-        None   = 0,        // 0000
-        Input  = 1 << 0,   // 0001
-        Window = 1 << 1,   // 0010
-        System = 1 << 2,   // 0100
-        Program= 1 << 3,   // 1000
+        None = 0,         // 0000
+        Input = 1 << 0,   // 0001
+        Window = 1 << 1,  // 0010
+        System = 1 << 2,  // 0100
+        Program = 1 << 3, // 1000
     };
-
 
     /**
      * @brief Bitwise AND operator for EventMask.
@@ -49,9 +48,7 @@ namespace sif::event {
      * Allows combining multiple event categories.
      */
     inline EventMask operator|(EventMask a, EventMask b) {
-        return static_cast<EventMask>(
-            static_cast<uint32_t>(a) | static_cast<uint32_t>(b)
-        );
+        return static_cast<EventMask>(static_cast<uint32_t>(a) | static_cast<uint32_t>(b));
     }
 
     /**
@@ -107,7 +104,7 @@ namespace sif::event {
     template<typename Event>
     class EventInstance final : public EventConcept {
     public:
-        Event value;  ///< Stored event value
+        Event value; ///< Stored event value
 
         /**
          * @brief Constructs an event instance.
@@ -119,22 +116,17 @@ namespace sif::event {
         /**
          * @brief Returns the event mask defined by the event type.
          */
-        [[nodiscard]] EventMask mask() const override {
-            return Event::mask;
-        }
+        [[nodiscard]] EventMask mask() const override { return Event::mask; }
 
         /**
          * @brief Returns the runtime type of the stored event.
          */
-        [[nodiscard]] std::type_index type() const override {
-            return typeid(Event);
-        }
+        [[nodiscard]] std::type_index type() const override { return typeid(Event); }
 
         /**
          * @brief Returns a pointer to the stored event value.
          */
         [[nodiscard]] const void* data() const override { return &value; }
-
 
         /**
          * @brief Creates a copy of this event instance.
@@ -143,6 +135,6 @@ namespace sif::event {
             return std::make_unique<EventInstance<Event>>(value);
         }
     };
-}
+} // namespace sif::event
 
-#endif //RENDER_ENGINE_EVENTS_H
+#endif // RENDER_ENGINE_EVENTS_H

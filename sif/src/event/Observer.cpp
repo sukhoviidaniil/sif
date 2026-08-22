@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-02-01
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-02-01
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #include "sif/event/Observer.h"
 
 namespace sif::event {
@@ -26,4 +26,4 @@ namespace sif::event {
         }
         subs_.clear();
     }
-}
+} // namespace sif::event

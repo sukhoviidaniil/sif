@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-01-13
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-01-13
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_ASSETREGISTRY_H
 #define RENDER_ENGINE_ASSETREGISTRY_H
 
@@ -16,12 +16,11 @@
 #include <queue>
 #include <unordered_map>
 
+#include "AssetHandle.h"
 #include "internal/AssetRecord.h"
 #include "internal/AssetType.h"
-#include "sif/internal/RecordID.h"
 #include "internal/IAssetLoader.h"
-#include "AssetHandle.h"
-
+#include "sif/internal/RecordID.h"
 
 namespace sif::asset {
     /**
@@ -43,7 +42,7 @@ namespace sif::asset {
      * non-critical ones. As soon as a load finishes (successfully or
      * not), the next queued request (if any) is started.
      */
-    class AssetRegistry{
+    class AssetRegistry {
     public:
         static AssetRegistry& instance();
 
@@ -70,10 +69,7 @@ namespace sif::asset {
          */
         [[nodiscard]] size_t max_concurrent_loads() const;
 
-        void register_loader(
-            asset::AssetType type,
-            std::unique_ptr<asset::IAssetLoader> loader
-            );
+        void register_loader(asset::AssetType type, std::unique_ptr<asset::IAssetLoader> loader);
 
         void add_AssetRecord(asset::AssetDesc desc);
         void add_AssetRecord(const asset::AssetRecord& other);
@@ -178,17 +174,9 @@ namespace sif::asset {
 
         std::string asset_dir;
 
-        std::unordered_map<
-            intrnl::GUID,
-            std::shared_ptr<asset::AssetRecord>,
-            intrnl::GUIDHash
-        >
-        by_guid_;
+        std::unordered_map<intrnl::GUID, std::shared_ptr<asset::AssetRecord>, intrnl::GUIDHash> by_guid_;
 
-        std::unordered_map<
-            asset::AssetType,
-            std::unique_ptr<asset::IAssetLoader>
-        > loaders_;
+        std::unordered_map<asset::AssetType, std::unique_ptr<asset::IAssetLoader>> loaders_;
 
         // ========== Load queue / concurrency control ==========
 
@@ -206,16 +194,16 @@ namespace sif::asset {
          */
         mutable std::mutex mtx_;
         std::queue<intrnl::GUID> critical_queue_; ///< Critical assets waiting for a free load slot
-        std::queue<intrnl::GUID> normal_queue_;  ///< Non-critical assets waiting for a free load slot
+        std::queue<intrnl::GUID> normal_queue_;   ///< Non-critical assets waiting for a free load slot
 
         /// Loads that pump() must run; see IAssetLoader::runs_on_main_thread.
         std::queue<intrnl::GUID> main_thread_queue_;
-        size_t active_loads_ = 0; ///< Number of loads currently in flight
-        size_t max_concurrent_loads_ = 2; ///< Configurable cap on simultaneous loads
+        size_t active_loads_ = 0;                 ///< Number of loads currently in flight
+        size_t max_concurrent_loads_ = 2;         ///< Configurable cap on simultaneous loads
         mutable std::condition_variable idle_cv_; ///< Signalled whenever a load finishes
     };
-}
+} // namespace sif::asset
 
 #include "AssetRegistry.inl"
 
-#endif //RENDER_ENGINE_ASSETREGISTRY_H
+#endif // RENDER_ENGINE_ASSETREGISTRY_H

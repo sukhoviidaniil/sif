@@ -1,15 +1,15 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-02-08
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-02-08
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 
-#include <stdexcept>
 #include "sif/internal/Size.h"
+#include <stdexcept>
 
 namespace sif::intrnl {
     Size Size::auto_() {
@@ -27,10 +27,7 @@ namespace sif::intrnl {
         return {Type::Percent, v};
     }
 
-    Size::Size(const Type t, const float v)
-        :type(t), value(v) {
-
-    }
+    Size::Size(const Type t, const float v) : type(t), value(v) {}
 
     Size::Size(std::string_view str) {
         const auto sep = str.find('|');
@@ -38,7 +35,7 @@ namespace sif::intrnl {
             throw std::invalid_argument("Size: invalid format");
         }
 
-        const auto type_sv  = str.substr(0, sep);
+        const auto type_sv = str.substr(0, sep);
         const auto value_sv = str.substr(sep + 1);
 
         if (type_sv == "AUTO") {
@@ -65,4 +62,4 @@ namespace sif::intrnl {
             throw std::invalid_argument("Size: unknown type");
         }
     }
-}
+} // namespace sif::intrnl

@@ -1,24 +1,23 @@
 /***************************************************************
-* Author:           <your name>
-* Email:            <your email>
-* Created:          2026-07-06
-*
-* License:
-*       (c) 2026 <your name>. All rights reserved.
-***************************************************************/
+ * Author:           <your name>
+ * Email:            <your email>
+ * Created:          2026-07-06
+ *
+ * License:
+ *       (c) 2026 <your name>. All rights reserved.
+ ***************************************************************/
 #ifndef DECLARATION_GRAPH_BUILDER_H
 #define DECLARATION_GRAPH_BUILDER_H
 
+#include "sif/math/Graph.h"
 #include <string>
 #include <unordered_map>
-#include "sif/math/Graph.h"
 
 namespace sif::diag {
     /**
      * @brief Result of scanning a project folder for classes/structs and includes.
      */
-    struct DeclarationGraphResult
-    {
+    struct DeclarationGraphResult {
         /**
          * @brief Vertex data is the class/struct name; an edge A -> B means
          * A's declaring file includes B's declaring file.
@@ -53,7 +52,6 @@ namespace sif::diag {
      * @param folderPath Root folder of the project to scan.
      */
     DeclarationGraphResult buildDeclarationGraph(const std::string& folderPath);
-}
-
+} // namespace sif::diag
 
 #endif // DECLARATION_GRAPH_BUILDER_H

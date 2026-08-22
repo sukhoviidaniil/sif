@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2025-12-20
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2025-12-20
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #include "sif/event/Event_Store.h"
 
 namespace sif::event {
@@ -54,4 +54,4 @@ namespace sif::event {
     bool Event_Store::matches(const std::size_t i, const EventMask mask) const {
         return static_cast<bool>(events_[i]->mask() & mask);
     }
-}
+} // namespace sif::event

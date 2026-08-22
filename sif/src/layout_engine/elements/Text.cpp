@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-01-12
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-01-12
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 
 #include "sif/layout_engine/elements/Text.h"
 #include "sif/render/elements/Text.h"
@@ -15,7 +15,7 @@
 
 namespace sif::ui {
 
-    math::Vector2 Text::measure(const math::Vector2 &available)  {
+    math::Vector2 Text::measure(const math::Vector2& available) {
         if (!font.ready() || text.empty()) {
             return {0.f, 0.f};
         }
@@ -38,13 +38,14 @@ namespace sif::ui {
         return measured;
     }
 
-    void Text::append_render_items(rnd::RenderFrame &frame, const rnd::FrameContext & /*ctx*/) const {
-        if (!font.ready() || text.empty()) return;
+    void Text::append_render_items(rnd::RenderFrame& frame, const rnd::FrameContext& /*ctx*/) const {
+        if (!font.ready() || text.empty())
+            return;
         std::unique_ptr<rnd::Text> item = std::make_unique<rnd::Text>();
 
         item->rect = result.rect;
         item->font = font;
-        item->text  = text;
+        item->text = text;
         item->size = fontSize;
         item->color = color;
         // temp_items, not constant_items: the two buckets are a *caching*
@@ -56,4 +57,4 @@ namespace sif::ui {
         // one bucket, so draw order is submission order.
         frame.temp_items.push_back(std::move(item));
     }
-}
+} // namespace sif::ui

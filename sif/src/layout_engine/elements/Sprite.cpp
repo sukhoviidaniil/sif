@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-01-12
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-01-12
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 
 #include "sif/layout_engine/elements/Sprite.h"
 
@@ -17,15 +17,10 @@
 #include <algorithm>
 
 namespace sif::ui {
-    Sprite::Sprite(asset::AssetHandle<void> handle,
-                   const asset::AssetType kind,
-                   const intrnl::RecordID record_id)
-        : asset_(std::move(handle))
-        , kind_(kind)
-        , record_id_(record_id) {
-    }
+    Sprite::Sprite(asset::AssetHandle<void> handle, const asset::AssetType kind, const intrnl::RecordID record_id)
+        : asset_(std::move(handle)), kind_(kind), record_id_(record_id) {}
 
-    math::Vector2 Sprite::measure(const math::Vector2 &available) {
+    math::Vector2 Sprite::measure(const math::Vector2& available) {
         // Auto keeps the old behaviour (fill whatever the parent gives
         // us); PX/PERCENT are honoured through the shared resolver, so
         // a width/height set from XML is no longer silently ignored.
@@ -37,7 +32,7 @@ namespace sif::ui {
         return size;
     }
 
-    void Sprite::append_render_items(rnd::RenderFrame &frame, const rnd::FrameContext & /*ctx*/) const {
+    void Sprite::append_render_items(rnd::RenderFrame& frame, const rnd::FrameContext& /*ctx*/) const {
         if (!visible || !asset_.ready()) {
             return;
         }
@@ -66,26 +61,26 @@ namespace sif::ui {
 
     intrnl::Rect Sprite::resolve_src_rect() const {
         switch (kind_) {
-            case asset::AssetType::SpriteAtlas: {
-                const auto* atlas = static_cast<const asset::SpriteAtlas*>(asset_.get());
-                if (atlas == nullptr || record_id_.id >= atlas->count()) {
-                    return {};
-                }
-                return atlas->rect(record_id_);
-            }
-            case asset::AssetType::SpriteGrid: {
-                const auto* grid = static_cast<const asset::SpriteGrid*>(asset_.get());
-                if (grid == nullptr || grid->cols() == 0) {
-                    return {};
-                }
-                if (record_id_.id >= grid->rows() * grid->cols()) {
-                    return {};
-                }
-                return grid->cell(record_id_);
-            }
-            default:
-                // SpriteSingle (and anything unexpected): whole texture.
+        case asset::AssetType::SpriteAtlas: {
+            const auto* atlas = static_cast<const asset::SpriteAtlas*>(asset_.get());
+            if (atlas == nullptr || record_id_.id >= atlas->count()) {
                 return {};
+            }
+            return atlas->rect(record_id_);
+        }
+        case asset::AssetType::SpriteGrid: {
+            const auto* grid = static_cast<const asset::SpriteGrid*>(asset_.get());
+            if (grid == nullptr || grid->cols() == 0) {
+                return {};
+            }
+            if (record_id_.id >= grid->rows() * grid->cols()) {
+                return {};
+            }
+            return grid->cell(record_id_);
+        }
+        default:
+            // SpriteSingle (and anything unexpected): whole texture.
+            return {};
         }
     }
-}
+} // namespace sif::ui

@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2025-12-19
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2025-12-19
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_UIELEMENT_H
 #define RENDER_ENGINE_UIELEMENT_H
 
@@ -14,10 +14,10 @@
 #include <memory>
 #include <string>
 
-#include "sif/math/Vector2.h"
-#include "sif/internal/Size.h"
-#include "sif/internal/Rect.h"
 #include "sif/internal/RecordID.h"
+#include "sif/internal/Rect.h"
+#include "sif/internal/Size.h"
+#include "sif/math/Vector2.h"
 
 #include "sif/layout_engine/internal/LayoutResult.h"
 #include "sif/render/FrameContext.h"
@@ -136,14 +136,14 @@ namespace sif::ui {
          */
         intrnl::RecordID id;
 
-        intrnl::Size width  = intrnl::Size::auto_(); ///< Width specification
+        intrnl::Size width = intrnl::Size::auto_();  ///< Width specification
         intrnl::Size height = intrnl::Size::auto_(); ///< Height specification
 
-        math::Vector2 min_size {0, 0};         ///< Minimum allowed size
-        math::Vector2 max_size {1e9f, 1e9f};   ///< Maximum allowed size
+        math::Vector2 min_size{0, 0};       ///< Minimum allowed size
+        math::Vector2 max_size{1e9f, 1e9f}; ///< Maximum allowed size
 
-        math::Vector2 margin  {0, 0}; ///< External spacing
-        math::Vector2 padding {0, 0}; ///< Internal spacing
+        math::Vector2 margin{0, 0};  ///< External spacing
+        math::Vector2 padding{0, 0}; ///< Internal spacing
 
         float flex = 0.f; ///< Flex grow factor (0 = fixed, >0 = expandable)
 
@@ -153,8 +153,8 @@ namespace sif::ui {
 
         /// @brief Child elements in the layout tree.
         std::vector<std::unique_ptr<UIElement>> children;
-    protected:
 
+    protected:
         /**
          * @brief Resolves the final size based on available space.
          *
@@ -164,7 +164,7 @@ namespace sif::ui {
          * @param available Available space from the parent.
          * @return Resolved size.
          */
-        [[nodiscard]] math::Vector2 resolve_size(const math::Vector2 &available) const;
+        [[nodiscard]] math::Vector2 resolve_size(const math::Vector2& available) const;
 
     private:
         /**
@@ -188,6 +188,6 @@ namespace sif::ui {
         UIElement* found = find_if([&](const UIElement& e) { return e.id == target_id; });
         return dynamic_cast<T*>(found);
     }
-}
+} // namespace sif::ui
 
-#endif //RENDER_ENGINE_UIELEMENT_H
+#endif // RENDER_ENGINE_UIELEMENT_H

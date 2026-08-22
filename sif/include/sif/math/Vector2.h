@@ -1,15 +1,15 @@
 /***************************************************************
-* Project:          Render_Engine
-* File:             Vector2.h
-*
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2025-10-23
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Project:          Render_Engine
+ * File:             Vector2.h
+ *
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2025-10-23
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_VECTOR2_H
 #define RENDER_ENGINE_VECTOR2_H
 
@@ -23,8 +23,8 @@ namespace sif::math {
      * Supports arithmetic, comparisons, geometric operations,
      * and conversion to Point2.
      */
-    struct  Vector2{
-        float x=0.0, y=0.0;
+    struct Vector2 {
+        float x = 0.0, y = 0.0;
 
         /**
          * @brief Default constructor initializes vector to (0, 0).
@@ -37,7 +37,7 @@ namespace sif::math {
          * @param x X-coordinate
          * @param y Y-coordinate
          */
-        [[nodiscard]] constexpr Vector2(const float in_x, const float in_y) : x(in_x), y(in_y){}
+        [[nodiscard]] constexpr Vector2(const float in_x, const float in_y) : x(in_x), y(in_y) {}
 
         /**
          * @brief Constructs a vector from a Point2.
@@ -130,7 +130,6 @@ namespace sif::math {
             return std::hash<int>{}(static_cast<int>(v.x)) ^ std::hash<int>{}(static_cast<int>(v.y)) << 1;
         }
     };
-}
+} // namespace sif::math
 
-#endif //RENDER_ENGINE_VECTOR2_H
-
+#endif // RENDER_ENGINE_VECTOR2_H

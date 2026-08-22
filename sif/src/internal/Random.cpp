@@ -1,25 +1,24 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-01-01
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-01-01
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 
 #include "sif/internal/Random.h"
 
 #include <algorithm>
 
 namespace sif::intrnl {
-    Random & Random::instance()  {
+    Random& Random::instance() {
         static Random inst;
         return inst;
     }
 
-    Random::Random() : engine_(std::random_device{}()) {
-    }
+    Random::Random() : engine_(std::random_device{}()) {}
 
     void Random::seed(const std::uint32_t value) {
         std::lock_guard lock(mtx_);
@@ -42,15 +41,13 @@ namespace sif::intrnl {
         // static_assert in next_int would fire for a perfectly ordinary
         // call.
         using Wide = unsigned long long;
-        return static_cast<std::size_t>(
-            next_int<Wide>(0, static_cast<Wide>(count) - 1));
+        return static_cast<std::size_t>(next_int<Wide>(0, static_cast<Wide>(count) - 1));
     }
 
-    float Random::next_float(const float min, const float max)  {
+    float Random::next_float(const float min, const float max) {
         if (max < min) {
-            throw std::invalid_argument(
-                "Random::next_float - empty range [" + std::to_string(min) +
-                ", " + std::to_string(max) + ")");
+            throw std::invalid_argument("Random::next_float - empty range [" + std::to_string(min) + ", " +
+                                        std::to_string(max) + ")");
         }
 
         std::uniform_real_distribution<float> dist(min, max);
@@ -59,7 +56,7 @@ namespace sif::intrnl {
         return dist(engine_);
     }
 
-    bool Random::chance(const float p)  {
+    bool Random::chance(const float p) {
         // Short-circuit the certain outcomes: it makes p <= 0 and p >= 1
         // exact instead of merely very likely, and it costs one branch.
         if (p <= 0.f) {
@@ -75,7 +72,7 @@ namespace sif::intrnl {
         return dist(engine_);
     }
 
-    Random::Engine & Random::engine() {
+    Random::Engine& Random::engine() {
         return engine_;
     }
-}
+} // namespace sif::intrnl

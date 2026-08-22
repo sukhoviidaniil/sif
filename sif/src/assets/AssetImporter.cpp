@@ -1,27 +1,27 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-01-16
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-01-16
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 
 #include "sif/asset/internal/AssetImporter.h"
-#include "sif/asset/internal/data/AssetDataLoader.h"
-#include "sif/asset/AssetRegistry.h"
-#include "sif/internal/from_JSON.h"
-#include "sif/diagnostics/Logger.h"
 #include "json.hpp"
+#include "sif/asset/AssetRegistry.h"
+#include "sif/asset/internal/data/AssetDataLoader.h"
+#include "sif/diagnostics/Logger.h"
+#include "sif/internal/from_JSON.h"
 
 #include <algorithm>
-#include <vector>
 #include <fstream>
+#include <vector>
 
 namespace sif::asset {
 
-    bool is_registry_filename(const std::string &filepath) {
+    bool is_registry_filename(const std::string& filepath) {
         const std::string name = std::filesystem::path(filepath).filename().string();
 
         // The suffix alone is not enough: ".rgst.json" has no <name>
@@ -30,12 +30,11 @@ namespace sif::asset {
         if (name.size() <= registry_extension.size()) {
             return false;
         }
-        return name.compare(name.size() - registry_extension.size(),
-                            registry_extension.size(),
-                            registry_extension) == 0;
+        return name.compare(name.size() - registry_extension.size(), registry_extension.size(), registry_extension) ==
+               0;
     }
 
-    std::string suggested_registry_filename(const std::string &filepath) {
+    std::string suggested_registry_filename(const std::string& filepath) {
         const std::filesystem::path path(filepath);
         std::string name = path.filename().string();
 
@@ -46,8 +45,7 @@ namespace sif::asset {
         // stem so the fallback below can name it, instead of being
         // treated as a hidden file and getting a second suffix glued on.
         const auto strip = [&name](const std::string_view suffix) {
-            if (name.size() >= suffix.size() &&
-                name.compare(name.size() - suffix.size(), suffix.size(), suffix) == 0) {
+            if (name.size() >= suffix.size() && name.compare(name.size() - suffix.size(), suffix.size(), suffix) == 0) {
                 name.erase(name.size() - suffix.size());
             }
         };
@@ -62,7 +60,6 @@ namespace sif::asset {
         const std::filesystem::path parent = path.parent_path();
         return parent.empty() ? name : (parent / name).generic_string();
     }
-
 
     AssetImporter& AssetImporter::instance() {
         static AssetImporter inst;
@@ -101,7 +98,6 @@ namespace sif::asset {
                 continue; // read only *.asset.json
             }
 
-
             auto data_node = data::AssetDataLoader::load_from_file(entry.path());
             if (data_node == nullptr) {
                 continue;
@@ -113,10 +109,7 @@ namespace sif::asset {
             // emits backslashes, which then get baked into the registry
             // file and cannot be opened again on Linux/macOS. '/' is
             // accepted by every platform we build on.
-            asset::AssetDesc desc(
-                rel_path.generic_string(),
-                data_node->meta
-                );
+            asset::AssetDesc desc(rel_path.generic_string(), data_node->meta);
 
             add(desc);
 
@@ -124,11 +117,10 @@ namespace sif::asset {
             ++found;
         }
 
-        LOG("AssetImporter: scanned " + dirpath + ", found " +
-            std::to_string(found) + " asset descriptor(s)");
+        LOG("AssetImporter: scanned " + dirpath + ", found " + std::to_string(found) + " asset descriptor(s)");
     }
 
-    void AssetImporter::save_in_file(const std::string &filepath) {
+    void AssetImporter::save_in_file(const std::string& filepath) {
         std::shared_lock lock(mtx_);
 
         // Sorted by asset name rather than emitted in unordered_map
@@ -155,21 +147,19 @@ namespace sif::asset {
             // Not fatal - an empty project is legal - but it is almost
             // always a wrong input path, and silence here is what makes
             // that take an hour to find.
-            LOG("AssetImporter: writing an EMPTY registry to " + filepath +
-                " - no assets have been imported");
+            LOG("AssetImporter: writing an EMPTY registry to " + filepath + " - no assets have been imported");
         }
 
         if (!is_registry_filename(filepath)) {
-            LOG("AssetImporter: '" + filepath + "' does not use the required " +
-                std::string(registry_extension) + " registry naming");
+            LOG("AssetImporter: '" + filepath + "' does not use the required " + std::string(registry_extension) +
+                " registry naming");
         }
 
         // Creates missing directories, writes to a temp file and renames
         // it into place, and verifies the stream afterwards.
         io::write_json_file(filepath, j);
 
-        LOG("AssetImporter: wrote " + std::to_string(ordered.size()) +
-            " asset(s) to " + filepath);
+        LOG("AssetImporter: wrote " + std::to_string(ordered.size()) + " asset(s) to " + filepath);
     }
 
     void AssetImporter::load_from_file(const std::string& filepath) {
@@ -221,15 +211,12 @@ namespace sif::asset {
     void AssetImporter::add(AssetDesc& desc) {
         intrnl::GUID& g = desc.meta.guid;
         std::string asset_name = desc.meta.asset_name;
-        auto it= by_asset_name_.find(asset_name);
+        auto it = by_asset_name_.find(asset_name);
         if (it != by_asset_name_.end()) {
             intrnl::GUID& existing = it->second.meta.guid;
             if (g != existing) {
-                LOG(
-                    "Asset_name - " + asset_name +
-                    " | GUID - " + g.string() +
-                    " collides with GUID - " + existing.string()
-                    );
+                LOG("Asset_name - " + asset_name + " | GUID - " + g.string() + " collides with GUID - " +
+                    existing.string());
             }
             return;
         }
@@ -243,7 +230,6 @@ namespace sif::asset {
         by_asset_name_.emplace(asset_name, desc);
     }
 
-
     void AssetImporter::load_in_registry() {
         std::shared_lock lock(mtx_);
         for (const auto& [guid, desc] : by_guid_) {
@@ -251,7 +237,7 @@ namespace sif::asset {
         }
     }
 
-    AssetDesc AssetImporter::get(const std::string &id) const {
+    AssetDesc AssetImporter::get(const std::string& id) const {
         std::shared_lock lock(mtx_);
         const auto it = by_asset_name_.find(id);
         if (it == by_asset_name_.end()) {
@@ -260,5 +246,4 @@ namespace sif::asset {
         return it->second;
     }
 
-}
-
+} // namespace sif::asset

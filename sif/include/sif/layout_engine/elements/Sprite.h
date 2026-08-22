@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2025-12-27
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2025-12-27
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_UI_SPRITEELEMENT_H
 #define RENDER_ENGINE_UI_SPRITEELEMENT_H
 
@@ -34,8 +34,7 @@ namespace sif::ui {
      */
     class Sprite : public UIElement {
     public:
-        Sprite(asset::AssetHandle<void> handle,
-               asset::AssetType kind,
+        Sprite(asset::AssetHandle<void> handle, asset::AssetType kind,
                intrnl::RecordID record_id = intrnl::RecordID{0});
 
         math::Vector2 measure(const math::Vector2& available) override;
@@ -67,6 +66,6 @@ namespace sif::ui {
         asset::AssetType kind_;
         intrnl::RecordID record_id_;
     };
-}
+} // namespace sif::ui
 
-#endif //RENDER_ENGINE_UI_SPRITEELEMENT_H
+#endif // RENDER_ENGINE_UI_SPRITEELEMENT_H

@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-08-03
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-08-03
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_RB_CONFIG_H
 #define RENDER_ENGINE_RB_CONFIG_H
 
@@ -37,16 +37,21 @@ namespace sif::ast {
     };
 
     inline RB_Type rb_type_from_string(const std::string& s) {
-        if (s == "SFML")     return RB_Type::SFML;
-        if (s == "Headless") return RB_Type::Headless;
+        if (s == "SFML")
+            return RB_Type::SFML;
+        if (s == "Headless")
+            return RB_Type::Headless;
         return RB_Type::None;
     }
 
     inline std::string to_string(const RB_Type t) {
         switch (t) {
-            case RB_Type::SFML:     return "SFML";
-            case RB_Type::Headless: return "Headless";
-            default:                return "None";
+        case RB_Type::SFML:
+            return "SFML";
+        case RB_Type::Headless:
+            return "Headless";
+        default:
+            return "None";
         }
     }
 
@@ -76,6 +81,6 @@ namespace sif::ast {
     struct EC_Config {
         RB_Type type = RB_Type::None;
     };
-}
+} // namespace sif::ast
 
-#endif //RENDER_ENGINE_RB_CONFIG_H
+#endif // RENDER_ENGINE_RB_CONFIG_H

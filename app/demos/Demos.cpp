@@ -12,7 +12,7 @@
  * License:
  *      c. 2026 Daniil Sukhovii. All rights reserved.
  *      Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ ***************************************************************/
 
 #include "Demo.h"
 #include "DemoSupport.h"
@@ -40,7 +40,7 @@ namespace app::demo {
             }
             return out;
         }
-    }
+    } // namespace
 
     // =================================================================
     // 1. Sprites only
@@ -62,22 +62,20 @@ namespace app::demo {
             return "Static sprites: SpriteSingle + SpriteAtlas (by name) + SpriteGrid (by id)";
         }
 
-        [[nodiscard]] std::unique_ptr<ui::UIElement> build_ui() override {
-            return load_scene("demo_sprites.ui.xml");
-        }
+        [[nodiscard]] std::unique_ptr<ui::UIElement> build_ui() override { return load_scene("demo_sprites.ui.xml"); }
 
-        void on_start(Context &ctx) override {
+        void on_start(Context& ctx) override {
             // Typed lookup by name is provided by the engine, so the
             // demo needs no cast of its own.
             badge_ = ctx.root.find_by_name<ui::Sprite>("badge");
         }
 
-        void update(Context &ctx, const float dt) override {
+        void update(Context& ctx, const float dt) override {
             elapsed_ += dt;
             const bool ready = badge_ != nullptr && badge_->ready();
             set_label(ctx.root, "status",
-                      std::string("badge asset: ") + (ready ? "ready" : "loading...") +
-                      "   uptime " + std::to_string(static_cast<int>(elapsed_)) + "s");
+                      std::string("badge asset: ") + (ready ? "ready" : "loading...") + "   uptime " +
+                          std::to_string(static_cast<int>(elapsed_)) + "s");
         }
 
     private:
@@ -105,11 +103,9 @@ namespace app::demo {
             return "Animation: one PrimitiveAnimation asset driving four independent cursors";
         }
 
-        [[nodiscard]] std::unique_ptr<ui::UIElement> build_ui() override {
-            return load_scene("demo_animation.ui.xml");
-        }
+        [[nodiscard]] std::unique_ptr<ui::UIElement> build_ui() override { return load_scene("demo_animation.ui.xml"); }
 
-        void on_start(Context &ctx) override {
+        void on_start(Context& ctx) override {
             for (const char* name : {"slow", "normal", "fast", "paused"}) {
                 if (auto* a = ctx.root.find_by_name<ui::Animation>(name)) {
                     cursors_.push_back(a);
@@ -117,13 +113,13 @@ namespace app::demo {
             }
         }
 
-        void update(Context &ctx, float /*dt*/) override {
+        void update(Context& ctx, float /*dt*/) override {
             if (!cursors_.empty()) {
                 set_label(ctx.root, "frames", frame_list(cursors_));
             }
         }
 
-        void on_key(Context &ctx, const Key key) override {
+        void on_key(Context& ctx, const Key key) override {
             if (key == Key::Space) {
                 if (auto* paused = ctx.root.find_by_name<ui::Animation>("paused")) {
                     paused->playing() ? paused->pause() : paused->play();
@@ -159,11 +155,9 @@ namespace app::demo {
             return "Sound: three Sound assets played through the backend-agnostic AudioPlayer";
         }
 
-        [[nodiscard]] std::unique_ptr<ui::UIElement> build_ui() override {
-            return load_scene("demo_sound.ui.xml");
-        }
+        [[nodiscard]] std::unique_ptr<ui::UIElement> build_ui() override { return load_scene("demo_sound.ui.xml"); }
 
-        void on_start(Context &ctx) override {
+        void on_start(Context& ctx) override {
             blip_ = request_sound("DemoBlip");
             chime_ = request_sound("DemoChime");
             thud_ = request_sound("DemoThud");
@@ -173,7 +167,7 @@ namespace app::demo {
             }
         }
 
-        void update(Context &ctx, const float dt) override {
+        void update(Context& ctx, const float dt) override {
             // Announce the startup chime once the asset finishes loading.
             if (!greeted_ && chime_.ready()) {
                 greeted_ = true;
@@ -196,36 +190,36 @@ namespace app::demo {
             }
 
             set_label(ctx.root, "voices",
-                      "active voices: " + std::to_string(ctx.audio.active_voices()) +
-                      "   master volume: " + std::to_string(static_cast<int>(ctx.audio.master_volume() * 100)) + "%");
+                      "active voices: " + std::to_string(ctx.audio.active_voices()) + "   master volume: " +
+                          std::to_string(static_cast<int>(ctx.audio.master_volume() * 100)) + "%");
         }
 
-        void on_key(Context &ctx, const Key key) override {
+        void on_key(Context& ctx, const Key key) override {
             switch (key) {
-                case Key::Num1:
-                    voices_[0] = ctx.audio.play(blip_, 0.9f, false);
-                    break;
-                case Key::Num2:
-                    // Toggling a looping voice is the clearest proof
-                    // that a VoiceId really identifies one playback.
-                    if (voices_[1] != audio::invalid_voice && ctx.audio.is_playing(voices_[1])) {
-                        ctx.audio.stop(voices_[1]);
-                        voices_[1] = audio::invalid_voice;
-                    } else {
-                        voices_[1] = ctx.audio.play(chime_, 0.7f, true);
-                    }
-                    break;
-                case Key::Num3:
-                    voices_[2] = ctx.audio.play(thud_, 1.0f, false);
-                    break;
-                case Key::Down:
-                    ctx.audio.set_master_volume(ctx.audio.master_volume() - 0.1f);
-                    break;
-                case Key::Up:
-                    ctx.audio.set_master_volume(ctx.audio.master_volume() + 0.1f);
-                    break;
-                default:
-                    break;
+            case Key::Num1:
+                voices_[0] = ctx.audio.play(blip_, 0.9f, false);
+                break;
+            case Key::Num2:
+                // Toggling a looping voice is the clearest proof
+                // that a VoiceId really identifies one playback.
+                if (voices_[1] != audio::invalid_voice && ctx.audio.is_playing(voices_[1])) {
+                    ctx.audio.stop(voices_[1]);
+                    voices_[1] = audio::invalid_voice;
+                } else {
+                    voices_[1] = ctx.audio.play(chime_, 0.7f, true);
+                }
+                break;
+            case Key::Num3:
+                voices_[2] = ctx.audio.play(thud_, 1.0f, false);
+                break;
+            case Key::Down:
+                ctx.audio.set_master_volume(ctx.audio.master_volume() - 0.1f);
+                break;
+            case Key::Up:
+                ctx.audio.set_master_volume(ctx.audio.master_volume() + 0.1f);
+                break;
+            default:
+                break;
             }
         }
 
@@ -262,11 +256,9 @@ namespace app::demo {
             return "Everything together: sprites + animation + sound synchronised by the animation clock";
         }
 
-        [[nodiscard]] std::unique_ptr<ui::UIElement> build_ui() override {
-            return load_scene("demo_all.ui.xml");
-        }
+        [[nodiscard]] std::unique_ptr<ui::UIElement> build_ui() override { return load_scene("demo_all.ui.xml"); }
 
-        void on_start(Context &ctx) override {
+        void on_start(Context& ctx) override {
             ball_ = ctx.root.find_by_name<ui::Animation>("ball");
             pulse_ = ctx.root.find_by_name<ui::Sprite>("pulse");
             thud_ = request_sound("DemoThud");
@@ -278,7 +270,7 @@ namespace app::demo {
             }
         }
 
-        void update(Context &ctx, float /*dt*/) override {
+        void update(Context& ctx, float /*dt*/) override {
             if (ball_ == nullptr) {
                 return;
             }
@@ -295,9 +287,7 @@ namespace app::demo {
                     if (pulse_ != nullptr) {
                         static const char* icons[] = {"heart", "gem", "coin", "shield"};
                         pulse_->set_record_id(
-                            asset::AssetRegistry::instance().record_id_of(
-                                guid_of("DemoIcons"), icons[loops_ % 4])
-                        );
+                            asset::AssetRegistry::instance().record_id_of(guid_of("DemoIcons"), icons[loops_ % 4]));
                     }
                 } else {
                     ctx.audio.play(blip_, 0.18f, false);
@@ -315,28 +305,34 @@ namespace app::demo {
             }
 
             set_label(ctx.root, "beat",
-                      "frame " + std::to_string(frame) +
-                      "   loops " + std::to_string(loops_) +
-                      "   voices " + std::to_string(ctx.audio.active_voices()));
+                      "frame " + std::to_string(frame) + "   loops " + std::to_string(loops_) + "   voices " +
+                          std::to_string(ctx.audio.active_voices()));
         }
 
-        void on_key(Context &ctx, const Key key) override {
+        void on_key(Context& ctx, const Key key) override {
             switch (key) {
-                case Key::Space:
-                    if (ball_ != nullptr) {
-                        ball_->playing() ? ball_->pause() : ball_->play();
-                    }
-                    break;
-                case Key::Num1: ctx.audio.play(blip_, 0.9f, false); break;
-                case Key::Num2: ctx.audio.play(thud_, 0.9f, false); break;
-                // Was ctx.audio.stop_all() - the on-screen hint promises
-                // "1/2/3 - play a sound manually", matching SoundDemo's own
-                // three-key pattern (blip/chime/thud), but this demo only
-                // ever loaded two sounds, so pressing 3 silently stopped
-                // everything instead of playing anything. DemoChime is the
-                // third sound SoundDemo already uses for exactly this slot.
-                case Key::Num3: ctx.audio.play(chime_, 0.7f, false); break;
-                default: break;
+            case Key::Space:
+                if (ball_ != nullptr) {
+                    ball_->playing() ? ball_->pause() : ball_->play();
+                }
+                break;
+            case Key::Num1:
+                ctx.audio.play(blip_, 0.9f, false);
+                break;
+            case Key::Num2:
+                ctx.audio.play(thud_, 0.9f, false);
+                break;
+            // Was ctx.audio.stop_all() - the on-screen hint promises
+            // "1/2/3 - play a sound manually", matching SoundDemo's own
+            // three-key pattern (blip/chime/thud), but this demo only
+            // ever loaded two sounds, so pressing 3 silently stopped
+            // everything instead of playing anything. DemoChime is the
+            // third sound SoundDemo already uses for exactly this slot.
+            case Key::Num3:
+                ctx.audio.play(chime_, 0.7f, false);
+                break;
+            default:
+                break;
             }
         }
 
@@ -369,14 +365,14 @@ namespace app::demo {
 
         const std::vector<Entry>& entries() {
             static const std::vector<Entry> table = {
-                {"sprites",   SpritesDemo{}.title(),   &create_demo<SpritesDemo>},
+                {"sprites", SpritesDemo{}.title(), &create_demo<SpritesDemo>},
                 {"animation", AnimationDemo{}.title(), &create_demo<AnimationDemo>},
-                {"sound",     SoundDemo{}.title(),     &create_demo<SoundDemo>},
-                {"all",       AllDemo{}.title(),       &create_demo<AllDemo>},
+                {"sound", SoundDemo{}.title(), &create_demo<SoundDemo>},
+                {"all", AllDemo{}.title(), &create_demo<AllDemo>},
             };
             return table;
         }
-    }
+    } // namespace
 
     std::vector<std::string> demo_ids() {
         std::vector<std::string> ids;
@@ -387,7 +383,7 @@ namespace app::demo {
         return ids;
     }
 
-    std::string demo_title(const std::string &id) {
+    std::string demo_title(const std::string& id) {
         for (const Entry& e : entries()) {
             if (e.id == id) {
                 return e.title;
@@ -396,7 +392,7 @@ namespace app::demo {
         return {};
     }
 
-    std::unique_ptr<Demo> make_demo(const std::string &id) {
+    std::unique_ptr<Demo> make_demo(const std::string& id) {
         for (const Entry& e : entries()) {
             if (e.id == id) {
                 return e.create();
@@ -404,4 +400,4 @@ namespace app::demo {
         }
         return nullptr;
     }
-}
+} // namespace app::demo

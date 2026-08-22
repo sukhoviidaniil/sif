@@ -1,16 +1,16 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2025-12-13
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2025-12-13
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 
+#include "sif/math/Vector2.h"
 #include <cmath>
 #include <string>
-#include "sif/math/Vector2.h"
 
 namespace sif::math {
 
@@ -76,7 +76,7 @@ namespace sif::math {
         return std::fabs(x - other.x) < EPS && std::fabs(y - other.y) < EPS;
     }
 
-    bool Vector2::is_between(const Vector2 &start, const Vector2 &end) const {
+    bool Vector2::is_between(const Vector2& start, const Vector2& end) const {
         // Vector from start to end
         const Vector2 segVec = end - start;
         // Vector from start to current point
@@ -89,12 +89,14 @@ namespace sif::math {
 
         // Check that the point lies between start and end on x and y
         const float dotProd = segVec.dot(pointVec);
-        if (dotProd < 0) return false; // “before” start
-        if (dotProd > segVec.dot(segVec)) return false; // “after” end
-        return true; // point on a segment
+        if (dotProd < 0)
+            return false; // “before” start
+        if (dotProd > segVec.dot(segVec))
+            return false; // “after” end
+        return true;      // point on a segment
     }
 
-    bool Vector2::is_within_radius(const Vector2 &other, const float radius) const {
+    bool Vector2::is_within_radius(const Vector2& other, const float radius) const {
         // Difference in coordinates
         const float dx = other.x - x;
         const float dy = other.y - y;
@@ -106,10 +108,11 @@ namespace sif::math {
         return distanceSquared <= radius * radius;
     }
 
-    bool Vector2::has_same_direction(const Vector2 &other) const {
+    bool Vector2::has_same_direction(const Vector2& other) const {
         float len1 = length();
         float len2 = other.length();
-        if (len1 == 0.0f || len2 == 0.0f) return false;
+        if (len1 == 0.0f || len2 == 0.0f)
+            return false;
 
         float cos_angle = dot(other) / (len1 * len2);
 
@@ -165,4 +168,4 @@ namespace sif::math {
     float Vector2::cross(const Vector2& other) const {
         return x * other.y - y * other.x;
     }
-}
+} // namespace sif::math

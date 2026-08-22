@@ -14,7 +14,7 @@
  * Disclaimer:
  *   This file is part of Render_Engine.
  *   Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ ***************************************************************/
 #ifndef RENDER_ENGINE_TYPEID_H
 #define RENDER_ENGINE_TYPEID_H
 #include <cstddef>
@@ -27,6 +27,6 @@ namespace sif::intrnl {
         static int unique;
         return reinterpret_cast<TypeId>(&unique);
     }
-}
+} // namespace sif::intrnl
 
-#endif //RENDER_ENGINE_TYPEID_H
+#endif // RENDER_ENGINE_TYPEID_H

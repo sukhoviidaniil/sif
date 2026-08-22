@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-01-14
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-01-14
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_SPRITEATLASNODE_H
 #define RENDER_ENGINE_SPRITEATLASNODE_H
 
@@ -32,6 +32,6 @@ namespace sif::asset::data {
     struct SpriteAtlasNode : AssetDataNode {
         std::vector<intrnl::Rect> rects;
     };
-}
+} // namespace sif::asset::data
 
-#endif //RENDER_ENGINE_SPRITEATLASNODE_H
+#endif // RENDER_ENGINE_SPRITEATLASNODE_H

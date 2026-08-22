@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-07-06
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-07-06
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_MENU_H
 #define RENDER_ENGINE_MENU_H
 
@@ -84,6 +84,6 @@ namespace sif::ui {
     private:
         std::vector<Button*> buttons_; ///< Non-owning; ownership lives in UIElement::children
     };
-}
+} // namespace sif::ui
 
-#endif //RENDER_ENGINE_MENU_H
+#endif // RENDER_ENGINE_MENU_H

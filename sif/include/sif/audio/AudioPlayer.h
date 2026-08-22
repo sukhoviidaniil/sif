@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-08-03
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-08-03
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_AUDIOPLAYER_H
 #define RENDER_ENGINE_AUDIOPLAYER_H
 
@@ -59,9 +59,7 @@ namespace sif::audio {
          * @return The new voice id, or invalid_voice if the asset is
          * not ready (or no free voice was available).
          */
-        virtual VoiceId play(const asset::AssetHandle<asset::Sound>& sound,
-                             float volume = 1.f,
-                             bool loop = false) = 0;
+        virtual VoiceId play(const asset::AssetHandle<asset::Sound>& sound, float volume = 1.f, bool loop = false) = 0;
 
         /// @brief Stops one voice; a no-op if it already finished.
         virtual void stop(VoiceId voice) = 0;
@@ -80,6 +78,6 @@ namespace sif::audio {
 
         [[nodiscard]] virtual float master_volume() const = 0;
     };
-}
+} // namespace sif::audio
 
-#endif //RENDER_ENGINE_AUDIOPLAYER_H
+#endif // RENDER_ENGINE_AUDIOPLAYER_H

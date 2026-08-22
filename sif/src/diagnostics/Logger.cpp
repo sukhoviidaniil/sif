@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2025-11-19
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2025-11-19
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 
 #include "sif/diagnostics/Logger.h"
 
@@ -18,25 +18,25 @@ namespace sif::diag {
     namespace {
         /// Hands out 0, 1, 2, ... to threads in the order they first log.
         std::atomic<unsigned int> next_thread_ordinal{0};
-    }
+    } // namespace
 
     Logger::Logger() : logfile_("debug.log") {
         logfile_.flush();
     }
 
-    Logger & Logger::instance() {
+    Logger& Logger::instance() {
         static Logger inst;
         return inst;
     }
 
-    unsigned int & Logger::depth() {
+    unsigned int& Logger::depth() {
         // Per-thread: an indentation scope belongs to the call stack
         // that opened it, not to the process.
         static thread_local unsigned int value = 0;
         return value;
     }
 
-    const std::string & Logger::thread_tag() {
+    const std::string& Logger::thread_tag() {
         static thread_local const std::string tag = [] {
             const unsigned int ordinal = next_thread_ordinal.fetch_add(1, std::memory_order_relaxed);
             // The first thread to log (in practice the main one) stays
@@ -46,7 +46,7 @@ namespace sif::diag {
         return tag;
     }
 
-    void Logger::write(const std::string &message) {
+    void Logger::write(const std::string& message) {
         // Formatting happens outside the lock; only the stream needs it.
         const std::string indented = indent(message);
 
@@ -72,7 +72,7 @@ namespace sif::diag {
         }
     }
 
-    std::string Logger::indent(const std::string &message) const {
+    std::string Logger::indent(const std::string& message) const {
         std::string total_indent;
         const unsigned int levels = std::min(depth(), max_depth);
         total_indent.reserve(levels * indent_str_.size());
@@ -97,20 +97,18 @@ namespace sif::diag {
         return ss.str();
     }
 
-    void Logger::print_exception(const std::exception &e, const int level) {
+    void Logger::print_exception(const std::exception& e, const int level) {
         add_depth();
         write(e.what());
         lower_depth();
 
         try {
             std::rethrow_if_nested(e);
-        }
-        catch (const std::exception& nested) {
+        } catch (const std::exception& nested) {
             print_exception(nested, level + 1);
-        }
-        catch (...) {
+        } catch (...) {
             // A nested object that is not a std::exception carries no
             // message we can print; the outer frames are already logged.
         }
     }
-}
+} // namespace sif::diag

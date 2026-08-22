@@ -1,20 +1,20 @@
 /***************************************************************
-* Author:           <your name>
-* Email:            <your email>
-* Created:          2026-07-06
-*
-* License:
-*       (c) 2026 <your name>. All rights reserved.
-***************************************************************/
+ * Author:           <your name>
+ * Email:            <your email>
+ * Created:          2026-07-06
+ *
+ * License:
+ *       (c) 2026 <your name>. All rights reserved.
+ ***************************************************************/
 #ifndef GRAPH_H
 #define GRAPH_H
 
 #include <cstddef>
-#include <vector>
-#include <unordered_map>
 #include <iostream>
-#include <stdexcept>
 #include <optional>
+#include <stdexcept>
+#include <unordered_map>
+#include <vector>
 
 namespace sif::math {
     /**
@@ -26,9 +26,8 @@ namespace sif::math {
      * algorithms (BFS / DFS), and degree queries. Vertices are identified
      * by a stable size_t index handed out when the vertex is created.
      */
-    template <typename T, typename W = double>
-    class DirectedGraph
-    {
+    template<typename T, typename W = double>
+    class DirectedGraph {
     public:
         // Type alias for a vertex identifier.
         using VertexId = size_t;
@@ -185,14 +184,13 @@ namespace sif::math {
          * @brief Writes the graph to an output stream, one vertex and its
          * outgoing edges per line.
          */
-        template <typename U, typename V>
+        template<typename U, typename V>
         friend std::ostream& operator<<(std::ostream& os, const DirectedGraph<U, V>& graph);
 
     private:
         // Adjacency information for a single vertex: outgoing and incoming
         // edges, each mapped to their weight.
-        struct AdjacencyEntry
-        {
+        struct AdjacencyEntry {
             T data;
             std::unordered_map<VertexId, W> outEdges;
             std::unordered_map<VertexId, W> inEdges;
@@ -204,8 +202,8 @@ namespace sif::math {
 
         void checkVertexExists(VertexId id, const char* operationName) const;
         void depthFirstVisit(VertexId current, std::unordered_map<VertexId, bool>& visited,
-                              std::vector<VertexId>& order) const;
+                             std::vector<VertexId>& order) const;
     };
-}
+} // namespace sif::math
 
 #endif // GRAPH_H

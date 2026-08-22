@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-07-06
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-07-06
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_BUTTON_H
 #define RENDER_ENGINE_BUTTON_H
 
@@ -26,10 +26,7 @@ namespace sif::ui {
      * ever needed - e.g. Disabled) a matter of extending the enum and
      * the color table, not hunting down every branch.
      */
-    enum class ButtonState {
-        Unselected,
-        Selected
-    };
+    enum class ButtonState { Unselected, Selected };
 
     /**
      * @brief Clickable UI element with two states and a smooth transition.
@@ -92,6 +89,6 @@ namespace sif::ui {
         ButtonState state_ = ButtonState::Unselected;
         float transition_ = 0.f; ///< 0 = fully Unselected, 1 = fully Selected
     };
-}
+} // namespace sif::ui
 
-#endif //RENDER_ENGINE_BUTTON_H
+#endif // RENDER_ENGINE_BUTTON_H

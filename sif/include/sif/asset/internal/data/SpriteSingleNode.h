@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-01-14
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-01-14
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_SPRITESINGLENODE_H
 #define RENDER_ENGINE_SPRITESINGLENODE_H
 
@@ -19,9 +19,7 @@ namespace sif::asset::data {
      * The whole image referenced by AssetDataNode::source is the
      * sprite; no extra fields are needed beyond the base node.
      */
-    struct SpriteSingleNode : AssetDataNode {
+    struct SpriteSingleNode : AssetDataNode {};
+} // namespace sif::asset::data
 
-    };
-}
-
-#endif //RENDER_ENGINE_SPRITESINGLENODE_H
+#endif // RENDER_ENGINE_SPRITESINGLENODE_H

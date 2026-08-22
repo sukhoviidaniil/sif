@@ -1,21 +1,20 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-01-15
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-01-15
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_ASSETDATASHORT_H
 #define RENDER_ENGINE_ASSETDATASHORT_H
 
 #include <string>
 #include <unordered_map>
 
-#include "sif/internal/GUID.h"
 #include "sif/asset/internal/AssetType.h"
-
+#include "sif/internal/GUID.h"
 
 namespace sif::asset::data {
     struct AssetMetaData {
@@ -45,16 +44,10 @@ namespace sif::asset::data {
          */
         bool critical = false;
 
-        std::unordered_map<
-            uint32_t,
-            std::string
-        > record_id_to_name;
+        std::unordered_map<uint32_t, std::string> record_id_to_name;
 
-        std::unordered_map<
-            std::string,
-            uint32_t
-        > record_name_to_id;
+        std::unordered_map<std::string, uint32_t> record_name_to_id;
     };
-}
+} // namespace sif::asset::data
 
-#endif //RENDER_ENGINE_ASSETDATASHORT_H
+#endif // RENDER_ENGINE_ASSETDATASHORT_H

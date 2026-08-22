@@ -1,19 +1,19 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2025-12-19
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2025-12-19
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_LINEARLAYOUT_H
 #define RENDER_ENGINE_LINEARLAYOUT_H
 
-#include "sif/math/Vector2.h"
 #include "sif/internal/Alignment.h"
 #include "sif/internal/Rect.h"
 #include "sif/layout_engine/elements/UIElement.h"
+#include "sif/math/Vector2.h"
 
 namespace sif::ui {
 
@@ -52,7 +52,7 @@ namespace sif::ui {
          * @param available Available space from the parent.
          * @return Desired size of the layout.
          */
-        math::Vector2 measure(const math::Vector2 &available) override;
+        math::Vector2 measure(const math::Vector2& available) override;
 
         /**
          * @brief Lays out children within the assigned rectangle.
@@ -64,6 +64,6 @@ namespace sif::ui {
          */
         void layout(intrnl::Rect r) override;
     };
-}
+} // namespace sif::ui
 
-#endif //RENDER_ENGINE_LINEARLAYOUT_H
+#endif // RENDER_ENGINE_LINEARLAYOUT_H

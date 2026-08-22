@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2025-12-13
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2025-12-13
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_POINT2_H
 #define RENDER_ENGINE_POINT2_H
 
@@ -19,7 +19,7 @@ namespace sif::math {
      * Supports basic arithmetic operations, comparisons, and stream output.
      */
     struct Point2 {
-        float x=0.0, y=0.0;
+        float x = 0.0, y = 0.0;
 
         /**
          * @brief Default constructor initializing point to (0, 0).
@@ -41,8 +41,7 @@ namespace sif::math {
          * @param x X-coordinate
          * @param y Y-coordinate
          */
-        [[nodiscard]] constexpr Point2(const float in_x, const float in_y): x(in_x), y(in_y) {
-        }
+        [[nodiscard]] constexpr Point2(const float in_x, const float in_y) : x(in_x), y(in_y) {}
         // ========== Arithmetic operators ==========
 
         /**
@@ -113,6 +112,6 @@ namespace sif::math {
          */
         friend std::ostream& operator<<(std::ostream& os, const Point2& vector);
     };
-}
+} // namespace sif::math
 
-#endif //RENDER_ENGINE_POINT2_H
+#endif // RENDER_ENGINE_POINT2_H

@@ -1,15 +1,15 @@
 /***************************************************************
-* Project:          Render_Engine
-* File:             RenderNode.h
-*
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2025-12-24
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Project:          Render_Engine
+ * File:             RenderNode.h
+ *
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2025-12-24
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_RENDERNODE_H
 #define RENDER_ENGINE_RENDERNODE_H
 
@@ -39,15 +39,14 @@ namespace sif::rnd {
         virtual void visit(const Sprite&) = 0;
     };
 
-    struct RenderNode  {
+    struct RenderNode {
         virtual ~RenderNode() = default;
 
-        virtual void accept(RenderVisitor &v) const = 0;
+        virtual void accept(RenderVisitor& v) const = 0;
 
         /// Element dimensions
         intrnl::Rect rect{};
     };
-}
+} // namespace sif::rnd
 
-
-#endif //RENDER_ENGINE_RENDERNODE_H
+#endif // RENDER_ENGINE_RENDERNODE_H

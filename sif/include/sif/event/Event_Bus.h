@@ -1,24 +1,24 @@
 /***************************************************************
-* Project:          Render_Engine
-* File:             Event_Bus.h
-*
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2025-12-14
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Project:          Render_Engine
+ * File:             Event_Bus.h
+ *
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2025-12-14
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_EVENT_BUS_H
 #define RENDER_ENGINE_EVENT_BUS_H
 
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <typeindex>
 #include <unordered_map>
 #include <vector>
-#include <cstdint>
 
 #include "Event.h"
 
@@ -30,7 +30,7 @@ namespace sif::event {
      * Manages event handlers, allows subscribing to specific event types
      * and emitting events to all registered listeners.
      */
-    class Event_Bus : public std::enable_shared_from_this<Event_Bus>{
+    class Event_Bus : public std::enable_shared_from_this<Event_Bus> {
     public:
         /// Unique identifier of a registered handler
         using HandlerId = std::uint64_t;
@@ -56,9 +56,7 @@ namespace sif::event {
              * @param type Event type this subscription listens to.
              * @param id   Handler identifier.
              */
-            Subscription(std::shared_ptr<Event_Bus> bus,
-                         std::type_index type,
-                         HandlerId id);
+            Subscription(std::shared_ptr<Event_Bus> bus, std::type_index type, HandlerId id);
 
             /**
              * @brief Unsubscribes the handler from the event bus.
@@ -87,8 +85,8 @@ namespace sif::event {
 
         private:
             std::shared_ptr<Event_Bus> bus_ = nullptr; ///< Owning event bus
-            std::type_index type_{typeid(void)}; ///< Subscribed event type
-            HandlerId id_ = 0; ///< Handler identifier
+            std::type_index type_{typeid(void)};       ///< Subscribed event type
+            HandlerId id_ = 0;                         ///< Handler identifier
         };
 
         // ---------- Subscribe ----------
@@ -127,9 +125,9 @@ namespace sif::event {
          * @brief Internal representation of a registered handler.
          */
         struct Handler {
-            HandlerId id; ///< Handler identifier
-            int priority; ///< Execution priority
-            EventMask mask; ///< Event mask filter
+            HandlerId id;                                ///< Handler identifier
+            int priority;                                ///< Execution priority
+            EventMask mask;                              ///< Event mask filter
             std::function<void(const EventConcept&)> fn; ///< Handler callback
         };
 
@@ -148,10 +146,10 @@ namespace sif::event {
         static void sort(std::vector<Handler>& list);
 
         std::unordered_map<std::type_index, std::vector<Handler>> handlers_; ///< Registered handlers
-        HandlerId next_id_ = 1; ///< Next handler id
+        HandlerId next_id_ = 1;                                              ///< Next handler id
     };
-}
+} // namespace sif::event
 
 #include "Event_Bus.inl"
 
-#endif //RENDER_ENGINE_EVENT_BUS_H
+#endif // RENDER_ENGINE_EVENT_BUS_H

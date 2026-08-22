@@ -1,15 +1,15 @@
 /***************************************************************
-* Project:          Render_Engine
-* File:             Camera.h
-*
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-08-04
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Project:          Render_Engine
+ * File:             Camera.h
+ *
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-08-04
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_CAMERA_H
 #define RENDER_ENGINE_CAMERA_H
 
@@ -211,6 +211,6 @@ namespace sif::rnd {
         float zoom_ = 1.f;
         bool y_axis_up_ = false;
     };
-}
+} // namespace sif::rnd
 
-#endif //RENDER_ENGINE_CAMERA_H
+#endif // RENDER_ENGINE_CAMERA_H

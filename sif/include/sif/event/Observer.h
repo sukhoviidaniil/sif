@@ -1,18 +1,17 @@
 /***************************************************************
-* Project:          Render_Engine
-* File:             Observer.h
-*
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2025-12-15
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Project:          Render_Engine
+ * File:             Observer.h
+ *
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2025-12-15
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_OBSERVER_H
 #define RENDER_ENGINE_OBSERVER_H
-
 
 #include "Event_Bus.h"
 namespace sif::event {
@@ -66,10 +65,11 @@ namespace sif::event {
          *
          */
         void un_track_all();
+
     private:
         /// List of tracked subscriptions
         std::vector<Event_Bus::Subscription> subs_;
     };
-}
+} // namespace sif::event
 
-#endif //RENDER_ENGINE_OBSERVER_H
+#endif // RENDER_ENGINE_OBSERVER_H

@@ -11,7 +11,7 @@
  * Disclaimer:
  *   This file is part of render-engine.
  *   Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ ***************************************************************/
 #ifndef RENDER_ENGINE_RANDOM_H
 #define RENDER_ENGINE_RANDOM_H
 
@@ -37,10 +37,9 @@ namespace sif::intrnl {
      */
     template<class T>
     inline constexpr bool is_uniform_int_type_v =
-        std::is_same_v<T, short> || std::is_same_v<T, int> ||
-        std::is_same_v<T, long> || std::is_same_v<T, long long> ||
-        std::is_same_v<T, unsigned short> || std::is_same_v<T, unsigned int> ||
-        std::is_same_v<T, unsigned long> || std::is_same_v<T, unsigned long long>;
+        std::is_same_v<T, short> || std::is_same_v<T, int> || std::is_same_v<T, long> || std::is_same_v<T, long long> ||
+        std::is_same_v<T, unsigned short> || std::is_same_v<T, unsigned int> || std::is_same_v<T, unsigned long> ||
+        std::is_same_v<T, unsigned long long>;
 
     /**
      * @brief Singleton random number generator utility.
@@ -109,15 +108,13 @@ namespace sif::intrnl {
          */
         template<class Int>
         Int next_int(Int min, Int max) {
-            static_assert(is_uniform_int_type_v<Int>,
-                          "next_int supports short/int/long/long long and their unsigned "
-                          "counterparts only; narrower types are undefined behaviour for "
-                          "std::uniform_int_distribution");
+            static_assert(is_uniform_int_type_v<Int>, "next_int supports short/int/long/long long and their unsigned "
+                                                      "counterparts only; narrower types are undefined behaviour for "
+                                                      "std::uniform_int_distribution");
 
             if (max < min) {
-                throw std::invalid_argument(
-                    "Random::next_int - empty range [" + std::to_string(min) +
-                    ", " + std::to_string(max) + "]");
+                throw std::invalid_argument("Random::next_int - empty range [" + std::to_string(min) + ", " +
+                                            std::to_string(max) + "]");
             }
 
             std::uniform_int_distribution<Int> dist(min, max);
@@ -147,8 +144,7 @@ namespace sif::intrnl {
          */
         template<class Range>
         decltype(auto) pick(Range&& range) {
-            const auto size = static_cast<std::size_t>(
-                std::distance(std::begin(range), std::end(range)));
+            const auto size = static_cast<std::size_t>(std::distance(std::begin(range), std::end(range)));
             auto it = std::begin(range);
             std::advance(it, static_cast<std::ptrdiff_t>(next_index(size)));
             return *it;
@@ -242,12 +238,12 @@ namespace sif::intrnl {
     inline bool rand_chance(const float p) {
         return Random::instance().chance(p);
     }
-}
+} // namespace sif::intrnl
 
-#define RAND_INT(min, max)   ::sif::intrnl::rand_int((min), (max))
-#define RAND_INDEX(count)    ::sif::intrnl::rand_index((count))
+#define RAND_INT(min, max) ::sif::intrnl::rand_int((min), (max))
+#define RAND_INDEX(count) ::sif::intrnl::rand_index((count))
 #define RAND_FLOAT(min, max) ::sif::intrnl::rand_float((min), (max))
-#define RAND_CHANCE(p)       ::sif::intrnl::rand_chance((p))
-#define RAND_ENGINE()        ::sif::intrnl::Random::instance().engine()
+#define RAND_CHANCE(p) ::sif::intrnl::rand_chance((p))
+#define RAND_ENGINE() ::sif::intrnl::Random::instance().engine()
 
-#endif //RENDER_ENGINE_RANDOM_H
+#endif // RENDER_ENGINE_RANDOM_H

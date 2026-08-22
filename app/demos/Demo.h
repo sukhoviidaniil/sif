@@ -9,7 +9,7 @@
  * License:
  *      c. 2026 Daniil Sukhovii. All rights reserved.
  *      Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ ***************************************************************/
 #ifndef RENDER_ENGINE_DEMO_H
 #define RENDER_ENGINE_DEMO_H
 
@@ -89,6 +89,6 @@ namespace app::demo {
      * available ids instead of throwing at the user.
      */
     [[nodiscard]] std::unique_ptr<Demo> make_demo(const std::string& id);
-}
+} // namespace app::demo
 
-#endif //RENDER_ENGINE_DEMO_H
+#endif // RENDER_ENGINE_DEMO_H

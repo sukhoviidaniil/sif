@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2025-12-19
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2025-12-19
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_ALIGNMENT_H
 #define RENDER_ENGINE_ALIGNMENT_H
 
@@ -24,6 +24,6 @@ namespace sif::intrnl {
         End,    ///< Align to the end of the available space
         Stretch ///< Stretch to fill the available space
     };
-}
+} // namespace sif::intrnl
 
-#endif //RENDER_ENGINE_ALIGNMENT_H
+#endif // RENDER_ENGINE_ALIGNMENT_H

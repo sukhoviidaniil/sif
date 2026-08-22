@@ -15,7 +15,7 @@
  * License:
  *      c. 2026 Daniil Sukhovii. All rights reserved.
  *      Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ ***************************************************************/
 
 #include "HeadlessCheck.h"
 
@@ -82,7 +82,7 @@ namespace app::demo {
             }
             return asset::AssetRegistry::instance().get<T>(guid).get();
         }
-    }
+    } // namespace
 
     int run_headless_check() {
         failures = 0;
@@ -95,9 +95,8 @@ namespace app::demo {
         check(badge != nullptr, "DemoBadge loaded");
         if (badge != nullptr) {
             check(badge->size().x == 128.f && badge->size().y == 128.f,
-                  "DemoBadge texture is 128x128 (got " +
-                  std::to_string(static_cast<int>(badge->size().x)) + "x" +
-                  std::to_string(static_cast<int>(badge->size().y)) + ")");
+                  "DemoBadge texture is 128x128 (got " + std::to_string(static_cast<int>(badge->size().x)) + "x" +
+                      std::to_string(static_cast<int>(badge->size().y)) + ")");
         }
 
         std::cout << "-- SpriteAtlas --\n";
@@ -105,8 +104,7 @@ namespace app::demo {
         check(icons != nullptr, "DemoIcons loaded");
         if (icons != nullptr) {
             check(icons->count() == 4, "DemoIcons has 4 sub-sprites");
-            check(icons->rect(intrnl::RecordID(2)).x == 128.f,
-                  "record 2 ('coin') starts at x = 128");
+            check(icons->rect(intrnl::RecordID(2)).x == 128.f, "record 2 ('coin') starts at x = 128");
             const intrnl::RecordID by_name =
                 asset::AssetRegistry::instance().record_id_of(guid_of("DemoIcons"), "shield");
             check(by_name == intrnl::RecordID(3), "record name 'shield' resolves to id 3");
@@ -158,8 +156,7 @@ namespace app::demo {
             if (sound != nullptr) {
                 const float d = sound->duration_seconds();
                 std::cout << "  " << name << " duration: " << std::fixed << std::setprecision(3) << d << "s\n";
-                check(d > expected * 0.9f && d < expected * 1.1f,
-                      name + " duration is close to the authored length");
+                check(d > expected * 0.9f && d < expected * 1.1f, name + " duration is close to the authored length");
             }
         }
 
@@ -171,4 +168,4 @@ namespace app::demo {
         std::cout << "HEADLESS CHECK FAILED (" << failures << " check(s))\n";
         return 1;
     }
-}
+} // namespace app::demo

@@ -9,7 +9,7 @@
  * License:
  *      c. 2026 Daniil Sukhovii. All rights reserved.
  *      Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ ***************************************************************/
 #ifndef RENDER_ENGINE_DEMOSUPPORT_H
 #define RENDER_ENGINE_DEMOSUPPORT_H
 
@@ -66,6 +66,6 @@ namespace app::demo {
      * not crash because a label was renamed in the scene file.
      */
     void set_label(sif::ui::UIElement& root, const std::string& element_name, const std::string& value);
-}
+} // namespace app::demo
 
-#endif //RENDER_ENGINE_DEMOSUPPORT_H
+#endif // RENDER_ENGINE_DEMOSUPPORT_H

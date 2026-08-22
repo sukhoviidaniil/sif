@@ -1,5 +1,5 @@
 /***************************************************************
-* Project:       Render_Engine
+ * Project:       Render_Engine
  * File:          ErasedObject.inl
  *
  * Author:        Sukhovii Daniil
@@ -14,22 +14,18 @@
  * Disclaimer:
  *   This file is part of Render_Engine.
  *   Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ ***************************************************************/
 
 #pragma once
 
 #include <algorithm>
 #include <iostream>
 
-
 namespace sif::intrnl {
 
     template<typename T>
     ErasedObject::ErasedObject(T value)
-    : storage_(new T(std::move(value)))
-    , destroy_(&destroy_impl<T>)
-    , type_(type_id<T>()) {
-    }
+        : storage_(new T(std::move(value))), destroy_(&destroy_impl<T>), type_(type_id<T>()) {}
 
     inline void assert_true(bool condition, const char* message) {
         if (!condition) {
@@ -54,4 +50,4 @@ namespace sif::intrnl {
     void ErasedObject::destroy_impl(void* ptr) {
         delete static_cast<T*>(ptr);
     }
-}
+} // namespace sif::intrnl

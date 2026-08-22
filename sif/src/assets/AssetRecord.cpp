@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-02-01
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-02-01
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 
 #include "sif/asset/internal/AssetRecord.h"
 
@@ -15,31 +15,26 @@ namespace sif::asset {
         bool is_terminal(const AssetState s) {
             return s == AssetState::Ready || s == AssetState::Failed;
         }
-    }
+    } // namespace
 
-    AssetRecord::AssetRecord(AssetDesc d)
-        : desc(std::move(d)) {
-
-    }
+    AssetRecord::AssetRecord(AssetDesc d) : desc(std::move(d)) {}
 
     AssetRecord::AssetRecord(data::AssetMetaData meta, std::string conf_path)
-        : AssetRecord(AssetDesc{std::move(conf_path), std::move(meta)}) {
-
-    }
+        : AssetRecord(AssetDesc{std::move(conf_path), std::move(meta)}) {}
 
     AssetDesc AssetRecord::get_desc() const {
         return desc;
     }
 
-    const data::AssetMetaData & AssetRecord::get_meta() const {
+    const data::AssetMetaData& AssetRecord::get_meta() const {
         return desc.meta;
     }
 
-    const std::string & AssetRecord::get_conf_path() const {
+    const std::string& AssetRecord::get_conf_path() const {
         return desc.conf_path;
     }
 
-    AssetState AssetRecord::get_state() const  {
+    AssetState AssetRecord::get_state() const {
         std::lock_guard lock(mtx_);
         return state_;
     }
@@ -122,4 +117,4 @@ namespace sif::asset {
         // Already finished: fire immediately, outside the lock.
         callback(snapshot);
     }
-}
+} // namespace sif::asset

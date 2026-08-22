@@ -6,7 +6,7 @@
  * License:
  *      c. 2026 Daniil Sukhovii. All rights reserved.
  *      Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ ***************************************************************/
 
 #include "App.h"
 
@@ -26,12 +26,9 @@
 namespace app {
     using namespace sif;
 
-    App::App(std::shared_ptr<event::Event_Bus> bus,
-             const ast::RB_Config &render_config,
-             const ast::EC_Config &collector_config,
-             std::unique_ptr<demo::Demo> demo)
-        : bus_(std::move(bus))
-        , demo_(std::move(demo)) {
+    App::App(std::shared_ptr<event::Event_Bus> bus, const ast::RB_Config& render_config,
+             const ast::EC_Config& collector_config, std::unique_ptr<demo::Demo> demo)
+        : bus_(std::move(bus)), demo_(std::move(demo)) {
 
         if (bus_ == nullptr) {
             throw std::invalid_argument("App: the global event bus must not be null");
@@ -42,13 +39,8 @@ namespace app {
 
         // Closing the window is the one event App itself reacts to;
         // everything else is somebody else's business.
-        track(
-            bus_->subscribe<event::window::Window_Closed>(
-                [this](const event::window::Window_Closed&) {
-                    running_ = false;
-                }
-            )
-        );
+        track(bus_->subscribe<event::window::Window_Closed>(
+            [this](const event::window::Window_Closed&) { running_ = false; }));
 
         backend::Graphics_Factory& factory = backend::Graphics_Factory::instance();
 
@@ -69,7 +61,7 @@ namespace app {
 
     App::~App() = default;
 
-    void App::handle_event(const event::EventConcept &ev) {
+    void App::handle_event(const event::EventConcept& ev) {
         // Window events are broadcast: the renderer resizes its view,
         // App stops the loop on close.
         if (has(ev.mask(), event::EventMask::Window)) {
@@ -156,4 +148,4 @@ namespace app {
         // would ever reproduce on purpose.
         asset::AssetRegistry::instance().wait_for_idle();
     }
-}
+} // namespace app

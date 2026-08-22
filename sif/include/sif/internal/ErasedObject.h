@@ -14,7 +14,7 @@
  * Disclaimer:
  *   This file is part of Render_Engine.
  *   Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ ***************************************************************/
 #ifndef RENDER_ENGINE_ERASEDOBJECT_H
 #define RENDER_ENGINE_ERASEDOBJECT_H
 
@@ -53,7 +53,6 @@ namespace sif::intrnl {
         [[nodiscard]] bool valid() const;
 
     private:
-
         void reset();
 
         template<typename T>
@@ -65,8 +64,8 @@ namespace sif::intrnl {
 
         TypeId type_;
     };
-}
+} // namespace sif::intrnl
 
 #include "sif/internal/ErasedObject.inl"
 
-#endif //RENDER_ENGINE_ERASEDOBJECT_H
+#endif // RENDER_ENGINE_ERASEDOBJECT_H

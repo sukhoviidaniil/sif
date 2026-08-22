@@ -1,20 +1,20 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-07-06
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-07-06
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_ASSETS_PRIMITIVEANIMATION_H
 #define RENDER_ENGINE_ASSETS_PRIMITIVEANIMATION_H
 
 #include <cstddef>
 
+#include "sif/internal/Rect.h"
 #include "sif/math/Vector.h"
 #include "sif/math/Vector2.h"
-#include "sif/internal/Rect.h"
 
 namespace sif::asset {
     /**
@@ -107,6 +107,6 @@ namespace sif::asset {
         float frame_duration_seconds_;
         bool loop_;
     };
-}
+} // namespace sif::asset
 
-#endif //RENDER_ENGINE_ASSETS_PRIMITIVEANIMATION_H
+#endif // RENDER_ENGINE_ASSETS_PRIMITIVEANIMATION_H

@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-08-04
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-08-04
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 
 #include "sif/render/Camera.h"
 
@@ -28,12 +28,11 @@ namespace sif::rnd {
         bool is_degenerate(const intrnl::Rect& r) {
             return r.width <= 0.f || r.height <= 0.f;
         }
-    }
+    } // namespace
 
     Camera::Camera() = default;
 
-    Camera::Camera(const math::Vector2 screen_size, const AspectPolicy policy)
-        : policy_(policy) {
+    Camera::Camera(const math::Vector2 screen_size, const AspectPolicy policy) : policy_(policy) {
         set_screen_size(screen_size);
     }
 
@@ -58,7 +57,7 @@ namespace sif::rnd {
         viewport_ = viewport;
     }
 
-    const intrnl::Rect & Camera::viewport() const {
+    const intrnl::Rect& Camera::viewport() const {
         return viewport_;
     }
 
@@ -114,25 +113,22 @@ namespace sif::rnd {
         const float sy = half_h / world_half_extent * zoom_;
 
         switch (policy_) {
-            case AspectPolicy::Stretch:
-                return {sx, sy};
-            case AspectPolicy::Fill:
-                // Cover the viewport: the larger scale wins, the excess
-                // falls outside and is cropped.
-                return {std::max(sx, sy), std::max(sx, sy)};
-            case AspectPolicy::Fit:
-            default:
-                // Keep everything visible: the smaller scale wins, the
-                // remainder becomes empty margin.
-                return {std::min(sx, sy), std::min(sx, sy)};
+        case AspectPolicy::Stretch:
+            return {sx, sy};
+        case AspectPolicy::Fill:
+            // Cover the viewport: the larger scale wins, the excess
+            // falls outside and is cropped.
+            return {std::max(sx, sy), std::max(sx, sy)};
+        case AspectPolicy::Fit:
+        default:
+            // Keep everything visible: the smaller scale wins, the
+            // remainder becomes empty margin.
+            return {std::min(sx, sy), std::min(sx, sy)};
         }
     }
 
     math::Point2 Camera::viewport_center() const {
-        return {
-            viewport_.x + viewport_.width * 0.5f,
-            viewport_.y + viewport_.height * 0.5f
-        };
+        return {viewport_.x + viewport_.width * 0.5f, viewport_.y + viewport_.height * 0.5f};
     }
 
     math::Point2 Camera::world_to_screen(const math::Point2 world_point) const {
@@ -171,22 +167,14 @@ namespace sif::rnd {
         return {std::abs(world_size.x) * s.x, std::abs(world_size.y) * s.y};
     }
 
-    intrnl::Rect Camera::world_to_screen(const intrnl::Rect &world_rect) const {
+    intrnl::Rect Camera::world_to_screen(const intrnl::Rect& world_rect) const {
         // Project both corners rather than "corner + size": that way the
         // y flip is handled by the same code path as points, instead of
         // being a special case that has to be remembered.
         const math::Point2 a = world_to_screen({world_rect.x, world_rect.y});
-        const math::Point2 b = world_to_screen({
-            world_rect.x + world_rect.width,
-            world_rect.y + world_rect.height
-        });
+        const math::Point2 b = world_to_screen({world_rect.x + world_rect.width, world_rect.y + world_rect.height});
 
-        return {
-            std::min(a.x, b.x),
-            std::min(a.y, b.y),
-            std::abs(b.x - a.x),
-            std::abs(b.y - a.y)
-        };
+        return {std::min(a.x, b.x), std::min(a.y, b.y), std::abs(b.x - a.x), std::abs(b.y - a.y)};
     }
 
     intrnl::Rect Camera::visible_world_bounds() const {
@@ -198,23 +186,16 @@ namespace sif::rnd {
         const float half_w = viewport_.width * 0.5f / s.x;
         const float half_h = viewport_.height * 0.5f / s.y;
 
-        return {
-            center_.x - half_w,
-            center_.y - half_h,
-            half_w * 2.f,
-            half_h * 2.f
-        };
+        return {center_.x - half_w, center_.y - half_h, half_w * 2.f, half_h * 2.f};
     }
 
-    bool Camera::is_visible(const intrnl::Rect &world_rect) const {
+    bool Camera::is_visible(const intrnl::Rect& world_rect) const {
         const intrnl::Rect view = visible_world_bounds();
         if (is_degenerate(view)) {
             return false;
         }
 
-        return world_rect.x < view.x + view.width
-            && world_rect.x + world_rect.width > view.x
-            && world_rect.y < view.y + view.height
-            && world_rect.y + world_rect.height > view.y;
+        return world_rect.x < view.x + view.width && world_rect.x + world_rect.width > view.x &&
+               world_rect.y < view.y + view.height && world_rect.y + world_rect.height > view.y;
     }
-}
+} // namespace sif::rnd

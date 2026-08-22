@@ -6,7 +6,7 @@
  * License:
  *      c. 2026 Daniil Sukhovii. All rights reserved.
  *      Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ ***************************************************************/
 
 #include <exception>
 #include <iostream>
@@ -30,8 +30,7 @@ namespace {
         std::cout << "Usage: " << argv0 << " [demo-id] [data-dir]\n\n"
                   << "Demos:\n";
         for (const std::string& id : app::demo::demo_ids()) {
-            std::cout << "  " << id << std::string(12 - id.size(), ' ')
-                      << app::demo::demo_title(id) << '\n';
+            std::cout << "  " << id << std::string(12 - id.size(), ' ') << app::demo::demo_title(id) << '\n';
         }
         std::cout << "  headless    Load and verify every asset without a window (used by CI)\n"
                   << "\ndata-dir defaults to ../data/ (i.e. running from the build directory).\n";
@@ -59,7 +58,7 @@ namespace {
 
         sif::backend::Graphics_Factory::instance().register_asset_loaders(config, registry);
     }
-}
+} // namespace
 
 int main(const int argc, char* argv[]) {
     const std::string demo_id = argc > 1 ? argv[1] : "all";
@@ -77,14 +76,13 @@ int main(const int argc, char* argv[]) {
         // so it runs on the CPU-only backend instead of SFML.
         const bool headless = demo_id == "headless";
 
-        const sif::ast::RB_Config render_config{
-            .type = headless ? sif::ast::RB_Type::Headless : sif::ast::RB_Type::SFML,
-            .window_name = "sif - " + demo_id,
-            .window_width = 1000,
-            .window_height = 640,
-            .fps = 60
-        };
-        const sif::ast::EC_Config collector_config{ .type = sif::ast::RB_Type::SFML };
+        const sif::ast::RB_Config render_config{.type =
+                                                    headless ? sif::ast::RB_Type::Headless : sif::ast::RB_Type::SFML,
+                                                .window_name = "sif - " + demo_id,
+                                                .window_width = 1000,
+                                                .window_height = 640,
+                                                .fps = 60};
+        const sif::ast::EC_Config collector_config{.type = sif::ast::RB_Type::SFML};
 
         bootstrap_assets(app::demo::Paths::data_dir(), render_config);
 

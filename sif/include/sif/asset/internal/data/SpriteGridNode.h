@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-01-14
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-01-14
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_SPRITEGRIDNODE_H
 #define RENDER_ENGINE_SPRITEGRIDNODE_H
 
@@ -24,11 +24,11 @@ namespace sif::asset::data {
      * to asset::SpriteGrid (see sif/asset/internal/SpriteGrid.h).
      */
     struct SpriteGridNode : AssetDataNode {
-        uint32_t rows = 1; ///< Number of grid rows
-        uint32_t cols = 1; ///< Number of grid columns
-        float cell_width = 0.f; ///< Width of one cell, in pixels
+        uint32_t rows = 1;       ///< Number of grid rows
+        uint32_t cols = 1;       ///< Number of grid columns
+        float cell_width = 0.f;  ///< Width of one cell, in pixels
         float cell_height = 0.f; ///< Height of one cell, in pixels
     };
-}
+} // namespace sif::asset::data
 
-#endif //RENDER_ENGINE_SPRITEGRIDNODE_H
+#endif // RENDER_ENGINE_SPRITEGRIDNODE_H

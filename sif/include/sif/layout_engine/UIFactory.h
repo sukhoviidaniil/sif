@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-01-12
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-01-12
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_UIFACTORY_H
 #define RENDER_ENGINE_UIFACTORY_H
 
@@ -24,14 +24,10 @@ namespace sif::ui {
         std::unique_ptr<UIElement> build(const Node& n);
 
     private:
-        std::unordered_map<
-            std::string,
-            std::function<std::unique_ptr<UIElement>(const Node&)>
-        > map_;
+        std::unordered_map<std::string, std::function<std::unique_ptr<UIElement>(const Node&)>> map_;
 
         UIFactory();
     };
-}
+} // namespace sif::ui
 
-
-#endif //RENDER_ENGINE_UIFACTORY_H
+#endif // RENDER_ENGINE_UIFACTORY_H

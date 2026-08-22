@@ -9,7 +9,7 @@
  * License:
  *      c. 2026 Daniil Sukhovii. All rights reserved.
  *      Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ ***************************************************************/
 #ifndef RENDER_ENGINE_HEADLESSCHECK_H
 #define RENDER_ENGINE_HEADLESSCHECK_H
 
@@ -21,6 +21,6 @@ namespace app::demo {
      * process exit code directly).
      */
     int run_headless_check();
-}
+} // namespace app::demo
 
-#endif //RENDER_ENGINE_HEADLESSCHECK_H
+#endif // RENDER_ENGINE_HEADLESSCHECK_H

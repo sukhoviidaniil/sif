@@ -1,18 +1,18 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-01-13
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-01-13
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 
 #include <stdexcept>
 #include <thread>
 
-#include "sif/diagnostics/Logger.h"
 #include "sif/diagnostics/LogScope.h"
+#include "sif/diagnostics/Logger.h"
 
 #include "sif/asset/AssetRegistry.h"
 
@@ -24,11 +24,11 @@ namespace sif::asset {
 
     AssetRegistry::AssetRegistry() = default;
 
-    bool AssetRegistry::uniq_GUID_locked(const intrnl::GUID &guid) const {
+    bool AssetRegistry::uniq_GUID_locked(const intrnl::GUID& guid) const {
         return !by_guid_.contains(guid);
     }
 
-    void AssetRegistry::set_asset_dir(const std::string &dir) {
+    void AssetRegistry::set_asset_dir(const std::string& dir) {
         std::lock_guard lock(mtx_);
         asset_dir = dir;
     }
@@ -67,7 +67,7 @@ namespace sif::asset {
         by_guid_[id] = record_ptr;
     }
 
-    void AssetRegistry::add_AssetRecord(const AssetRecord &other) {
+    void AssetRegistry::add_AssetRecord(const AssetRecord& other) {
         std::lock_guard lock(mtx_);
         const intrnl::GUID id = other.get_meta().guid;
         if (!uniq_GUID_locked(id)) {
@@ -134,14 +134,12 @@ namespace sif::asset {
         return meta_of(id).type;
     }
 
-    intrnl::RecordID AssetRegistry::record_id_of(const intrnl::GUID id, const std::string &record_name) const {
+    intrnl::RecordID AssetRegistry::record_id_of(const intrnl::GUID id, const std::string& record_name) const {
         const data::AssetMetaData meta = meta_of(id);
         const auto it = meta.record_name_to_id.find(record_name);
         if (it == meta.record_name_to_id.end()) {
-            throw std::runtime_error(
-                "AssetRegistry::record_id_of - asset " + id.string() +
-                " has no record named '" + record_name + "'"
-            );
+            throw std::runtime_error("AssetRegistry::record_id_of - asset " + id.string() + " has no record named '" +
+                                     record_name + "'");
         }
         return intrnl::RecordID(it->second);
     }
@@ -273,8 +271,7 @@ namespace sif::asset {
         // main_thread_queue_ is deliberately not part of the condition:
         // only pump() can drain it, pump() runs on this very thread, and
         // waiting here for work that only we could do is a deadlock.
-        return idle_cv_.wait_for(lock, timeout, [this] {
-            return active_loads_ == 0 && critical_queue_.empty() && normal_queue_.empty();
-        });
+        return idle_cv_.wait_for(
+            lock, timeout, [this] { return active_loads_ == 0 && critical_queue_.empty() && normal_queue_.empty(); });
     }
-}
+} // namespace sif::asset

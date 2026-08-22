@@ -1,19 +1,19 @@
 /***************************************************************
-* Author:           <your name>
-* Email:            <your email>
-* Created:          2026-07-06
-*
-* License:
-*       (c) 2026 <your name>. All rights reserved.
-***************************************************************/
+ * Author:           <your name>
+ * Email:            <your email>
+ * Created:          2026-07-06
+ *
+ * License:
+ *       (c) 2026 <your name>. All rights reserved.
+ ***************************************************************/
 #ifndef MATRIX_H
 #define MATRIX_H
 
 #include <cstddef>
-#include <vector>
-#include <iostream>
 #include <initializer_list>
+#include <iostream>
 #include <stdexcept>
+#include <vector>
 
 #include "Vector.h"
 namespace sif::math {
@@ -24,9 +24,8 @@ namespace sif::math {
      * and sub-matrix extraction, and interoperability with Vector<T> (see
      * Vector.h). T is expected to support +, -, *, / and comparison.
      */
-    template <typename T>
-    class Matrix
-    {
+    template<typename T>
+    class Matrix {
     public:
         // ========== Construction / destruction ==========
 
@@ -141,8 +140,7 @@ namespace sif::math {
          * @param colStart First column of the sub-matrix.
          * @param colCount Number of columns to copy.
          */
-        Matrix<T> subMatrix(size_t rowStart, size_t rowCount,
-                             size_t colStart, size_t colCount) const;
+        Matrix<T> subMatrix(size_t rowStart, size_t rowCount, size_t colStart, size_t colCount) const;
 
         // ========== Matrix <-> Matrix arithmetic ==========
 
@@ -226,19 +224,19 @@ namespace sif::math {
         /**
          * @brief Writes the matrix to an output stream, one row per line.
          */
-        template <typename U>
+        template<typename U>
         friend std::ostream& operator<<(std::ostream& os, const Matrix<U>& mat);
 
         /**
          * @brief Allows writing "scalar * matrix" (scalar on the left side).
          */
-        template <typename U>
+        template<typename U>
         friend Matrix<U> operator*(const U& scalar, const Matrix<U>& mat);
 
         /**
          * @brief Allows writing "row-vector * matrix" -> row-vector.
          */
-        template <typename U>
+        template<typename U>
         friend Vector<U> operator*(const Vector<U>& vec, const Matrix<U>& mat);
 
     private:
@@ -253,6 +251,6 @@ namespace sif::math {
          */
         void checkSameDimensions(const Matrix<T>& other, const char* operationName) const;
     };
-}
+} // namespace sif::math
 
 #endif // MATRIX_H

@@ -1,15 +1,15 @@
 /***************************************************************
-* Project:          Render_Engine
-* File:             input_Mouse.h
-*
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2025-12-21
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Project:          Render_Engine
+ * File:             input_Mouse.h
+ *
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2025-12-21
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_INPUT_MOUSE_H
 #define RENDER_ENGINE_INPUT_MOUSE_H
 #include <cstdint>
@@ -17,13 +17,7 @@
 #include "sif/event/Event_Bus.h"
 
 namespace sif::event::input {
-    enum class MouseButton : std::uint8_t {
-        Left,
-        Right,
-        Middle,
-        XButton1,
-        XButton2
-    };
+    enum class MouseButton : std::uint8_t { Left, Right, Middle, XButton1, XButton2 };
 
     struct Mouse_Moved {
         static constexpr EventMask mask = EventMask::Input;
@@ -55,6 +49,6 @@ namespace sif::event::input {
         int x;
         int y;
     };
-}
+} // namespace sif::event::input
 
-#endif //RENDER_ENGINE_INPUT_MOUSE_H
+#endif // RENDER_ENGINE_INPUT_MOUSE_H

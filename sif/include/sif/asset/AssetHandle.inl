@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-01-13
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-01-13
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #pragma once
 #include <utility>
 
@@ -17,9 +17,7 @@ namespace sif::asset {
     AssetHandle<T>::AssetHandle() = default;
 
     template<class T>
-    AssetHandle<T>::AssetHandle(std::weak_ptr<AssetRecord> record) : record_(std::move(record)) {
-
-    }
+    AssetHandle<T>::AssetHandle(std::weak_ptr<AssetRecord> record) : record_(std::move(record)) {}
 
     template<class T>
     std::weak_ptr<AssetRecord> AssetHandle<T>::record() const {
@@ -51,7 +49,7 @@ namespace sif::asset {
     }
 
     template<class T>
-    T * AssetHandle<T>::get() const {
+    T* AssetHandle<T>::get() const {
         // Deliberately drops the ownership the temporary held: see the
         // warning on the declaration. Callers that need the pointer to
         // outlive the expression use lock() instead.
@@ -66,7 +64,7 @@ namespace sif::asset {
     template<class T>
     intrnl::GUID AssetHandle<T>::guid() const {
         const auto r = record_.lock();
-        return r ? r->get_meta().guid: intrnl::GUID{};
+        return r ? r->get_meta().guid : intrnl::GUID{};
     }
 
     template<class T>
@@ -93,4 +91,4 @@ namespace sif::asset {
             callback(typed.get());
         });
     }
-}
+} // namespace sif::asset

@@ -1,20 +1,21 @@
 /***************************************************************
-* Project:          Render_Engine
-* File:             LogScope.h
-*
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2025-12-10
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Project:          Render_Engine
+ * File:             LogScope.h
+ *
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2025-12-10
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_LOGSCOPE_H
 #define RENDER_ENGINE_LOGSCOPE_H
 
 #ifdef _DEBUG
-#define LOG_SCOPE() sif::diag::LogScope UNIQUE_NAME(__scope){}
+#define LOG_SCOPE()                                                                                                    \
+    sif::diag::LogScope UNIQUE_NAME(__scope) {}
 #define UNIQUE_NAME(base) CONCAT(base, __COUNTER__)
 #define CONCAT(a, b) CONCAT_INNER(a, b)
 #define CONCAT_INNER(a, b) a##b
@@ -46,6 +47,6 @@ namespace sif::diag {
          */
         ~LogScope();
     };
-}
+} // namespace sif::diag
 
-#endif //RENDER_ENGINE_LOGSCOPE_H
+#endif // RENDER_ENGINE_LOGSCOPE_H

@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2025-12-10
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2025-12-10
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_LOGGER_H
 #define RENDER_ENGINE_LOGGER_H
 
@@ -23,7 +23,6 @@
 #define LOG_ADD_DEPTH()
 #define LOG_LOWER_DEPTH()
 #endif
-
 
 namespace sif::diag {
     /**
@@ -74,7 +73,6 @@ namespace sif::diag {
          */
         void print_exception(const std::exception& e, int level = 0);
 
-
         /**
          * @brief Increases the indentation depth.
          *
@@ -91,6 +89,7 @@ namespace sif::diag {
          * message tried to build a four-billion-level indent string.
          */
         void lower_depth();
+
     private:
         /**
          * @brief Constructs the logger and opens the log file.
@@ -109,8 +108,8 @@ namespace sif::diag {
         /// @brief Short marker identifying the calling thread ("" for the first one).
         static const std::string& thread_tag();
 
-        mutable std::mutex mtx_;    ///< Guards logfile_
-        std::ofstream logfile_;     ///< Output log file stream
+        mutable std::mutex mtx_;        ///< Guards logfile_
+        std::ofstream logfile_;         ///< Output log file stream
         std::string indent_str_ = "  "; ///< String used for one indentation level
 
         /// @brief Upper bound on indentation, so a runaway depth cannot
@@ -125,9 +124,6 @@ namespace sif::diag {
          */
         std::string indent(const std::string& message) const;
     };
-}
+} // namespace sif::diag
 
-
-
-
-#endif //RENDER_ENGINE_LOGGER_H
+#endif // RENDER_ENGINE_LOGGER_H

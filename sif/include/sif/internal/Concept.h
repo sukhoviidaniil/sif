@@ -14,7 +14,7 @@
  * Disclaimer:
  *   This file is part of Render_Engine.
  *   Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ ***************************************************************/
 #ifndef RENDER_ENGINE_CONCEPT_H
 #define RENDER_ENGINE_CONCEPT_H
 #include <algorithm>
@@ -29,6 +29,6 @@ namespace sif::intrnl {
         explicit Model(T v) : impl(std::move(v)) {}
         T impl;
     };
-}
+} // namespace sif::intrnl
 
-#endif //RENDER_ENGINE_CONCEPT_H
+#endif // RENDER_ENGINE_CONCEPT_H

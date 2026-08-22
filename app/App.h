@@ -6,7 +6,7 @@
  * License:
  *      c. 2026 Daniil Sukhovii. All rights reserved.
  *      Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ ***************************************************************/
 #ifndef RENDER_ENGINE_APP_H
 #define RENDER_ENGINE_APP_H
 
@@ -38,10 +38,8 @@ namespace app {
      */
     class App final : public sif::event::Observer {
     public:
-        App(std::shared_ptr<sif::event::Event_Bus> bus,
-            const sif::ast::RB_Config& render_config,
-            const sif::ast::EC_Config& collector_config,
-            std::unique_ptr<demo::Demo> demo);
+        App(std::shared_ptr<sif::event::Event_Bus> bus, const sif::ast::RB_Config& render_config,
+            const sif::ast::EC_Config& collector_config, std::unique_ptr<demo::Demo> demo);
 
         ~App() override;
 
@@ -71,6 +69,6 @@ namespace app {
 
         float total_seconds_ = 0.f;
     };
-}
+} // namespace app
 
-#endif //RENDER_ENGINE_APP_H
+#endif // RENDER_ENGINE_APP_H

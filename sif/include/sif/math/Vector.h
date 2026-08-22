@@ -1,23 +1,23 @@
 /***************************************************************
-* Author:           <your name>
-* Email:            <your email>
-* Created:          2026-07-06
-*
-* License:
-*       (c) 2026 <your name>. All rights reserved.
-***************************************************************/
+ * Author:           <your name>
+ * Email:            <your email>
+ * Created:          2026-07-06
+ *
+ * License:
+ *       (c) 2026 <your name>. All rights reserved.
+ ***************************************************************/
 #ifndef VECTOR_H
 #define VECTOR_H
 
 #include <cstddef>
-#include <vector>
-#include <iostream>
 #include <initializer_list>
+#include <iostream>
 #include <stdexcept>
+#include <vector>
 
 namespace sif::math {
     // Forward declaration to allow conversion helpers without circular include.
-    template <typename T>
+    template<typename T>
     class Matrix;
 
     /**
@@ -29,9 +29,8 @@ namespace sif::math {
      * and comparison.
      */
 
-    template <typename T>
-    class Vector
-    {
+    template<typename T>
+    class Vector {
     public:
         // ========== Construction / destruction ==========
 
@@ -208,13 +207,13 @@ namespace sif::math {
          *
          * Format: "[a, b, c]"
          */
-        template <typename U>
+        template<typename U>
         friend std::ostream& operator<<(std::ostream& os, const Vector<U>& vec);
 
         /**
          * @brief Allows writing "scalar * vector" (scalar on the left side).
          */
-        template <typename U>
+        template<typename U>
         friend Vector<U> operator*(const U& scalar, const Vector<U>& vec);
 
     private:
@@ -225,5 +224,5 @@ namespace sif::math {
          */
         void checkSameSize(const Vector<T>& other, const char* operationName) const;
     };
-}
+} // namespace sif::math
 #endif // VECTOR_H

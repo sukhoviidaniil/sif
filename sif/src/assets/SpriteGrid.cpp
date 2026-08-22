@@ -1,21 +1,19 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-07-06
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-07-06
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 
 #include "sif/asset/internal/SpriteGrid.h"
 
 #include <stdexcept>
 
 namespace sif::asset {
-    SpriteGrid::SpriteGrid(math::Matrix<intrnl::Rect> cells)
-        : cells_(std::move(cells)) {
-    }
+    SpriteGrid::SpriteGrid(math::Matrix<intrnl::Rect> cells) : cells_(std::move(cells)) {}
 
     SpriteGrid::~SpriteGrid() = default;
 
@@ -47,4 +45,4 @@ namespace sif::asset {
         const size_t col = id.id % col_count;
         return cell(row, col);
     }
-}
+} // namespace sif::asset

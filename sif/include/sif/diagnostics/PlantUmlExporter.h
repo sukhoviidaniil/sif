@@ -1,18 +1,18 @@
 /***************************************************************
-* Author:           <your name>
-* Email:            <your email>
-* Created:          2026-07-06
-*
-* License:
-*       (c) 2026 <your name>. All rights reserved.
-***************************************************************/
+ * Author:           <your name>
+ * Email:            <your email>
+ * Created:          2026-07-06
+ *
+ * License:
+ *       (c) 2026 <your name>. All rights reserved.
+ ***************************************************************/
 #ifndef PLANT_UML_EXPORTER_H
 #define PLANT_UML_EXPORTER_H
 
+#include "DeclarationGraphBuilder.h"
+#include "sif/math/Graph.h"
 #include <string>
 #include <vector>
-#include "sif/math/Graph.h"
-#include "DeclarationGraphBuilder.h"
 
 namespace sif::diag {
     /**
@@ -31,12 +31,10 @@ namespace sif::diag {
      *
      * @return Full path of the file that was written.
      */
-    std::string exportToPlantUml(
-        const math::DirectedGraph<std::string>& graph,
-        const DeclarationGraphResult& metadata,
-        const std::vector<std::vector<math::DirectedGraph<std::string>::VertexId>>& cycles,
-        const std::string& outputFolder,
-        const std::string& fileName = "declaration_graph.puml");
-}
+    std::string exportToPlantUml(const math::DirectedGraph<std::string>& graph, const DeclarationGraphResult& metadata,
+                                 const std::vector<std::vector<math::DirectedGraph<std::string>::VertexId>>& cycles,
+                                 const std::string& outputFolder,
+                                 const std::string& fileName = "declaration_graph.puml");
+} // namespace sif::diag
 
 #endif // PLANT_UML_EXPORTER_H

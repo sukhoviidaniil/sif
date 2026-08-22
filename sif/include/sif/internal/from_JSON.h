@@ -1,28 +1,26 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-01-17
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-01-17
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_RB_FROM_JSON_H
 #define RENDER_ENGINE_RB_FROM_JSON_H
 
-
 #include "sif/io/from_JSON.h"
 
+#include "sif/asset/internal/AssetDesc.h"
 #include "sif/asset/internal/data/AssetMetaData.h"
 #include "sif/asset/internal/data/FontNode.h"
-#include "sif/asset/internal/data/SpriteSingleNode.h"
-#include "sif/asset/internal/data/SpriteAtlasNode.h"
-#include "sif/asset/internal/data/SpriteGridNode.h"
 #include "sif/asset/internal/data/PrimitiveAnimationNode.h"
 #include "sif/asset/internal/data/SoundNode.h"
-#include "sif/asset/internal/AssetDesc.h"
+#include "sif/asset/internal/data/SpriteAtlasNode.h"
+#include "sif/asset/internal/data/SpriteGridNode.h"
+#include "sif/asset/internal/data/SpriteSingleNode.h"
 #include "sif/internal/Rect.h"
-
 
 namespace sif::intrnl {
     inline void from_json(const nlohmann::json& j, Rect& r) {
@@ -33,14 +31,9 @@ namespace sif::intrnl {
     }
 
     inline void to_json(nlohmann::json& j, const Rect& r) {
-        j = nlohmann::json{
-            { "x", r.x },
-            { "y", r.y },
-            { "width", r.width },
-            { "height", r.height }
-        };
+        j = nlohmann::json{{"x", r.x}, {"y", r.y}, {"width", r.width}, {"height", r.height}};
     }
-}
+} // namespace sif::intrnl
 
 namespace sif::asset::data {
     /**
@@ -94,9 +87,8 @@ namespace sif::asset::data {
         d.type = from_string(io::get_checked<std::string>(j, "type"));
         d.asset_name = io::get_checked<std::string>(j, "asset_name");
 
-        d.expected_load_time_seconds = io::get_checked<double>(
-            j, "expected_load_time_seconds", d.expected_load_time_seconds
-        );
+        d.expected_load_time_seconds =
+            io::get_checked<double>(j, "expected_load_time_seconds", d.expected_load_time_seconds);
 
         d.critical = io::get_checked<bool>(j, "critical", d.critical);
 
@@ -109,13 +101,9 @@ namespace sif::asset::data {
 
     inline void to_json(nlohmann::json& j, const AssetMetaData& d) {
         j = nlohmann::json{
-            { "guid", d.guid.string() },
-            { "type", to_string(d.type) },
-            { "asset_name", d.asset_name },
-            { "expected_load_time_seconds", d.expected_load_time_seconds },
-            { "critical", d.critical },
-            { "record_id_to_name", write_record_names(d.record_id_to_name) }
-        };
+            {"guid", d.guid.string()},    {"type", to_string(d.type)},
+            {"asset_name", d.asset_name}, {"expected_load_time_seconds", d.expected_load_time_seconds},
+            {"critical", d.critical},     {"record_id_to_name", write_record_names(d.record_id_to_name)}};
     }
 
     inline void from_json(const nlohmann::json& j, FontNode& d) {
@@ -137,11 +125,7 @@ namespace sif::asset::data {
     }
 
     inline void to_json(nlohmann::json& j, const SpriteAtlasNode& d) {
-        j = nlohmann::json{
-            { "meta", d.meta },
-            { "source", d.source },
-            { "rects", d.rects }
-        };
+        j = nlohmann::json{{"meta", d.meta}, {"source", d.source}, {"rects", d.rects}};
     }
 
     inline void from_json(const nlohmann::json& j, SpriteGridNode& d) {
@@ -154,14 +138,8 @@ namespace sif::asset::data {
     }
 
     inline void to_json(nlohmann::json& j, const SpriteGridNode& d) {
-        j = nlohmann::json{
-            { "meta", d.meta },
-            { "source", d.source },
-            { "rows", d.rows },
-            { "cols", d.cols },
-            { "cell_width", d.cell_width },
-            { "cell_height", d.cell_height }
-        };
+        j = nlohmann::json{{"meta", d.meta}, {"source", d.source},         {"rows", d.rows},
+                           {"cols", d.cols}, {"cell_width", d.cell_width}, {"cell_height", d.cell_height}};
     }
 
     inline void from_json(const nlohmann::json& j, PrimitiveAnimationNode& d) {
@@ -173,20 +151,18 @@ namespace sif::asset::data {
     }
 
     inline void to_json(nlohmann::json& j, const PrimitiveAnimationNode& d) {
-        j = nlohmann::json{
-            { "meta", d.meta },
-            { "source", d.source },
-            { "frames", d.frames },
-            { "frame_duration_seconds", d.frame_duration_seconds },
-            { "loop", d.loop }
-        };
+        j = nlohmann::json{{"meta", d.meta},
+                           {"source", d.source},
+                           {"frames", d.frames},
+                           {"frame_duration_seconds", d.frame_duration_seconds},
+                           {"loop", d.loop}};
     }
 
     inline void from_json(const nlohmann::json& j, SoundNode& d) {
         d.meta = io::get_checked<data::AssetMetaData>(j);
         d.source = io::get_checked<std::string>(j, "source");
     }
-}
+} // namespace sif::asset::data
 
 namespace sif::asset {
     inline void from_json(const nlohmann::json& j, AssetDesc& d) {
@@ -194,13 +170,9 @@ namespace sif::asset {
         d.conf_path = io::get_checked<std::string>(j, "conf_path");
     }
     inline void to_json(nlohmann::json& j, const AssetDesc& d) {
-        j = nlohmann::json{
-            { "meta", d.meta },
-            { "conf_path", d.conf_path }
-        };
+        j = nlohmann::json{{"meta", d.meta}, {"conf_path", d.conf_path}};
     }
 
-}
+} // namespace sif::asset
 
-
-#endif //RENDER_ENGINE_RB_FROM_JSON_H
+#endif // RENDER_ENGINE_RB_FROM_JSON_H

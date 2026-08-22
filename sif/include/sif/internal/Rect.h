@@ -1,18 +1,18 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-01-19
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-01-19
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_RECT_H
 #define RENDER_ENGINE_RECT_H
 
 #include <iosfwd>
 
-namespace sif::intrnl{
+namespace sif::intrnl {
     /**
      * @brief Axis-aligned rectangle in layout coordinates.
      *
@@ -23,14 +23,13 @@ namespace sif::intrnl{
      * supports componentwise arithmetic below.
      */
     struct Rect {
-        float x = 0; ///< X position (left)
-        float y = 0; ///< Y position (top)
-        float width = 0; ///< Width
+        float x = 0;      ///< X position (left)
+        float y = 0;      ///< Y position (top)
+        float width = 0;  ///< Width
         float height = 0; ///< Height
 
         Rect() = default;
-        Rect(const float left, const float top, const float w, const float h)
-            : x(left), y(top), width(w), height(h) {}
+        Rect(const float left, const float top, const float w, const float h) : x(left), y(top), width(w), height(h) {}
 
         // ========== Arithmetic operators ==========
 
@@ -96,5 +95,5 @@ namespace sif::intrnl{
          */
         friend std::ostream& operator<<(std::ostream& os, const Rect& rect);
     };
-}
-#endif //RENDER_ENGINE_RECT_H
+} // namespace sif::intrnl
+#endif // RENDER_ENGINE_RECT_H

@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-07-06
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-07-06
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 
 #include "sif/asset/internal/PrimitiveAnimation.h"
 
@@ -15,11 +15,9 @@
 #include <stdexcept>
 
 namespace sif::asset {
-    PrimitiveAnimation::PrimitiveAnimation(math::Vector<intrnl::Rect> frames, const float frame_duration_seconds, const bool loop)
-        : frames_(std::move(frames))
-        , frame_duration_seconds_(frame_duration_seconds)
-        , loop_(loop) {
-    }
+    PrimitiveAnimation::PrimitiveAnimation(math::Vector<intrnl::Rect> frames, const float frame_duration_seconds,
+                                           const bool loop)
+        : frames_(std::move(frames)), frame_duration_seconds_(frame_duration_seconds), loop_(loop) {}
 
     PrimitiveAnimation::~PrimitiveAnimation() = default;
 
@@ -83,4 +81,4 @@ namespace sif::asset {
         }
         return frames_[index];
     }
-}
+} // namespace sif::asset

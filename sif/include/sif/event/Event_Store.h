@@ -1,15 +1,15 @@
 /***************************************************************
-* Project:          Render_Engine
-* File:             Event_Store.h
-*
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2025-12-18
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Project:          Render_Engine
+ * File:             Event_Store.h
+ *
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2025-12-18
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_EVENT_STORE_H
 #define RENDER_ENGINE_EVENT_STORE_H
 #include <memory>
@@ -66,8 +66,7 @@ namespace sif::event {
          *
          * @param e Event concept instance.
          */
-        void push_concept(EventConcept &e);
-
+        void push_concept(EventConcept& e);
 
         /**
          * @brief Removes and returns the last event as a concrete type.
@@ -97,7 +96,6 @@ namespace sif::event {
          */
         [[nodiscard]] const EventConcept& at(std::size_t i) const;
 
-
         /**
          * @brief Accesses a stored event as a concrete type.
          *
@@ -106,11 +104,12 @@ namespace sif::event {
          */
         template<typename Event>
         const Event& get(std::size_t i) const;
+
     private:
         /// Stored events
         std::vector<std::unique_ptr<EventConcept>> events_;
     };
-}
+} // namespace sif::event
 #include "Event_Store.inl"
 
-#endif //RENDER_ENGINE_EVENT_STORE_H
+#endif // RENDER_ENGINE_EVENT_STORE_H

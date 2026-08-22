@@ -1,16 +1,16 @@
 /***************************************************************
-* Author:           <your name>
-* Email:            <your email>
-* Created:          2026-07-06
-*
-* License:
-*       (c) 2026 <your name>. All rights reserved.
-***************************************************************/
+ * Author:           <your name>
+ * Email:            <your email>
+ * Created:          2026-07-06
+ *
+ * License:
+ *       (c) 2026 <your name>. All rights reserved.
+ ***************************************************************/
 #ifndef CYCLE_FINDER_H
 #define CYCLE_FINDER_H
 
-#include <vector>
 #include "sif/math/Graph.h"
+#include <vector>
 
 namespace sif::diag {
     /**
@@ -33,6 +33,6 @@ namespace sif::diag {
      */
     std::vector<std::vector<math::DirectedGraph<std::string>::VertexId>>
     findCycles(const math::DirectedGraph<std::string>& graph);
-}
+} // namespace sif::diag
 
 #endif // CYCLE_FINDER_H

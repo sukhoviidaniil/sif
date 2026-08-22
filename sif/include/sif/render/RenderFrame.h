@@ -1,5 +1,5 @@
 /***************************************************************
-* Project:          Render_Engine
+ * Project:          Render_Engine
  * File:            RenderFrame.h
  *
  * Author:          Daniil Sukhovii
@@ -9,7 +9,7 @@
  * License:
  *      c. 2026 Daniil Sukhovii. All rights reserved.
  *      Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ ***************************************************************/
 #ifndef RENDER_ENGINE_AST_RENDERFRAME_H
 #define RENDER_ENGINE_AST_RENDERFRAME_H
 
@@ -23,6 +23,6 @@ namespace sif::rnd {
         std::vector<std::unique_ptr<RenderNode>> constant_items;
         std::vector<std::unique_ptr<RenderNode>> temp_items;
     };
-}
+} // namespace sif::rnd
 
-#endif //RENDER_ENGINE_AST_RENDERFRAME_H
+#endif // RENDER_ENGINE_AST_RENDERFRAME_H

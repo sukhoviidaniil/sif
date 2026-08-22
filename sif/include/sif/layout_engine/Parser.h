@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-01-12
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-01-12
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_PARSER_H
 #define RENDER_ENGINE_PARSER_H
 
@@ -18,6 +18,6 @@ namespace sif::ui {
     public:
         static std::unique_ptr<Node> parse(const std::vector<Token>& tokens);
     };
-}
+} // namespace sif::ui
 
-#endif //RENDER_ENGINE_PARSER_H
+#endif // RENDER_ENGINE_PARSER_H

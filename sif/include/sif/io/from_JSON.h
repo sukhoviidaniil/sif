@@ -1,18 +1,18 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-01-17
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-01-17
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_IO_FROM_JSON_H
 #define RENDER_ENGINE_IO_FROM_JSON_H
 
 #include <filesystem>
-#include <system_error>
 #include <fstream>
+#include <system_error>
 
 #include "json.hpp"
 #include "sif/diagnostics/Logger.h"
@@ -54,18 +54,14 @@ namespace sif::io {
         return read_json(file);
     }
 
-    inline void invalid_parameter(const std::string &path, const std::string &object, const std::string &name) {
-        const std::string error = "File: " + path+ ", in " + object +  ", parameter " + name + " missing or invalid;";
+    inline void invalid_parameter(const std::string& path, const std::string& object, const std::string& name) {
+        const std::string error = "File: " + path + ", in " + object + ", parameter " + name + " missing or invalid;";
         LOG(error);
         throw std::runtime_error(error);
     }
 
     template<class T>
-    T get_checked(
-    const nlohmann::json &j,
-    const std::string &key,
-    const T &default_value
-    ) {
+    T get_checked(const nlohmann::json& j, const std::string& key, const T& default_value) {
         // Key not found -> return default
         if (!j.contains(key))
             return default_value;
@@ -75,18 +71,14 @@ namespace sif::io {
         // If the JSON value type is correct -> return it
         try {
             return value.get<T>();
-        }
-        catch (const std::exception& e) {
+        } catch (const std::exception& e) {
             LOG(e.what());
             throw;
         }
     }
 
     template<class T>
-    T get_checked(
-        const nlohmann::json &j,
-        const std::string &key
-        ) {
+    T get_checked(const nlohmann::json& j, const std::string& key) {
         // Key not found -> err
         if (!j.contains(key)) {
             const std::string error = "nlohmann::json " + key + " parameter missing or invalid;";
@@ -103,9 +95,7 @@ namespace sif::io {
     }
 
     template<class T>
-    T get_checked(
-    const nlohmann::json &j
-    ) {
+    T get_checked(const nlohmann::json& j) {
         // If the JSON value type is correct -> return it
         try {
             return j.get<T>();
@@ -141,8 +131,7 @@ namespace sif::io {
             std::error_code ec;
             std::filesystem::create_directories(parent, ec);
             if (ec) {
-                throw std::runtime_error(
-                    "Cannot create directory '" + parent.string() + "': " + ec.message());
+                throw std::runtime_error("Cannot create directory '" + parent.string() + "': " + ec.message());
             }
         }
 
@@ -167,12 +156,10 @@ namespace sif::io {
         std::filesystem::rename(tmp, path, ec);
         if (ec) {
             std::filesystem::remove(tmp, ec);
-            throw std::runtime_error(
-                "Failed to replace '" + path.string() + "': " + ec.message());
+            throw std::runtime_error("Failed to replace '" + path.string() + "': " + ec.message());
         }
     }
 
-}
+} // namespace sif::io
 
-
-#endif //RENDER_ENGINE_IO_FROM_JSON_H
+#endif // RENDER_ENGINE_IO_FROM_JSON_H

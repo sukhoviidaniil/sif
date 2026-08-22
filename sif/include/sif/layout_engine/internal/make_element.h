@@ -1,29 +1,28 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-01-13
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-01-13
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_MAKE_ELEMENT_H
 #define RENDER_ENGINE_MAKE_ELEMENT_H
 
 #include "add_attribute.h"
-#include "sif/internal/GUID.h"
 #include "sif/asset/AssetRegistry.h"
 #include "sif/asset/internal/Font.h"
+#include "sif/internal/GUID.h"
 #include "sif/layout_engine/Node.h"
-#include "sif/layout_engine/elements/LinearLayout.h"
-#include "sif/layout_engine/elements/Rectangle.h"
-#include "sif/layout_engine/elements/Sprite.h"
 #include "sif/layout_engine/elements/Animation.h"
 #include "sif/layout_engine/elements/Button.h"
+#include "sif/layout_engine/elements/LinearLayout.h"
 #include "sif/layout_engine/elements/Menu.h"
+#include "sif/layout_engine/elements/Rectangle.h"
+#include "sif/layout_engine/elements/Sprite.h"
 #include "sif/layout_engine/elements/Text.h"
 #include "sif/layout_engine/elements/V_HBox.h"
-
 
 namespace sif::ui {
 
@@ -63,7 +62,7 @@ namespace sif::ui {
         static std::string from = "VBox node";
 
         auto e = std::make_unique<VBox>();
-        VBox *ep = e.get();
+        VBox* ep = e.get();
 
         add_attribute_width(n, from, ep);
         add_attribute_height(n, from, ep);
@@ -179,14 +178,11 @@ namespace sif::ui {
         registry.request(guid);
 
         const asset::AssetType kind = registry.type_of(guid);
-        if (kind != asset::AssetType::SpriteSingle &&
-            kind != asset::AssetType::SpriteAtlas &&
+        if (kind != asset::AssetType::SpriteSingle && kind != asset::AssetType::SpriteAtlas &&
             kind != asset::AssetType::SpriteGrid) {
-            throw std::runtime_error(
-                from + ": asset " + guid.string() + " is a " + asset::to_string(kind) +
-                ", which <Sprite> cannot draw (expected SpriteSingle/SpriteAtlas/SpriteGrid)"
-            );
-            }
+            throw std::runtime_error(from + ": asset " + guid.string() + " is a " + asset::to_string(kind) +
+                                     ", which <Sprite> cannot draw (expected SpriteSingle/SpriteAtlas/SpriteGrid)");
+        }
 
         // Sub-sprite selection: either a numeric record_id, or a
         // human-readable record_name resolved through the asset's
@@ -236,10 +232,8 @@ namespace sif::ui {
 
         const asset::AssetType kind = registry.type_of(guid);
         if (kind != asset::AssetType::PrimitiveAnimation) {
-            throw std::runtime_error(
-                from + ": asset " + guid.string() + " is a " + asset::to_string(kind) +
-                ", expected PrimitiveAnimation"
-            );
+            throw std::runtime_error(from + ": asset " + guid.string() + " is a " + asset::to_string(kind) +
+                                     ", expected PrimitiveAnimation");
         }
 
         auto e = std::make_unique<Animation>(registry.get<asset::PrimitiveAnimation>(guid));
@@ -339,6 +333,6 @@ namespace sif::ui {
 
         return e;
     }
-}
+} // namespace sif::ui
 
 #endif

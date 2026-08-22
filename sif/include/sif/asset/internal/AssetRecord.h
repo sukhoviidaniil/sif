@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-01-13
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-01-13
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_ASSETRECORD_H
 #define RENDER_ENGINE_ASSETRECORD_H
 
@@ -139,6 +139,6 @@ namespace sif::asset {
         uint64_t attempt_id_ = 0;
         std::vector<CompletionCallback> completion_callbacks_;
     };
-}
+} // namespace sif::asset
 
-#endif //RENDER_ENGINE_ASSETRECORD_H
+#endif // RENDER_ENGINE_ASSETRECORD_H

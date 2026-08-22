@@ -1,5 +1,5 @@
 /***************************************************************
-* Project:          Render_Engine
+ * Project:          Render_Engine
  * File:            Renderer.h
  *
  * Author:          Daniil Sukhovii
@@ -9,7 +9,7 @@
  * License:
  *      c. 2026 Daniil Sukhovii. All rights reserved.
  *      Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ ***************************************************************/
 #ifndef RENDER_ENGINE_VIEW_H
 #define RENDER_ENGINE_VIEW_H
 
@@ -34,6 +34,6 @@ namespace sif::rnd {
 
         virtual void render(const RenderFrame& graph) = 0;
     };
-}
+} // namespace sif::rnd
 
-#endif //RENDER_ENGINE_VIEW_H
+#endif // RENDER_ENGINE_VIEW_H

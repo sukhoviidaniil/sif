@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-01-17
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-01-17
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_ASSETDATALOADER_H
 #define RENDER_ENGINE_ASSETDATALOADER_H
 
@@ -14,17 +14,15 @@
 
 #include "AssetDataNode.h"
 #include "FontNode.h"
-#include "SpriteSingleNode.h"
-#include "SpriteAtlasNode.h"
-#include "SpriteGridNode.h"
 #include "PrimitiveAnimationNode.h"
 #include "SoundNode.h"
-
+#include "SpriteAtlasNode.h"
+#include "SpriteGridNode.h"
+#include "SpriteSingleNode.h"
 
 namespace sif::asset::data {
     class AssetDataLoader {
     public:
-
         static AssetDataLoader& instance();
 
         static std::unique_ptr<AssetDataNode> load_from_file(const std::filesystem::path& path);
@@ -42,7 +40,8 @@ namespace sif::asset::data {
         static std::unique_ptr<SpriteGridNode> load_SpriteGrid_from_file(const std::filesystem::path& path);
         static void save_Meta_SpriteGrid(const std::filesystem::path& path, data::AssetMetaData& meta);
 
-        static std::unique_ptr<PrimitiveAnimationNode> load_PrimitiveAnimation_from_file(const std::filesystem::path& path);
+        static std::unique_ptr<PrimitiveAnimationNode>
+        load_PrimitiveAnimation_from_file(const std::filesystem::path& path);
         static void save_Meta_PrimitiveAnimation(const std::filesystem::path& path, data::AssetMetaData& meta);
 
         static std::unique_ptr<SoundNode> load_Sound_from_file(const std::filesystem::path& path);
@@ -51,6 +50,6 @@ namespace sif::asset::data {
     private:
         AssetDataLoader();
     };
-}
+} // namespace sif::asset::data
 
-#endif //RENDER_ENGINE_ASSETDATALOADER_H
+#endif // RENDER_ENGINE_ASSETDATALOADER_H

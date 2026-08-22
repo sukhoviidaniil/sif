@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-01-15
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-01-15
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #include <exception>
 #include <iostream>
 #include <string>
@@ -37,17 +37,16 @@ namespace {
         const std::string suggestion = sif::asset::suggested_registry_filename(registry_file);
 
         std::cerr << "Warning: '" << registry_file << "' is not a registry name.\n"
-                  << "         Registry files must be named <name>"
-                  << sif::asset::registry_extension << " - did you mean '"
-                  << suggestion << "'?\n"
+                  << "         Registry files must be named <name>" << sif::asset::registry_extension
+                  << " - did you mean '" << suggestion << "'?\n"
                   << "         Writing to the given path anyway.\n";
 
-        LOG("Asset_GUID_Assignment: non-conforming registry name '" + registry_file +
-            "', expected <name>" + std::string(sif::asset::registry_extension));
+        LOG("Asset_GUID_Assignment: non-conforming registry name '" + registry_file + "', expected <name>" +
+            std::string(sif::asset::registry_extension));
 
         return false;
     }
-}
+} // namespace
 
 /**
  * @brief Scans a data directory, assigns/collects asset GUIDs and writes
@@ -59,11 +58,9 @@ namespace {
  */
 int main(const int argc, char* argv[]) {
     if (argc < 3) {
-        std::cerr << "Usage: " << argv[0]
-                  << " <asset_dir> <registry_file>\n"
+        std::cerr << "Usage: " << argv[0] << " <asset_dir> <registry_file>\n"
                   << "  asset_dir      directory scanned recursively for *.asset.json\n"
-                  << "  registry_file  registry to write, named <name>"
-                  << sif::asset::registry_extension
+                  << "  registry_file  registry to write, named <name>" << sif::asset::registry_extension
                   << " (parent directories are created)\n";
         return 1;
     }

@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-01-13
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-01-13
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 
 #include "sif/layout_engine/UIFactory.h"
 
@@ -23,11 +23,11 @@ namespace sif::ui {
         return f;
     }
 
-    void UIFactory::register_tag(std::string tag, UIFactoryFn fn)  {
+    void UIFactory::register_tag(std::string tag, UIFactoryFn fn) {
         map_[std::move(tag)] = std::move(fn);
     }
 
-    std::unique_ptr<UIElement> UIFactory::build(const Node &n)  {
+    std::unique_ptr<UIElement> UIFactory::build(const Node& n) {
         const auto it = map_.find(n.tag);
 
         if (it == map_.end()) {
@@ -64,4 +64,4 @@ namespace sif::ui {
         register_tag("Button", make_Button);
         register_tag("Menu", make_Menu);
     }
-}
+} // namespace sif::ui

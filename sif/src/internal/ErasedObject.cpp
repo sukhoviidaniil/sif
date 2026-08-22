@@ -1,26 +1,20 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-01-15
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-01-15
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #include "sif/internal/ErasedObject.h"
 
 namespace sif::intrnl {
 
-    ErasedObject::ErasedObject()
-        : storage_(nullptr)
-        , destroy_(nullptr)
-        , type_(TypeId{})
-    {}
+    ErasedObject::ErasedObject() : storage_(nullptr), destroy_(nullptr), type_(TypeId{}) {}
 
     ErasedObject::ErasedObject(ErasedObject&& other) noexcept
-    : storage_(other.storage_)
-    , destroy_(other.destroy_)
-    , type_(other.type_) {
+        : storage_(other.storage_), destroy_(other.destroy_), type_(other.type_) {
         other.storage_ = nullptr;
         other.destroy_ = nullptr;
         other.type_ = 0;
@@ -51,10 +45,10 @@ namespace sif::intrnl {
         return storage_ != nullptr;
     }
 
-    void  ErasedObject::reset() {
+    void ErasedObject::reset() {
         if (storage_) {
             destroy_(storage_);
             storage_ = nullptr;
         }
     }
-}
+} // namespace sif::intrnl

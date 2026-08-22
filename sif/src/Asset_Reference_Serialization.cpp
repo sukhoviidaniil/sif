@@ -1,24 +1,23 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-01-15
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-01-15
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 
 #include <exception>
 #include <iostream>
 
-#include "sif/internal/reference_serialization.h"
 #include "sif/asset/internal/AssetImporter.h"
+#include "sif/internal/reference_serialization.h"
 
 int main(const int argc, char* argv[]) {
 
     if (argc < 4) {
-        std::cerr << "Usage: " << argv[0]
-                  << " <registry_file> <scenes_dir> <serialized_scenes_dir>\n"
+        std::cerr << "Usage: " << argv[0] << " <registry_file> <scenes_dir> <serialized_scenes_dir>\n"
                   << "  registry_file           produced by Asset_GUID_Assignment\n"
                   << "  scenes_dir              authoring scenes (asset_name=\"...\")\n"
                   << "  serialized_scenes_dir   output scenes (guid=\"...\"), created if missing\n";
@@ -32,8 +31,7 @@ int main(const int argc, char* argv[]) {
     try {
         sif::asset::AssetImporter::instance().load_from_file(registry_file);
         if (const size_t failed = sif::reference_serialization(scenes_dir, serialized_scenes_dir); failed > 0) {
-            std::cerr << "Asset_Reference_Serialization: " << failed
-                      << " scene(s) could not be serialized\n";
+            std::cerr << "Asset_Reference_Serialization: " << failed << " scene(s) could not be serialized\n";
             return 1;
         }
     } catch (const std::exception& e) {

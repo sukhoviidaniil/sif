@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-02-08
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-02-08
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_ADD_ATTRIBUTE_H
 #define RENDER_ENGINE_ADD_ATTRIBUTE_H
 #include <cstdint>
@@ -17,11 +17,9 @@
 #include "sif/layout_engine/elements/LinearLayout.h"
 #include "sif/layout_engine/elements/UIElement.h"
 
-
 namespace sif::ui {
 
-
-    inline void add_attribute_width(const Node& n, const std::string& from, UIElement * element) {
+    inline void add_attribute_width(const Node& n, const std::string& from, UIElement* element) {
         const std::string attribute = "width";
         if (n.attributes.contains(attribute)) {
             try {
@@ -32,7 +30,7 @@ namespace sif::ui {
         }
     }
 
-    inline void add_attribute_height(const Node& n, const std::string& from, UIElement * element) {
+    inline void add_attribute_height(const Node& n, const std::string& from, UIElement* element) {
         const std::string attribute = "height";
         if (n.attributes.contains(attribute)) {
             try {
@@ -50,7 +48,7 @@ namespace sif::ui {
      * only some elements interpret), so UIFactory::build applies this
      * once for every tag rather than each make_* function repeating it.
      */
-    inline void add_attribute_name(const Node& n, UIElement * element) {
+    inline void add_attribute_name(const Node& n, UIElement* element) {
         const std::string attribute = "name";
         if (n.attributes.contains(attribute)) {
             element->name = n.attributes.at(attribute);
@@ -63,7 +61,7 @@ namespace sif::ui {
      *
      * Common to every element type, applied once by UIFactory::build.
      */
-    inline void add_attribute_id(const Node& n, const std::string& from, UIElement * element) {
+    inline void add_attribute_id(const Node& n, const std::string& from, UIElement* element) {
         const std::string attribute = "id";
         if (n.attributes.contains(attribute)) {
             try {
@@ -74,13 +72,12 @@ namespace sif::ui {
         }
     }
 
-
-    inline void add_attribute_padding(const Node& n, const std::string& from, UIElement * element) {
+    inline void add_attribute_padding(const Node& n, const std::string& from, UIElement* element) {
         const std::string attribute = "padding";
         if (n.attributes.contains(attribute)) {
             try {
                 const float a = std::stof(n.attributes.at(attribute));
-                element->padding = {a,a};
+                element->padding = {a, a};
             } catch (const std::exception& ex) {
                 invalid_attribute(from, attribute, n.attributes.at(attribute), ex.what());
             }
@@ -95,7 +92,7 @@ namespace sif::ui {
      * pixels or percentages: the flex machinery existed in
      * LinearLayout::layout but was unreachable from XML.
      */
-    inline void add_attribute_flex(const Node& n, const std::string& from, UIElement * element) {
+    inline void add_attribute_flex(const Node& n, const std::string& from, UIElement* element) {
         const std::string attribute = "flex";
         if (n.attributes.contains(attribute)) {
             try {
@@ -110,20 +107,25 @@ namespace sif::ui {
      * @brief Applies the optional "align" attribute of a LinearLayout
      * (Start | Center | End | Stretch).
      */
-    inline void add_attribute_align(const Node& n, const std::string& from, LinearLayout * element) {
+    inline void add_attribute_align(const Node& n, const std::string& from, LinearLayout* element) {
         const std::string attribute = "align";
         if (!n.attributes.contains(attribute)) {
             return;
         }
         const std::string& value = n.attributes.at(attribute);
-        if (value == "Start")        element->align = intrnl::Align::Start;
-        else if (value == "Center")  element->align = intrnl::Align::Center;
-        else if (value == "End")     element->align = intrnl::Align::End;
-        else if (value == "Stretch") element->align = intrnl::Align::Stretch;
-        else invalid_attribute(from, attribute, value, "expected Start|Center|End|Stretch");
+        if (value == "Start")
+            element->align = intrnl::Align::Start;
+        else if (value == "Center")
+            element->align = intrnl::Align::Center;
+        else if (value == "End")
+            element->align = intrnl::Align::End;
+        else if (value == "Stretch")
+            element->align = intrnl::Align::Stretch;
+        else
+            invalid_attribute(from, attribute, value, "expected Start|Center|End|Stretch");
     }
 
-    inline void add_attribute_spacing(const Node& n, const std::string& from, LinearLayout * element) {
+    inline void add_attribute_spacing(const Node& n, const std::string& from, LinearLayout* element) {
         const std::string attribute = "spacing";
         if (n.attributes.contains(attribute)) {
             try {
@@ -135,7 +137,6 @@ namespace sif::ui {
         }
     }
 
+} // namespace sif::ui
 
-}
-
-#endif //RENDER_ENGINE_ADD_ATTRIBUTE_H
+#endif // RENDER_ENGINE_ADD_ATTRIBUTE_H

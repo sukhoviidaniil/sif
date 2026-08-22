@@ -1,15 +1,15 @@
 /***************************************************************
-* Project:          Render_Engine
-* File:             input_Keyboard.h
-*
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2025-12-21
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Project:          Render_Engine
+ * File:             input_Keyboard.h
+ *
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2025-12-21
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_INPUT_H
 #define RENDER_ENGINE_INPUT_H
 #include <cstdint>
@@ -19,12 +19,20 @@
 namespace sif::event::input {
     enum class Key : std::uint16_t {
         Unknown,
-        W, A, S, D,
+        W,
+        A,
+        S,
+        D,
         Escape,
         Enter,
         Space,
-        Left, Right, Up, Down,
-        Num1, Num2, Num3,
+        Left,
+        Right,
+        Up,
+        Down,
+        Num1,
+        Num2,
+        Num3,
         Backspace,
     };
 
@@ -55,15 +63,13 @@ namespace sif::event::input {
         char32_t unicode = 0;
 
         /// @brief True for characters that make sense in a text field.
-        [[nodiscard]] bool printable() const {
-            return unicode >= 32 && unicode != 127;
-        }
+        [[nodiscard]] bool printable() const { return unicode >= 32 && unicode != 127; }
     };
 
     struct KeyReleased {
         static constexpr EventMask mask = EventMask::Input;
         Key key;
     };
-}
+} // namespace sif::event::input
 
-#endif //RENDER_ENGINE_INPUT_H
+#endif // RENDER_ENGINE_INPUT_H

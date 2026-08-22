@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-01-14
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-01-14
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_IASSETLOADER_H
 #define RENDER_ENGINE_IASSETLOADER_H
 
@@ -66,7 +66,6 @@ namespace sif::asset {
         [[nodiscard]] virtual bool runs_on_main_thread() const;
 
     private:
-
         /**
          * @brief Performs the actual load; must be implemented by subclasses.
          *
@@ -83,6 +82,6 @@ namespace sif::asset {
          */
         virtual void load_asset(AssetRecord& record, const std::string& asset_dir, uint64_t attempt_token) = 0;
     };
-}
+} // namespace sif::asset
 
-#endif //RENDER_ENGINE_IASSETLOADER_H
+#endif // RENDER_ENGINE_IASSETLOADER_H

@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-07-06
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-07-06
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 
 #include "sif/layout_engine/elements/Button.h"
 #include "sif/render/elements/Rectangle.h"
@@ -21,28 +21,28 @@ namespace sif::ui {
          */
         intrnl::Color blend(const intrnl::Color& a, const intrnl::Color& b, const float t) {
             const auto lerp = [t](const std::uint8_t from, const std::uint8_t to) {
-                return static_cast<std::uint8_t>(
-                    static_cast<float>(from) + (static_cast<float>(to) - static_cast<float>(from)) * t
-                );
+                return static_cast<std::uint8_t>(static_cast<float>(from) +
+                                                 (static_cast<float>(to) - static_cast<float>(from)) * t);
             };
             return {lerp(a.r, b.r), lerp(a.g, b.g), lerp(a.b, b.b), lerp(a.a, b.a)};
         }
-    }
+    } // namespace
 
-    math::Vector2 Button::measure(const math::Vector2 &available) {
-        math::Vector2 size{
-            std::max(0.f, available.x),
-            std::max(0.f, available.y)
-        };
+    math::Vector2 Button::measure(const math::Vector2& available) {
+        math::Vector2 size{std::max(0.f, available.x), std::max(0.f, available.y)};
 
         const auto resolve = [](const intrnl::Size& s, const float avail) {
-            if (s.type == intrnl::Size::Type::Pixel)   return s.value;
-            if (s.type == intrnl::Size::Type::Percent) return avail * s.value;
+            if (s.type == intrnl::Size::Type::Pixel)
+                return s.value;
+            if (s.type == intrnl::Size::Type::Percent)
+                return avail * s.value;
             return avail;
         };
 
-        if (width.type != intrnl::Size::Type::Auto)  size.x = resolve(width, available.x);
-        if (height.type != intrnl::Size::Type::Auto) size.y = resolve(height, available.y);
+        if (width.type != intrnl::Size::Type::Auto)
+            size.x = resolve(width, available.x);
+        if (height.type != intrnl::Size::Type::Auto)
+            size.y = resolve(height, available.y);
 
         size.x = std::clamp(size.x, min_size.x, max_size.x);
         size.y = std::clamp(size.y, min_size.y, max_size.y);
@@ -50,8 +50,9 @@ namespace sif::ui {
         return size;
     }
 
-    void Button::append_render_items(rnd::RenderFrame &frame, const rnd::FrameContext &ctx) const {
-        if (!visible) return;
+    void Button::append_render_items(rnd::RenderFrame& frame, const rnd::FrameContext& ctx) const {
+        if (!visible)
+            return;
 
         auto item = std::make_unique<rnd::Rectangle>();
         item->rect = result.rect;
@@ -87,8 +88,7 @@ namespace sif::ui {
 
     bool Button::contains(const math::Vector2 point) const {
         const intrnl::Rect& r = result.rect;
-        return point.x >= r.x && point.x <= r.x + r.width
-            && point.y >= r.y && point.y <= r.y + r.height;
+        return point.x >= r.x && point.x <= r.x + r.width && point.y >= r.y && point.y <= r.y + r.height;
     }
 
     bool Button::handle_click(const math::Vector2 point) {
@@ -114,4 +114,4 @@ namespace sif::ui {
     bool Button::is_selected() const {
         return state_ == ButtonState::Selected;
     }
-}
+} // namespace sif::ui

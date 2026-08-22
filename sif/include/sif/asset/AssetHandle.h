@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-01-13
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-01-13
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 #ifndef RENDER_ENGINE_ASSETHANDLE_H
 #define RENDER_ENGINE_ASSETHANDLE_H
 #include <functional>
@@ -74,8 +74,8 @@ namespace sif::asset {
     private:
         std::weak_ptr<AssetRecord> record_;
     };
-}
+} // namespace sif::asset
 
 #include "AssetHandle.inl"
 
-#endif //RENDER_ENGINE_ASSETHANDLE_H
+#endif // RENDER_ENGINE_ASSETHANDLE_H

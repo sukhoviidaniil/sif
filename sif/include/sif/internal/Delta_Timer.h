@@ -14,7 +14,7 @@
  * Disclaimer:
  *   This file is part of render-engine.
  *   Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ ***************************************************************/
 #ifndef RENDER_ENGINE_DELTATIMER_H
 #define RENDER_ENGINE_DELTATIMER_H
 
@@ -30,7 +30,6 @@ namespace sif::intrnl {
     class Delta_Timer {
 
     public:
-
         /**
          * @brief Returns the single Delta_Timer of the program.
          *
@@ -68,6 +67,6 @@ namespace sif::intrnl {
         using clock = std::chrono::steady_clock;
         clock::time_point last{}; ///< Last recorded time point
     };
-}
+} // namespace sif::intrnl
 
-#endif //RENDER_ENGINE_DELTATIMER_H
+#endif // RENDER_ENGINE_DELTATIMER_H

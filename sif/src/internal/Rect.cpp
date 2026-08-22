@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-01-19
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-01-19
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 
 #include "sif/internal/Rect.h"
 
@@ -14,31 +14,31 @@
 
 namespace sif::intrnl {
     Rect Rect::operator+(const Rect& other) const {
-        return { x + other.x, y + other.y, width + other.width, height + other.height };
+        return {x + other.x, y + other.y, width + other.width, height + other.height};
     }
 
     Rect Rect::operator-(const Rect& other) const {
-        return { x - other.x, y - other.y, width - other.width, height - other.height };
+        return {x - other.x, y - other.y, width - other.width, height - other.height};
     }
 
     Rect Rect::operator-() const {
-        return { -x, -y, -width, -height };
+        return {-x, -y, -width, -height};
     }
 
     Rect Rect::operator*(const Rect& other) const {
-        return { x * other.x, y * other.y, width * other.width, height * other.height };
+        return {x * other.x, y * other.y, width * other.width, height * other.height};
     }
 
     Rect Rect::operator/(const Rect& other) const {
-        return { x / other.x, y / other.y, width / other.width, height / other.height };
+        return {x / other.x, y / other.y, width / other.width, height / other.height};
     }
 
     Rect Rect::operator*(const float scalar) const {
-        return { x * scalar, y * scalar, width * scalar, height * scalar };
+        return {x * scalar, y * scalar, width * scalar, height * scalar};
     }
 
     Rect Rect::operator/(const float scalar) const {
-        return { x / scalar, y / scalar, width / scalar, height / scalar };
+        return {x / scalar, y / scalar, width / scalar, height / scalar};
     }
 
     Rect& Rect::operator+=(const Rect& other) {
@@ -101,4 +101,4 @@ namespace sif::intrnl {
         os << "(" << rect.x << ", " << rect.y << ", " << rect.width << ", " << rect.height << ")";
         return os;
     }
-}
+} // namespace sif::intrnl

@@ -1,12 +1,12 @@
 /***************************************************************
-* Author:           Daniil Sukhovii
-* Email:            sukhovii.daniil@gmail.com
-* Created:          2026-01-12
-*
-* License:
-*       c. 2026 Daniil Sukhovii. All rights reserved.
-*       Unauthorized use, reproduction, or distribution is prohibited.
-***************************************************************/
+ * Author:           Daniil Sukhovii
+ * Email:            sukhovii.daniil@gmail.com
+ * Created:          2026-01-12
+ *
+ * License:
+ *       c. 2026 Daniil Sukhovii. All rights reserved.
+ *       Unauthorized use, reproduction, or distribution is prohibited.
+ ***************************************************************/
 
 #include <filesystem>
 #include <fstream>
@@ -23,20 +23,20 @@ namespace sif::ui {
         }
     }
 
-    bool Tokenizer::is_ui_xml_file(const std::string &path) {
+    bool Tokenizer::is_ui_xml_file(const std::string& path) {
         try {
             ensure_ui_xml_file(path, true);
-        } catch (const std::exception &e) {
+        } catch (const std::exception& e) {
             return false;
         }
         return true;
     }
 
-    std::vector<Token> Tokenizer::tokenize(const std::string &path) {
+    std::vector<Token> Tokenizer::tokenize(const std::string& path) {
 
         try {
             ensure_ui_xml_file(path, true);
-        } catch (const std::exception &e) {
+        } catch (const std::exception& e) {
             std::string err = "Tokenizer::tokenize failed for file '" + path + "': " + e.what();
             LOG(err);
             throw std::runtime_error(err);
@@ -59,8 +59,6 @@ namespace sif::ui {
         file.read(src.data(), size);
         //
 
-
-
         std::vector<Token> tokens;
         size_t i = 0;
 
@@ -74,11 +72,7 @@ namespace sif::ui {
 
                 std::string text(src.substr(start, i - start));
                 if (!text.empty()) {
-                    tokens.push_back(Token{
-                        TokenType::Text,
-                        std::move(text),
-                        {}
-                    });
+                    tokens.push_back(Token{TokenType::Text, std::move(text), {}});
                 }
                 continue;
             }
@@ -96,8 +90,7 @@ namespace sif::ui {
 
             // tag name
             size_t nameStart = i;
-            while (i < src.size() &&
-                   (std::isalnum(static_cast<unsigned char>(src[i])) || src[i] == '_')) {
+            while (i < src.size() && (std::isalnum(static_cast<unsigned char>(src[i])) || src[i] == '_')) {
                 ++i;
             }
 
@@ -112,7 +105,8 @@ namespace sif::ui {
                 while (i < src.size() && src[i] != '>') {
                     ++i;
                 }
-                if (i < src.size()) ++i;
+                if (i < src.size())
+                    ++i;
 
                 token.type = TokenType::CloseTag;
                 tokens.push_back(std::move(token));
@@ -129,8 +123,7 @@ namespace sif::ui {
 
                 // attribute name
                 size_t attrNameStart = i;
-                while (i < src.size() &&
-                       (std::isalnum(static_cast<unsigned char>(src[i])) || src[i] == '_')) {
+                while (i < src.size() && (std::isalnum(static_cast<unsigned char>(src[i])) || src[i] == '_')) {
                     ++i;
                 }
 
@@ -151,22 +144,22 @@ namespace sif::ui {
                         ++i;
                     }
                     attrValue = std::string(src.substr(valueStart, i - valueStart));
-                    if (i < src.size()) ++i;
+                    if (i < src.size())
+                        ++i;
                 }
 
-                token.attributes.emplace(
-                    std::move(attrName),
-                    std::move(attrValue)
-                );
+                token.attributes.emplace(std::move(attrName), std::move(attrValue));
             }
 
             // ---------- TAG END ----------
             if (i < src.size() && src[i] == '/') {
                 ++i; // skip '/'
-                if (i < src.size() && src[i] == '>') ++i;
+                if (i < src.size() && src[i] == '>')
+                    ++i;
                 token.type = TokenType::SelfCloseTag;
             } else {
-                if (i < src.size() && src[i] == '>') ++i;
+                if (i < src.size() && src[i] == '>')
+                    ++i;
                 token.type = TokenType::OpenTag;
                 // If it is <Text>, parse the content into the “text” attribute
                 if (token.name == "Text") {
@@ -178,7 +171,7 @@ namespace sif::ui {
 
                     // Normalization: removing indents and hyphenations
                     size_t first = text_content.find_first_not_of(" \t\n\r");
-                    size_t last  = text_content.find_last_not_of(" \t\n\r");
+                    size_t last = text_content.find_last_not_of(" \t\n\r");
                     if (first != std::string::npos && last != std::string::npos) {
                         text_content = text_content.substr(first, last - first + 1);
                     } else {
@@ -197,11 +190,11 @@ namespace sif::ui {
         return tokens;
     }
 
-    void Tokenizer::save_tokens(const std::string &path, const std::vector<Token> &tokens) {
+    void Tokenizer::save_tokens(const std::string& path, const std::vector<Token>& tokens) {
 
         try {
             ensure_ui_xml_file(path, false);
-        } catch (const std::exception &e) {
+        } catch (const std::exception& e) {
             std::string err = "Tokenizer::save_tokens failed for file '" + path + "': " + e.what();
             LOG(err);
             throw std::runtime_error(err);
@@ -212,38 +205,38 @@ namespace sif::ui {
             throw std::runtime_error("Cannot open file for writing");
         }
 
-        for (const auto &token : tokens) {
+        for (const auto& token : tokens) {
             switch (token.type) {
-                case TokenType::Text:
-                    file << token.name; // для текста поле name содержит сам текст
-                    break;
+            case TokenType::Text:
+                file << token.name; // для текста поле name содержит сам текст
+                break;
 
-                case TokenType::OpenTag:
-                    file << "<" << token.name;
-                    for (const auto &[attrName, attrValue] : token.attributes) {
-                        file << " " << attrName << "=\"" << attrValue << "\"";
-                    }
-                    file << ">";
-                    break;
+            case TokenType::OpenTag:
+                file << "<" << token.name;
+                for (const auto& [attrName, attrValue] : token.attributes) {
+                    file << " " << attrName << "=\"" << attrValue << "\"";
+                }
+                file << ">";
+                break;
 
-                case TokenType::CloseTag:
-                    file << "</" << token.name << ">";
-                    break;
+            case TokenType::CloseTag:
+                file << "</" << token.name << ">";
+                break;
 
-                case TokenType::SelfCloseTag:
-                    file << "<" << token.name;
-                    for (const auto &[attrName, attrValue] : token.attributes) {
-                        file << " " << attrName << "=\"" << attrValue << "\"";
-                    }
-                    file << "/>";
-                    break;
+            case TokenType::SelfCloseTag:
+                file << "<" << token.name;
+                for (const auto& [attrName, attrValue] : token.attributes) {
+                    file << " " << attrName << "=\"" << attrValue << "\"";
+                }
+                file << "/>";
+                break;
             }
         }
 
         file.close();
     }
 
-    void Tokenizer::ensure_ui_xml_file(const std::string &path, bool must_exist) {
+    void Tokenizer::ensure_ui_xml_file(const std::string& path, bool must_exist) {
         std::filesystem::path p(path);
 
         if (must_exist) {
@@ -252,11 +245,11 @@ namespace sif::ui {
             }
         }
 
-        std::string ext = p.extension().string(); // latest extension
+        std::string ext = p.extension().string();             // latest extension
         std::string stem_ext = p.stem().extension().string(); // extension before the last one
 
         if (ext != ".xml" || stem_ext != ".ui") {
             throw std::runtime_error("File must have '.ui.xml' extension: " + path);
         }
     }
-}
+} // namespace sif::ui
