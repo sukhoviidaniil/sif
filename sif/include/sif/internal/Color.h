@@ -15,17 +15,17 @@
 #include <string_view>
 
 namespace sif::intrnl {
-    class Color {
-    public:
-        Color();
+class Color {
+public:
+    Color();
 
-        Color(std::uint8_t red, std::uint8_t green, std::uint8_t blue, std::uint8_t alpha = 255);
+    Color(std::uint8_t red, std::uint8_t green, std::uint8_t blue, std::uint8_t alpha = 255);
 
-        explicit Color(std::string_view s, std::string separator = "|");
+    explicit Color(std::string_view s, std::string separator = "|");
 
-        std::uint8_t r = 255, g = 255, b = 255;
-        std::uint8_t a = 255;
-    };
+    std::uint8_t r = 255, g = 255, b = 255;
+    std::uint8_t a = 255;
+};
 } // namespace sif::intrnl
 
 #endif // RENDER_ENGINE_COLOR_H

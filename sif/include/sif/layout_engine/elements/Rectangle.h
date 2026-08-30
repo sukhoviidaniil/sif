@@ -16,22 +16,22 @@
 
 namespace sif::ui {
 
-    class Rectangle : public UIElement {
-    public:
-        explicit Rectangle();
-        explicit Rectangle(intrnl::Color fill, intrnl::Color border = {}, int border_w = 0);
+class Rectangle : public UIElement {
+public:
+    explicit Rectangle();
+    explicit Rectangle(intrnl::Color fill, intrnl::Color border = {}, int border_w = 0);
 
-        math::Vector2 measure(const math::Vector2& available) override;
+    math::Vector2 measure(const math::Vector2& available) override;
 
-        void append_render_items(rnd::RenderFrame& frame, const rnd::FrameContext& ctx) const override;
+    void append_render_items(rnd::RenderFrame& frame, const rnd::FrameContext& ctx) const override;
 
-        intrnl::Color fill_color;
-        intrnl::Color border_color;
-        int border_width = 0;
+    intrnl::Color fill_color;
+    intrnl::Color border_color;
+    int border_width = 0;
 
-    private:
-        static float resolve(const intrnl::Size& s, float avail);
-    };
+private:
+    static float resolve(const intrnl::Size& s, float avail);
+};
 
 } // namespace sif::ui
 

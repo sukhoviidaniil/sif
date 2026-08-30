@@ -15,19 +15,19 @@
 
 namespace sif::ui {
 
-    class UIFactory {
-    public:
-        static UIFactory& instance();
+class UIFactory {
+public:
+    static UIFactory& instance();
 
-        void register_tag(std::string tag, std::function<std::unique_ptr<UIElement>(const Node&)> fn);
+    void register_tag(std::string tag, std::function<std::unique_ptr<UIElement>(const Node&)> fn);
 
-        std::unique_ptr<UIElement> build(const Node& n);
+    std::unique_ptr<UIElement> build(const Node& n);
 
-    private:
-        std::unordered_map<std::string, std::function<std::unique_ptr<UIElement>(const Node&)>> map_;
+private:
+    std::unordered_map<std::string, std::function<std::unique_ptr<UIElement>(const Node&)>> map_;
 
-        UIFactory();
-    };
+    UIFactory();
+};
 } // namespace sif::ui
 
 #endif // RENDER_ENGINE_UIFACTORY_H

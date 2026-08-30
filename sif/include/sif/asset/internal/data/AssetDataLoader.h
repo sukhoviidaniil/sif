@@ -21,40 +21,39 @@
 #include "SpriteSingleNode.h"
 
 namespace sif::asset::data {
-    class AssetDataLoader {
-    public:
-        static AssetDataLoader& instance();
+class AssetDataLoader {
+public:
+    static AssetDataLoader& instance();
 
-        AssetDataLoader(const AssetDataLoader&) = delete;
-        AssetDataLoader& operator=(const AssetDataLoader&) = delete;
-        AssetDataLoader(AssetDataLoader&&) = delete;
-        AssetDataLoader& operator=(AssetDataLoader&&) = delete;
+    AssetDataLoader(const AssetDataLoader&) = delete;
+    AssetDataLoader& operator=(const AssetDataLoader&) = delete;
+    AssetDataLoader(AssetDataLoader&&) = delete;
+    AssetDataLoader& operator=(AssetDataLoader&&) = delete;
 
-        static std::unique_ptr<AssetDataNode> load_from_file(const std::filesystem::path& path);
-        static void save_Meta(const std::filesystem::path& path, data::AssetMetaData& meta);
+    static std::unique_ptr<AssetDataNode> load_from_file(const std::filesystem::path& path);
+    static void save_Meta(const std::filesystem::path& path, data::AssetMetaData& meta);
 
-        static std::unique_ptr<FontNode> load_Font_from_file(const std::filesystem::path& path);
-        static void save_Meta_Font(const std::filesystem::path& path, data::AssetMetaData& meta);
+    static std::unique_ptr<FontNode> load_Font_from_file(const std::filesystem::path& path);
+    static void save_Meta_Font(const std::filesystem::path& path, data::AssetMetaData& meta);
 
-        static std::unique_ptr<SpriteSingleNode> load_SpriteSingle_from_file(const std::filesystem::path& path);
-        static void save_Meta_SpriteSingle(const std::filesystem::path& path, data::AssetMetaData& meta);
+    static std::unique_ptr<SpriteSingleNode> load_SpriteSingle_from_file(const std::filesystem::path& path);
+    static void save_Meta_SpriteSingle(const std::filesystem::path& path, data::AssetMetaData& meta);
 
-        static std::unique_ptr<SpriteAtlasNode> load_SpriteAtlas_from_file(const std::filesystem::path& path);
-        static void save_Meta_SpriteAtlas(const std::filesystem::path& path, data::AssetMetaData& meta);
+    static std::unique_ptr<SpriteAtlasNode> load_SpriteAtlas_from_file(const std::filesystem::path& path);
+    static void save_Meta_SpriteAtlas(const std::filesystem::path& path, data::AssetMetaData& meta);
 
-        static std::unique_ptr<SpriteGridNode> load_SpriteGrid_from_file(const std::filesystem::path& path);
-        static void save_Meta_SpriteGrid(const std::filesystem::path& path, data::AssetMetaData& meta);
+    static std::unique_ptr<SpriteGridNode> load_SpriteGrid_from_file(const std::filesystem::path& path);
+    static void save_Meta_SpriteGrid(const std::filesystem::path& path, data::AssetMetaData& meta);
 
-        static std::unique_ptr<PrimitiveAnimationNode>
-        load_PrimitiveAnimation_from_file(const std::filesystem::path& path);
-        static void save_Meta_PrimitiveAnimation(const std::filesystem::path& path, data::AssetMetaData& meta);
+    static std::unique_ptr<PrimitiveAnimationNode> load_PrimitiveAnimation_from_file(const std::filesystem::path& path);
+    static void save_Meta_PrimitiveAnimation(const std::filesystem::path& path, data::AssetMetaData& meta);
 
-        static std::unique_ptr<SoundNode> load_Sound_from_file(const std::filesystem::path& path);
-        static void save_Meta_Sound(const std::filesystem::path& path, data::AssetMetaData& meta);
+    static std::unique_ptr<SoundNode> load_Sound_from_file(const std::filesystem::path& path);
+    static void save_Meta_Sound(const std::filesystem::path& path, data::AssetMetaData& meta);
 
-    private:
-        AssetDataLoader();
-    };
+private:
+    AssetDataLoader();
+};
 } // namespace sif::asset::data
 
 #endif // RENDER_ENGINE_ASSETDATALOADER_H

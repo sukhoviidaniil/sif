@@ -13,13 +13,13 @@
 #include <cstddef>
 
 namespace sif::intrnl {
-    using TypeId = std::size_t;
+using TypeId = std::size_t;
 
-    template<typename T>
-    TypeId type_id() {
-        static int unique;
-        return reinterpret_cast<TypeId>(&unique);
-    }
+template <typename T>
+TypeId type_id() {
+    static int unique;
+    return reinterpret_cast<TypeId>(&unique);
+}
 } // namespace sif::intrnl
 
 #endif // RENDER_ENGINE_TYPEID_H

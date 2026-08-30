@@ -10,12 +10,12 @@
 
 #include "sif/asset/internal/Font.h"
 namespace sif::asset {
-    Font::Font() = default;
+Font::Font() = default;
 
-    Font::~Font() = default;
+Font::~Font() = default;
 
-    Font::Font(Font&&) noexcept = default;
+Font::Font(Font&&) noexcept = default;
 
-    Font& Font::operator=(Font&&) noexcept = default;
+Font& Font::operator=(Font&&) noexcept = default;
 
 } // namespace sif::asset

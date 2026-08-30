@@ -13,13 +13,13 @@
 #include "AssetDataNode.h"
 
 namespace sif::asset::data {
-    /**
-     * @brief JSON-facing data for AssetType::Sound.
-     *
-     * AssetDataNode::source is the audio file to load; no extra
-     * fields are needed beyond the base node.
-     */
-    struct SoundNode : AssetDataNode {};
+/**
+ * @brief JSON-facing data for AssetType::Sound.
+ *
+ * AssetDataNode::source is the audio file to load; no extra
+ * fields are needed beyond the base node.
+ */
+struct SoundNode : AssetDataNode {};
 } // namespace sif::asset::data
 
 #endif // RENDER_ENGINE_SOUNDNODE_H

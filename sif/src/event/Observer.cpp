@@ -10,20 +10,16 @@
 #include "sif/event/Observer.h"
 
 namespace sif::event {
-    Observer::Observer() = default;
+Observer::Observer() = default;
 
-    Observer::~Observer() {
-        un_track_all();
-    }
+Observer::~Observer() { un_track_all(); }
 
-    void Observer::track(Event_Bus::Subscription s) {
-        subs_.push_back(std::move(s));
-    }
+void Observer::track(Event_Bus::Subscription s) { subs_.push_back(std::move(s)); }
 
-    void Observer::un_track_all() {
-        for (auto& sub : subs_) {
-            sub.unsubscribe();
-        }
-        subs_.clear();
+void Observer::un_track_all() {
+    for (auto& sub : subs_) {
+        sub.unsubscribe();
     }
+    subs_.clear();
+}
 } // namespace sif::event

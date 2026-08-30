@@ -11,7 +11,7 @@
 #define RENDER_ENGINE_LOGSCOPE_H
 
 #ifdef _DEBUG
-#define LOG_SCOPE()                                                                                                    \
+#define LOG_SCOPE() \
     sif::diag::LogScope UNIQUE_NAME(__scope) {}
 #define UNIQUE_NAME(base) CONCAT(base, __COUNTER__)
 #define CONCAT(a, b) CONCAT_INNER(a, b)
@@ -21,29 +21,29 @@
 #endif
 
 namespace sif::diag {
+/**
+ * @brief RAII helper for automatic log indentation management.
+ *
+ * Increases the logger indentation level on construction
+ * and restores it on destruction.
+ *
+ * Intended to be used via the LOG_SCOPE() macro.
+ */
+class LogScope {
+public:
     /**
-     * @brief RAII helper for automatic log indentation management.
+     * @brief Constructs the log scope.
+     * Increases the logger indentation depth.
      *
-     * Increases the logger indentation level on construction
-     * and restores it on destruction.
-     *
-     * Intended to be used via the LOG_SCOPE() macro.
      */
-    class LogScope {
-    public:
-        /**
-         * @brief Constructs the log scope.
-         * Increases the logger indentation depth.
-         *
-         */
-        LogScope();
+    LogScope();
 
-        /**
-         * @brief Destroys the log scope and restores previous indentation.
-         * Decreases the logger indentation depth.
-         */
-        ~LogScope();
-    };
+    /**
+     * @brief Destroys the log scope and restores previous indentation.
+     * Decreases the logger indentation depth.
+     */
+    ~LogScope();
+};
 } // namespace sif::diag
 
 #endif // RENDER_ENGINE_LOGSCOPE_H

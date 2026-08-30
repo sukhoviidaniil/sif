@@ -13,16 +13,16 @@
 #include "sif/internal/Rect.h"
 
 namespace sif::ui {
-    /**
-     * @brief Result of a layout computation.
-     *
-     * Contains the resolved rectangle assigned to a UI element
-     * after the layout engine finishes its calculations.
-     */
-    struct LayoutResult {
-        LayoutResult() = default;
-        intrnl::Rect rect; ///< Final computed rectangle
-    };
+/**
+ * @brief Result of a layout computation.
+ *
+ * Contains the resolved rectangle assigned to a UI element
+ * after the layout engine finishes its calculations.
+ */
+struct LayoutResult {
+    LayoutResult() = default;
+    intrnl::Rect rect; ///< Final computed rectangle
+};
 } // namespace sif::ui
 
 #endif // RENDER_ENGINE_LAYOUTRESULT_H

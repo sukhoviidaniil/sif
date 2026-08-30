@@ -14,13 +14,13 @@
 #include "sif/internal/Color.h"
 
 namespace sif::rnd {
-    struct Rectangle : RenderNode {
-        void accept(RenderVisitor& v) const override { v.visit(*this); }
+struct Rectangle : RenderNode {
+    void accept(RenderVisitor& v) const override { v.visit(*this); }
 
-        int border_width = 0;
-        intrnl::Color border_color{};
-        intrnl::Color color{};
-    };
+    int border_width = 0;
+    intrnl::Color border_color{};
+    intrnl::Color color{};
+};
 } // namespace sif::rnd
 
 #endif // RENDER_ENGINE_AST_RI_RECTANGLE_H

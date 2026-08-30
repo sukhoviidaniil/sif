@@ -15,37 +15,37 @@
 #include "sif/diagnostics/Logger.h"
 
 namespace {
-    /**
-     * @brief Warns when the output path is not named <name>.rgst.json.
-     *
-     * Deliberately a warning and not a hard failure: refusing to write
-     * would break any existing pipeline that already points somewhere
-     * else, and the tool's job is still perfectly well defined. But the
-     * naming matters - a registry is a generated file that lives among
-     * hand-authored *.asset.json descriptors, and the distinct suffix
-     * is what keeps build scripts, .gitignore rules and humans from
-     * confusing the two (or from overwriting a descriptor with a
-     * registry because two arguments were swapped).
-     *
-     * @return true if the name conforms.
-     */
-    bool warn_if_not_registry_name(const std::string& registry_file) {
-        if (sif::asset::is_registry_filename(registry_file)) {
-            return true;
-        }
-
-        const std::string suggestion = sif::asset::suggested_registry_filename(registry_file);
-
-        std::cerr << "Warning: '" << registry_file << "' is not a registry name.\n"
-                  << "         Registry files must be named <name>" << sif::asset::registry_extension
-                  << " - did you mean '" << suggestion << "'?\n"
-                  << "         Writing to the given path anyway.\n";
-
-        LOG("Asset_GUID_Assignment: non-conforming registry name '" + registry_file + "', expected <name>" +
-            std::string(sif::asset::registry_extension));
-
-        return false;
+/**
+ * @brief Warns when the output path is not named <name>.rgst.json.
+ *
+ * Deliberately a warning and not a hard failure: refusing to write
+ * would break any existing pipeline that already points somewhere
+ * else, and the tool's job is still perfectly well defined. But the
+ * naming matters - a registry is a generated file that lives among
+ * hand-authored *.asset.json descriptors, and the distinct suffix
+ * is what keeps build scripts, .gitignore rules and humans from
+ * confusing the two (or from overwriting a descriptor with a
+ * registry because two arguments were swapped).
+ *
+ * @return true if the name conforms.
+ */
+bool warn_if_not_registry_name(const std::string& registry_file) {
+    if (sif::asset::is_registry_filename(registry_file)) {
+        return true;
     }
+
+    const std::string suggestion = sif::asset::suggested_registry_filename(registry_file);
+
+    std::cerr << "Warning: '" << registry_file << "' is not a registry name.\n"
+              << "         Registry files must be named <name>" << sif::asset::registry_extension << " - did you mean '"
+              << suggestion << "'?\n"
+              << "         Writing to the given path anyway.\n";
+
+    LOG("Asset_GUID_Assignment: non-conforming registry name '" + registry_file + "', expected <name>" +
+        std::string(sif::asset::registry_extension));
+
+    return false;
+}
 } // namespace
 
 /**

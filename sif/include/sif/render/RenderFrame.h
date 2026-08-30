@@ -16,10 +16,10 @@
 #include "elements/RenderNode.h"
 
 namespace sif::rnd {
-    struct RenderFrame {
-        std::vector<std::unique_ptr<RenderNode>> constant_items;
-        std::vector<std::unique_ptr<RenderNode>> temp_items;
-    };
+struct RenderFrame {
+    std::vector<std::unique_ptr<RenderNode>> constant_items;
+    std::vector<std::unique_ptr<RenderNode>> temp_items;
+};
 } // namespace sif::rnd
 
 #endif // RENDER_ENGINE_AST_RENDERFRAME_H

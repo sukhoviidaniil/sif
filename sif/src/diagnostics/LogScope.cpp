@@ -11,11 +11,7 @@
 #include "sif/diagnostics/Logger.h"
 
 namespace sif::diag {
-    LogScope::LogScope() {
-        Logger::instance().add_depth();
-    }
+LogScope::LogScope() { Logger::instance().add_depth(); }
 
-    LogScope::~LogScope() {
-        Logger::instance().lower_depth();
-    }
+LogScope::~LogScope() { Logger::instance().lower_depth(); }
 } // namespace sif::diag

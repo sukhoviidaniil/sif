@@ -16,29 +16,29 @@
 #include "sif/internal/Rect.h"
 
 namespace sif::asset::data {
+/**
+ * @brief JSON-facing data for AssetType::PrimitiveAnimation.
+ *
+ * AssetDataNode::source is one shared image (a strip/sheet); frames[i]
+ * is the pixel rect of the i-th animation frame, shown in order for
+ * frame_duration_seconds each before advancing to the next (see
+ * asset::PrimitiveAnimation::frame_at, which encapsulates this
+ * "transition timer" logic so callers do not have to reimplement it).
+ */
+struct PrimitiveAnimationNode : AssetDataNode {
+    std::vector<intrnl::Rect> frames;
+
     /**
-     * @brief JSON-facing data for AssetType::PrimitiveAnimation.
-     *
-     * AssetDataNode::source is one shared image (a strip/sheet); frames[i]
-     * is the pixel rect of the i-th animation frame, shown in order for
-     * frame_duration_seconds each before advancing to the next (see
-     * asset::PrimitiveAnimation::frame_at, which encapsulates this
-     * "transition timer" logic so callers do not have to reimplement it).
+     * @brief How long each frame is shown, in seconds.
      */
-    struct PrimitiveAnimationNode : AssetDataNode {
-        std::vector<intrnl::Rect> frames;
+    float frame_duration_seconds = 0.1f;
 
-        /**
-         * @brief How long each frame is shown, in seconds.
-         */
-        float frame_duration_seconds = 0.1f;
-
-        /**
-         * @brief Whether the animation restarts from frame 0 after the
-         * last frame, or holds on the last frame.
-         */
-        bool loop = true;
-    };
+    /**
+     * @brief Whether the animation restarts from frame 0 after the
+     * last frame, or holds on the last frame.
+     */
+    bool loop = true;
+};
 } // namespace sif::asset::data
 
 #endif // RENDER_ENGINE_PRIMITIVEANIMATIONNODE_H

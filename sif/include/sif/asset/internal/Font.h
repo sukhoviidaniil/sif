@@ -15,18 +15,18 @@
 #include "sif/math/Vector2.h"
 
 namespace sif::asset {
-    class Font {
-    public:
-        Font(const Font&) = delete;
-        Font& operator=(const Font&) = delete;
+class Font {
+public:
+    Font(const Font&) = delete;
+    Font& operator=(const Font&) = delete;
 
-        Font();
-        virtual ~Font();
-        Font(Font&&) noexcept;
-        Font& operator=(Font&&) noexcept;
+    Font();
+    virtual ~Font();
+    Font(Font&&) noexcept;
+    Font& operator=(Font&&) noexcept;
 
-        [[nodiscard]] virtual math::Vector2 measure_text(const std::string& str, unsigned int size) const = 0;
-    };
+    [[nodiscard]] virtual math::Vector2 measure_text(const std::string& str, unsigned int size) const = 0;
+};
 } // namespace sif::asset
 
 #endif // RENDER_ENGINE_ASSETS_FONT_H

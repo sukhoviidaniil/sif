@@ -13,29 +13,29 @@
 #include <string>
 
 namespace sif::intrnl {
-    /**
-     * Local identity (a specific thing within this one scene or this one asset)
-     */
-    struct RecordID {
-        std::uint32_t id = 0;
+/**
+ * Local identity (a specific thing within this one scene or this one asset)
+ */
+struct RecordID {
+    std::uint32_t id = 0;
 
-        RecordID() = default;
-        explicit RecordID(const std::uint32_t i) : id(i) {}
+    RecordID() = default;
+    explicit RecordID(const std::uint32_t i) : id(i) {}
 
-        // equality
-        friend constexpr bool operator==(const RecordID& a, const RecordID& b) noexcept { return a.id == b.id; }
+    // equality
+    friend constexpr bool operator==(const RecordID& a, const RecordID& b) noexcept { return a.id == b.id; }
 
-        // ordering
-        friend constexpr bool operator<(const RecordID& a, const RecordID& b) noexcept { return a.id < b.id; }
+    // ordering
+    friend constexpr bool operator<(const RecordID& a, const RecordID& b) noexcept { return a.id < b.id; }
 
-        friend constexpr bool operator>(const RecordID& a, const RecordID& b) noexcept { return a.id > b.id; }
+    friend constexpr bool operator>(const RecordID& a, const RecordID& b) noexcept { return a.id > b.id; }
 
-        [[nodiscard]] std::string string() const { return std::to_string(id); }
-    };
+    [[nodiscard]] std::string string() const { return std::to_string(id); }
+};
 
-    struct RecordIDHash {
-        size_t operator()(const RecordID& g) const noexcept { return std::hash<std::uint32_t>{}(g.id); }
-    };
+struct RecordIDHash {
+    size_t operator()(const RecordID& g) const noexcept { return std::hash<std::uint32_t>{}(g.id); }
+};
 } // namespace sif::intrnl
 
 #endif // RENDER_ENGINE_RECORDID_H

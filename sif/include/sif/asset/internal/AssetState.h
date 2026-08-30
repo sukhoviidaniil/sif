@@ -11,13 +11,13 @@
 #define RENDER_ENGINE_ASSETSTATE_H
 
 namespace sif::asset {
-    /**
-     * @brief Lifecycle state of an asset record.
-     *
-     * NotRequested -> Queued -> Loading -> Ready
-     *                                   \-> Failed
-     */
-    enum class AssetState { NotRequested, Queued, Loading, Ready, Failed };
+/**
+ * @brief Lifecycle state of an asset record.
+ *
+ * NotRequested -> Queued -> Loading -> Ready
+ *                                   \-> Failed
+ */
+enum class AssetState { NotRequested, Queued, Loading, Ready, Failed };
 } // namespace sif::asset
 
 #endif // RENDER_ENGINE_ASSETSTATE_H

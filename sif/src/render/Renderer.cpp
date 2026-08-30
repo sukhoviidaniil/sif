@@ -11,7 +11,7 @@
 #include "sif/render/Renderer.h"
 
 namespace sif::rnd {
-    Renderer::Renderer() = default;
+Renderer::Renderer() = default;
 
-    Renderer::~Renderer() = default;
+Renderer::~Renderer() = default;
 } // namespace sif::rnd

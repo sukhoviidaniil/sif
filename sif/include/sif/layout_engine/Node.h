@@ -16,13 +16,13 @@
 #include <vector>
 
 namespace sif::ui {
-    struct Node {
-        std::string tag;
+struct Node {
+    std::string tag;
 
-        std::unordered_map<std::string, std::string> attributes;
+    std::unordered_map<std::string, std::string> attributes;
 
-        std::vector<std::unique_ptr<Node>> children;
-    };
+    std::vector<std::unique_ptr<Node>> children;
+};
 } // namespace sif::ui
 
 #endif // RENDER_ENGINE_VIEW_AST_NODE_H

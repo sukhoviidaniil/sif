@@ -11,13 +11,13 @@
 #define RENDER_ENGINE_HEADLESSCHECK_H
 
 namespace app::demo {
-    /**
-     * @brief Loads and verifies every demo asset without a window.
-     *
-     * @return 0 if every check passed, 1 otherwise (so CI can use the
-     * process exit code directly).
-     */
-    int run_headless_check();
+/**
+ * @brief Loads and verifies every demo asset without a window.
+ *
+ * @return 0 if every check passed, 1 otherwise (so CI can use the
+ * process exit code directly).
+ */
+int run_headless_check();
 } // namespace app::demo
 
 #endif // RENDER_ENGINE_HEADLESSCHECK_H

@@ -15,38 +15,38 @@
 #include "sif/internal/Color.h"
 
 namespace sif::ui {
+/**
+ * @brief Simple text label UI element.
+ *
+ */
+class Text : public UIElement {
+public:
+    /// @brief Virtual destructor.
+    ~Text() override = default;
+    explicit Text(asset::AssetHandle<asset::Font> f) : font(std::move(f)) {}
+
     /**
-     * @brief Simple text label UI element.
+     * @brief Measures the desired size of the text.
      *
+     * Uses a simplified text metric: a fixed width per character
+     * and a constant line height.
+     *
+     * @param available Available space.
+     * @return Desired size of the text.
      */
-    class Text : public UIElement {
-    public:
-        /// @brief Virtual destructor.
-        ~Text() override = default;
-        explicit Text(asset::AssetHandle<asset::Font> f) : font(std::move(f)) {}
+    math::Vector2 measure(const math::Vector2& available) override;
+    void append_render_items(rnd::RenderFrame& frame, const rnd::FrameContext& ctx) const override;
 
-        /**
-         * @brief Measures the desired size of the text.
-         *
-         * Uses a simplified text metric: a fixed width per character
-         * and a constant line height.
-         *
-         * @param available Available space.
-         * @return Desired size of the text.
-         */
-        math::Vector2 measure(const math::Vector2& available) override;
-        void append_render_items(rnd::RenderFrame& frame, const rnd::FrameContext& ctx) const override;
+    std::string text;
 
-        std::string text;
+    intrnl::Color color = intrnl::Color(255, 255, 255);
 
-        intrnl::Color color = intrnl::Color(255, 255, 255);
+    asset::AssetHandle<asset::Font> font;
 
-        asset::AssetHandle<asset::Font> font;
+    int fontSize = 14;
 
-        int fontSize = 14;
-
-        bool stretch_font = false;
-    };
+    bool stretch_font = false;
+};
 } // namespace sif::ui
 
 #endif // RENDER_ENGINE_TEXT_H

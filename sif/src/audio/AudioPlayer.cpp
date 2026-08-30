@@ -11,5 +11,5 @@
 #include "sif/audio/AudioPlayer.h"
 
 namespace sif::audio {
-    AudioPlayer::~AudioPlayer() = default;
+AudioPlayer::~AudioPlayer() = default;
 }

@@ -13,7 +13,7 @@
 #include "AssetDataNode.h"
 
 namespace sif::asset::data {
-    struct FontNode : AssetDataNode {};
+struct FontNode : AssetDataNode {};
 } // namespace sif::asset::data
 
 #endif // RENDER_ENGINE_FONTNODE_H

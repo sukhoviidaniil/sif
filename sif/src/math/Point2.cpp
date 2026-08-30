@@ -13,61 +13,47 @@
 
 namespace sif::math {
 
-    Point2 Point2::operator*(const float scalar) const {
-        return {x * scalar, y * scalar};
-    }
+Point2 Point2::operator*(const float scalar) const { return {x * scalar, y * scalar}; }
 
-    Point2 Point2::operator/(const float scalar) const {
-        return {x / scalar, y / scalar};
-    }
+Point2 Point2::operator/(const float scalar) const { return {x / scalar, y / scalar}; }
 
-    Point2 Point2::operator+(const Point2& other) const {
-        return {x + other.x, y + other.y};
-    }
+Point2 Point2::operator+(const Point2& other) const { return {x + other.x, y + other.y}; }
 
-    Point2 Point2::operator-(const Point2& other) const {
-        return {x - other.x, y - other.y};
-    }
+Point2 Point2::operator-(const Point2& other) const { return {x - other.x, y - other.y}; }
 
-    Point2 Point2::operator*(const Point2& other) const {
-        return {x * other.x, y * other.y};
-    }
+Point2 Point2::operator*(const Point2& other) const { return {x * other.x, y * other.y}; }
 
-    Point2 Point2::operator/(const Point2& other) const {
-        return {x / other.x, y / other.y};
-    }
+Point2 Point2::operator/(const Point2& other) const { return {x / other.x, y / other.y}; }
 
-    Point2& Point2::operator*=(float scalar) {
-        x *= scalar;
-        y *= scalar;
-        return *this;
-    }
+Point2& Point2::operator*=(float scalar) {
+    x *= scalar;
+    y *= scalar;
+    return *this;
+}
 
-    Point2& Point2::operator/=(float scalar) {
-        x /= scalar;
-        y /= scalar;
-        return *this;
-    }
+Point2& Point2::operator/=(float scalar) {
+    x /= scalar;
+    y /= scalar;
+    return *this;
+}
 
-    Point2& Point2::operator+=(const Point2& other) {
-        x += other.x;
-        y += other.y;
-        return *this;
-    }
+Point2& Point2::operator+=(const Point2& other) {
+    x += other.x;
+    y += other.y;
+    return *this;
+}
 
-    Point2& Point2::operator-=(const Point2& other) {
-        x -= other.x;
-        y -= other.y;
-        return *this;
-    }
+Point2& Point2::operator-=(const Point2& other) {
+    x -= other.x;
+    y -= other.y;
+    return *this;
+}
 
-    bool Point2::operator==(const Point2& other) const {
-        return x == other.x && y == other.y;
-    }
+bool Point2::operator==(const Point2& other) const { return x == other.x && y == other.y; }
 
-    std::ostream& operator<<(std::ostream& os, const Point2& vector) {
-        const std::string out = "Point2(" + std::to_string(vector.x) + ", " + std::to_string(vector.y) + ")";
-        os << out;
-        return os;
-    }
+std::ostream& operator<<(std::ostream& os, const Point2& vector) {
+    const std::string out = "Point2(" + std::to_string(vector.x) + ", " + std::to_string(vector.y) + ")";
+    os << out;
+    return os;
+}
 } // namespace sif::math

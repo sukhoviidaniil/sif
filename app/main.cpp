@@ -24,40 +24,40 @@
 #include "sif/event/Event_Bus.h"
 
 namespace {
-    using namespace sif;
+using namespace sif;
 
-    void print_usage(const char* argv0) {
-        std::cout << "Usage: " << argv0 << " [demo-id] [data-dir]\n\n"
-                  << "Demos:\n";
-        for (const std::string& id : app::demo::demo_ids()) {
-            std::cout << "  " << id << std::string(12 - id.size(), ' ') << app::demo::demo_title(id) << '\n';
-        }
-        std::cout << "  headless    Load and verify every asset without a window (used by CI)\n"
-                  << "\ndata-dir defaults to ../data/ (i.e. running from the build directory).\n";
+void print_usage(const char* argv0) {
+    std::cout << "Usage: " << argv0 << " [demo-id] [data-dir]\n\n"
+              << "Demos:\n";
+    for (const std::string& id : app::demo::demo_ids()) {
+        std::cout << "  " << id << std::string(12 - id.size(), ' ') << app::demo::demo_title(id) << '\n';
     }
+    std::cout << "  headless    Load and verify every asset without a window (used by CI)\n"
+              << "\ndata-dir defaults to ../data/ (i.e. running from the build directory).\n";
+}
 
-    /**
-     * @brief Brings the asset system up: registry file, loaders, root dir.
-     *
-     * Order matters and is easy to get wrong, so it lives in one place:
-     * the importer must know every asset before any UI element can
-     * request one, and the backend loaders must be installed before the
-     * first request actually starts a load.
-     */
-    void bootstrap_assets(const std::string& data_dir, const ast::RB_Config& config) {
-        asset::AssetImporter& importer = asset::AssetImporter::instance();
-        asset::AssetRegistry& registry = asset::AssetRegistry::instance();
+/**
+ * @brief Brings the asset system up: registry file, loaders, root dir.
+ *
+ * Order matters and is easy to get wrong, so it lives in one place:
+ * the importer must know every asset before any UI element can
+ * request one, and the backend loaders must be installed before the
+ * first request actually starts a load.
+ */
+void bootstrap_assets(const std::string& data_dir, const ast::RB_Config& config) {
+    asset::AssetImporter& importer = asset::AssetImporter::instance();
+    asset::AssetRegistry& registry = asset::AssetRegistry::instance();
 
-        importer.load_from_file(data_dir + "bin/registry.rgst.json");
-        importer.load_in_registry();
+    importer.load_from_file(data_dir + "bin/registry.rgst.json");
+    importer.load_in_registry();
 
-        // Asset sources are stored relative to the data root, so images
-        // and audio can share one registry.
-        registry.set_asset_dir(data_dir);
-        registry.set_max_concurrent_loads(4);
+    // Asset sources are stored relative to the data root, so images
+    // and audio can share one registry.
+    registry.set_asset_dir(data_dir);
+    registry.set_max_concurrent_loads(4);
 
-        sif::backend::Graphics_Factory::instance().register_asset_loaders(config, registry);
-    }
+    sif::backend::Graphics_Factory::instance().register_asset_loaders(config, registry);
+}
 } // namespace
 
 int main(const int argc, char* argv[]) {

@@ -12,18 +12,18 @@
 
 namespace sif::intrnl {
 
-    /**
-     * @brief Alignment policy used by the layout engine.
-     *
-     * Defines how an element is positioned or sized along an axis
-     * relative to the available layout space.
-     */
-    enum class Align {
-        Start,  ///< Align to the beginning of the available space
-        Center, ///< Center within the available space
-        End,    ///< Align to the end of the available space
-        Stretch ///< Stretch to fill the available space
-    };
+/**
+ * @brief Alignment policy used by the layout engine.
+ *
+ * Defines how an element is positioned or sized along an axis
+ * relative to the available layout space.
+ */
+enum class Align {
+    Start,  ///< Align to the beginning of the available space
+    Center, ///< Center within the available space
+    End,    ///< Align to the end of the available space
+    Stretch ///< Stretch to fill the available space
+};
 } // namespace sif::intrnl
 
 #endif // RENDER_ENGINE_ALIGNMENT_H

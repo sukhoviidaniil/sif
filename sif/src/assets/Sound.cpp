@@ -11,11 +11,11 @@
 #include "sif/asset/internal/Sound.h"
 
 namespace sif::asset {
-    Sound::Sound() = default;
+Sound::Sound() = default;
 
-    Sound::~Sound() = default;
+Sound::~Sound() = default;
 
-    Sound::Sound(Sound&&) noexcept = default;
+Sound::Sound(Sound&&) noexcept = default;
 
-    Sound& Sound::operator=(Sound&&) noexcept = default;
+Sound& Sound::operator=(Sound&&) noexcept = default;
 } // namespace sif::asset

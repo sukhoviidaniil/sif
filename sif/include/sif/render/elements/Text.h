@@ -19,17 +19,17 @@
 #include "sif/internal/Color.h"
 
 namespace sif::rnd {
-    struct Text : RenderNode {
-        void accept(RenderVisitor& v) const override { v.visit(*this); }
+struct Text : RenderNode {
+    void accept(RenderVisitor& v) const override { v.visit(*this); }
 
-        asset::AssetHandle<asset::Font> font;
-        intrnl::Color color;
-        int size = 0;
-        /**
-         * @brief Any text
-         */
-        std::string text;
-    };
+    asset::AssetHandle<asset::Font> font;
+    intrnl::Color color;
+    int size = 0;
+    /**
+     * @brief Any text
+     */
+    std::string text;
+};
 } // namespace sif::rnd
 
 #endif // RENDER_ENGINE_AST_RI_TEXT_H

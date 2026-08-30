@@ -11,11 +11,11 @@
 #include "sif/asset/internal/Sprite.h"
 
 namespace sif::asset {
-    Sprite::Sprite() = default;
+Sprite::Sprite() = default;
 
-    Sprite::~Sprite() = default;
+Sprite::~Sprite() = default;
 
-    Sprite::Sprite(Sprite&&) noexcept = default;
+Sprite::Sprite(Sprite&&) noexcept = default;
 
-    Sprite& Sprite::operator=(Sprite&&) noexcept = default;
+Sprite& Sprite::operator=(Sprite&&) noexcept = default;
 } // namespace sif::asset

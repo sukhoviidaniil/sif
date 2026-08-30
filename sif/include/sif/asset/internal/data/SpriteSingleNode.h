@@ -13,13 +13,13 @@
 #include "AssetDataNode.h"
 
 namespace sif::asset::data {
-    /**
-     * @brief JSON-facing data for AssetType::SpriteSingle.
-     *
-     * The whole image referenced by AssetDataNode::source is the
-     * sprite; no extra fields are needed beyond the base node.
-     */
-    struct SpriteSingleNode : AssetDataNode {};
+/**
+ * @brief JSON-facing data for AssetType::SpriteSingle.
+ *
+ * The whole image referenced by AssetDataNode::source is the
+ * sprite; no extra fields are needed beyond the base node.
+ */
+struct SpriteSingleNode : AssetDataNode {};
 } // namespace sif::asset::data
 
 #endif // RENDER_ENGINE_SPRITESINGLENODE_H

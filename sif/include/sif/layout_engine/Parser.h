@@ -14,10 +14,10 @@
 #include "sif/layout_engine/Token.h"
 
 namespace sif::ui {
-    class Parser {
-    public:
-        static std::unique_ptr<Node> parse(const std::vector<Token>& tokens);
-    };
+class Parser {
+public:
+    static std::unique_ptr<Node> parse(const std::vector<Token>& tokens);
+};
 } // namespace sif::ui
 
 #endif // RENDER_ENGINE_PARSER_H

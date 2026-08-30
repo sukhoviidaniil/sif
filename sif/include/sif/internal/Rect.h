@@ -13,87 +13,87 @@
 #include <iosfwd>
 
 namespace sif::intrnl {
+/**
+ * @brief Axis-aligned rectangle in layout coordinates.
+ *
+ * Used internally by the layout engine to represent the final
+ * position and size of UI elements, and as the element type of
+ * math::Vector<Rect> / math::Matrix<Rect> (see asset::SpriteAtlas /
+ * asset::SpriteGrid / asset::PrimitiveAnimation), which is why it
+ * supports componentwise arithmetic below.
+ */
+struct Rect {
+    float x = 0;      ///< X position (left)
+    float y = 0;      ///< Y position (top)
+    float width = 0;  ///< Width
+    float height = 0; ///< Height
+
+    Rect() = default;
+    Rect(const float left, const float top, const float w, const float h) : x(left), y(top), width(w), height(h) {}
+
+    // ========== Arithmetic operators ==========
+
     /**
-     * @brief Axis-aligned rectangle in layout coordinates.
-     *
-     * Used internally by the layout engine to represent the final
-     * position and size of UI elements, and as the element type of
-     * math::Vector<Rect> / math::Matrix<Rect> (see asset::SpriteAtlas /
-     * asset::SpriteGrid / asset::PrimitiveAnimation), which is why it
-     * supports componentwise arithmetic below.
+     * @brief Componentwise addition (x, y, width, height added independently).
      */
-    struct Rect {
-        float x = 0;      ///< X position (left)
-        float y = 0;      ///< Y position (top)
-        float width = 0;  ///< Width
-        float height = 0; ///< Height
+    Rect operator+(const Rect& other) const;
 
-        Rect() = default;
-        Rect(const float left, const float top, const float w, const float h) : x(left), y(top), width(w), height(h) {}
+    /**
+     * @brief Componentwise subtraction.
+     */
+    Rect operator-(const Rect& other) const;
 
-        // ========== Arithmetic operators ==========
+    /**
+     * @brief Componentwise negation.
+     */
+    Rect operator-() const;
 
-        /**
-         * @brief Componentwise addition (x, y, width, height added independently).
-         */
-        Rect operator+(const Rect& other) const;
+    /**
+     * @brief Componentwise multiplication (x*x, y*y, width*width, height*height).
+     *
+     * Exists mainly so Rect satisfies math::Vector<T>/math::Matrix<T>,
+     * whose scalar-multiply operators take a T rather than a plain
+     * float (see operator*(float) for the usual, practical scaling).
+     */
+    Rect operator*(const Rect& other) const;
 
-        /**
-         * @brief Componentwise subtraction.
-         */
-        Rect operator-(const Rect& other) const;
+    /**
+     * @brief Componentwise division.
+     */
+    Rect operator/(const Rect& other) const;
 
-        /**
-         * @brief Componentwise negation.
-         */
-        Rect operator-() const;
+    /**
+     * @brief Scales x, y, width, and height by scalar.
+     */
+    Rect operator*(float scalar) const;
 
-        /**
-         * @brief Componentwise multiplication (x*x, y*y, width*width, height*height).
-         *
-         * Exists mainly so Rect satisfies math::Vector<T>/math::Matrix<T>,
-         * whose scalar-multiply operators take a T rather than a plain
-         * float (see operator*(float) for the usual, practical scaling).
-         */
-        Rect operator*(const Rect& other) const;
+    /**
+     * @brief Divides x, y, width, and height by scalar.
+     */
+    Rect operator/(float scalar) const;
 
-        /**
-         * @brief Componentwise division.
-         */
-        Rect operator/(const Rect& other) const;
+    // ========== Compound operators ==========
 
-        /**
-         * @brief Scales x, y, width, and height by scalar.
-         */
-        Rect operator*(float scalar) const;
+    Rect& operator+=(const Rect& other);
+    Rect& operator-=(const Rect& other);
+    Rect& operator*=(const Rect& other);
+    Rect& operator/=(const Rect& other);
+    Rect& operator*=(float scalar);
+    Rect& operator/=(float scalar);
 
-        /**
-         * @brief Divides x, y, width, and height by scalar.
-         */
-        Rect operator/(float scalar) const;
+    // ========== Comparison ==========
 
-        // ========== Compound operators ==========
+    bool operator==(const Rect& other) const;
+    bool operator!=(const Rect& other) const;
 
-        Rect& operator+=(const Rect& other);
-        Rect& operator-=(const Rect& other);
-        Rect& operator*=(const Rect& other);
-        Rect& operator/=(const Rect& other);
-        Rect& operator*=(float scalar);
-        Rect& operator/=(float scalar);
+    // ========== Output to stream ==========
 
-        // ========== Comparison ==========
-
-        bool operator==(const Rect& other) const;
-        bool operator!=(const Rect& other) const;
-
-        // ========== Output to stream ==========
-
-        /**
-         * @brief Writes the rect to an output stream.
-         *
-         * Format: "(x, y, width, height)"
-         */
-        friend std::ostream& operator<<(std::ostream& os, const Rect& rect);
-    };
+    /**
+     * @brief Writes the rect to an output stream.
+     *
+     * Format: "(x, y, width, height)"
+     */
+    friend std::ostream& operator<<(std::ostream& os, const Rect& rect);
+};
 } // namespace sif::intrnl
 #endif // RENDER_ENGINE_RECT_H

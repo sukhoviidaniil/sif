@@ -13,15 +13,15 @@
 #include <unordered_map>
 
 namespace sif::ui {
-    enum class TokenType { OpenTag, CloseTag, SelfCloseTag, Text };
+enum class TokenType { OpenTag, CloseTag, SelfCloseTag, Text };
 
-    struct Token {
-        TokenType type;
+struct Token {
+    TokenType type;
 
-        std::string name;
+    std::string name;
 
-        std::unordered_map<std::string, std::string> attributes;
-    };
+    std::unordered_map<std::string, std::string> attributes;
+};
 } // namespace sif::ui
 
 #endif // RENDER_ENGINE_TOKEN_H
