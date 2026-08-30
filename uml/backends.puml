@@ -42,12 +42,12 @@ package "sif (engine, links no graphics/audio library)" {
 
     package ui {
         class UIElement
-        class Sprite as UISprite {
+        class "Sprite" as UISprite {
             -kind : AssetType
             -record_id : RecordID
             +append_render_items()
         }
-        class Animation as UIAnimation {
+        class "Animation" as UIAnimation {
             -elapsed_seconds
             +update(dt)
             +current_frame() : size_t

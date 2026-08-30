@@ -1,7 +1,4 @@
 /***************************************************************
- * Project:          Render_Engine
- * File:             input_Mouse.h
- *
  * Author:           Daniil Sukhovii
  * Email:            sukhovii.daniil@gmail.com
  * Created:          2025-12-21

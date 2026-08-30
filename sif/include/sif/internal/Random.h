@@ -1,12 +1,7 @@
 /***************************************************************
- * Project:       render-engine
- * File:          Random.h
- *
  * Author:        Sukhovii Daniil
+ * Email:       sukhovii.daniil@gmail.com
  * Created:       2025-12-25
- *
- * Contact:
- *   Email:       sukhovii.daniil@gmail.com
  *
  * Disclaimer:
  *   This file is part of render-engine.

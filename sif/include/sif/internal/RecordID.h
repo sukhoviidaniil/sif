@@ -13,6 +13,9 @@
 #include <string>
 
 namespace sif::intrnl {
+    /**
+     * Local identity (a specific thing within this one scene or this one asset)
+     */
     struct RecordID {
         std::uint32_t id = 0;
 

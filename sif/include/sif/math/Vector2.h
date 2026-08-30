@@ -34,8 +34,8 @@ namespace sif::math {
         /**
          * @brief Constructs a vector with specified coordinates.
          *
-         * @param x X-coordinate
-         * @param y Y-coordinate
+         * @param in_x X-coordinate
+         * @param in_y Y-coordinate
          */
         [[nodiscard]] constexpr Vector2(const float in_x, const float in_y) : x(in_x), y(in_y) {}
 

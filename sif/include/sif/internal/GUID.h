@@ -18,6 +18,9 @@
 #include "Random.h"
 
 namespace sif::intrnl {
+    /**
+     * Global asset identity, generated automatically
+     */
     struct GUID {
         std::uint32_t id = 0;
 

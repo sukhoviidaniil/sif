@@ -25,6 +25,11 @@ namespace sif::asset::data {
     public:
         static AssetDataLoader& instance();
 
+        AssetDataLoader(const AssetDataLoader&) = delete;
+        AssetDataLoader& operator=(const AssetDataLoader&) = delete;
+        AssetDataLoader(AssetDataLoader&&) = delete;
+        AssetDataLoader& operator=(AssetDataLoader&&) = delete;
+
         static std::unique_ptr<AssetDataNode> load_from_file(const std::filesystem::path& path);
         static void save_Meta(const std::filesystem::path& path, data::AssetMetaData& meta);
 

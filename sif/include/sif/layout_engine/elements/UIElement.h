@@ -39,8 +39,8 @@ namespace sif::ui {
 
         /**
          * @brief Adds a child element to this node.
-         *
-         * Ownership is shared to allow flexible tree composition.
+         * Ownership of the child is transferred to this node, allowing
+         * the UI tree to manage the lifetime of its child elements.
          * Virtual so that containers with extra bookkeeping needs (e.g.
          * ui::Menu, which tracks Button children separately for
          * set_active) can hook into it and still work correctly when

@@ -25,6 +25,9 @@ namespace sif::audio {
      */
     using VoiceId = std::uint32_t;
 
+    /**
+     * this is a "zero" value, reserved as a "no sound was played at all" signal
+     */
     inline constexpr VoiceId invalid_voice = 0;
 
     /**

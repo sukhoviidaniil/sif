@@ -208,7 +208,7 @@ namespace sif::ui {
         for (const auto& token : tokens) {
             switch (token.type) {
             case TokenType::Text:
-                file << token.name; // для текста поле name содержит сам текст
+                file << token.name; // for text, the field name contains the text itself
                 break;
 
             case TokenType::OpenTag:

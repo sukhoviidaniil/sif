@@ -1,7 +1,4 @@
 /***************************************************************
- * Project:          Render_Engine
- * File:             RenderNode.h
- *
  * Author:           Daniil Sukhovii
  * Email:            sukhovii.daniil@gmail.com
  * Created:          2025-12-24

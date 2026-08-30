@@ -1,7 +1,4 @@
 /***************************************************************
- * Project:       Render_Engine (demos)
- * File:          DemoSupport.h
- *
  * Author:        Sukhovii Daniil
  * Email:         sukhovii.daniil@gmail.com
  * Created:       2026-08-03

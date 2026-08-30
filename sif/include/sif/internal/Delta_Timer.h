@@ -1,15 +1,7 @@
 /***************************************************************
- * Project:       render-engine
- * File:          Delta_Timer.h
- *
  * Author:        Sukhovii Daniil
+ * Email:       sukhovii.daniil@gmail.com
  * Created:       2025-11-15
- * Modified:      []
- *
- * Description:   []
- *
- * Contact:
- *   Email:       sukhovii.daniil@gmail.com
  *
  * Disclaimer:
  *   This file is part of render-engine.

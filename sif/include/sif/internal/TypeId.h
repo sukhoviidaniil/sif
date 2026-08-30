@@ -1,15 +1,8 @@
 /***************************************************************
- * Project:       Render_Engine
- * File:          TypeId.h
  *
  * Author:        Sukhovii Daniil
+ * Email:       sukhovii.daniil@gmail.com
  * Created:       2026-01-15
- * Modified:      []
- *
- * Description:   []
- *
- * Contact:
- *   Email:       sukhovii.daniil@gmail.com
  *
  * Disclaimer:
  *   This file is part of Render_Engine.
