@@ -25,6 +25,13 @@ public:
     Font(Font&&) noexcept;
     Font& operator=(Font&&) noexcept;
 
+    /**
+     * @brief Size of str drawn at the given character size.
+     *
+     * str is UTF-8 - the encoding *.ui.xml scenes are read in and the
+     * one ui::Text stores - so implementations must measure characters,
+     * not bytes, and decode it the same way their renderer does.
+     */
     [[nodiscard]] virtual math::Vector2 measure_text(const std::string& str, unsigned int size) const = 0;
 };
 } // namespace sif::asset

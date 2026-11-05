@@ -8,9 +8,13 @@
  *       Unauthorized use, reproduction, or distribution is prohibited.
  ***************************************************************/
 
+#include <charconv>
+#include <cstdint>
 #include <filesystem>
 #include <fstream>
 #include <stdexcept>
+#include <string>
+#include <string_view>
 
 #include "sif/diagnostics/Logger.h"
 #include "sif/layout_engine/Tokenizer.h"
@@ -22,6 +26,152 @@ static void skip_ws(const std::string_view src, size_t& i) {
         ++i;
     }
 }
+
+namespace {
+/// @brief True if src contains what starting exactly at offset i.
+bool starts_with_at(const std::string_view src, const size_t i, const std::string_view what) {
+    return i <= src.size() && src.substr(i).starts_with(what);
+}
+
+/**
+ * @brief "line L, column C" (both 1-based) of byte offset i.
+ *
+ * Computed only when an error is reported, so a well-formed scene
+ * pays nothing for it.
+ */
+std::string position_of(const std::string_view src, const size_t i) {
+    size_t line = 1;
+    size_t column = 1;
+    for (size_t k = 0; k < i && k < src.size(); ++k) {
+        if (src[k] == '\n') {
+            ++line;
+            column = 1;
+        } else {
+            ++column;
+        }
+    }
+    return "line " + std::to_string(line) + ", column " + std::to_string(column);
+}
+
+/// @brief Appends code point cp to out, encoded as UTF-8.
+void append_utf8(std::string& out, const std::uint32_t cp) {
+    if (cp < 0x80) {
+        out.push_back(static_cast<char>(cp));
+    } else if (cp < 0x800) {
+        out.push_back(static_cast<char>(0xC0 | (cp >> 6)));
+        out.push_back(static_cast<char>(0x80 | (cp & 0x3F)));
+    } else if (cp < 0x10000) {
+        out.push_back(static_cast<char>(0xE0 | (cp >> 12)));
+        out.push_back(static_cast<char>(0x80 | ((cp >> 6) & 0x3F)));
+        out.push_back(static_cast<char>(0x80 | (cp & 0x3F)));
+    } else {
+        out.push_back(static_cast<char>(0xF0 | (cp >> 18)));
+        out.push_back(static_cast<char>(0x80 | ((cp >> 12) & 0x3F)));
+        out.push_back(static_cast<char>(0x80 | ((cp >> 6) & 0x3F)));
+        out.push_back(static_cast<char>(0x80 | (cp & 0x3F)));
+    }
+}
+
+/**
+ * @brief Decodes the five predefined XML entities and numeric
+ * character references (&#1055; / &#x41;).
+ *
+ * Deliberately lenient: a bare '&' or an unknown entity such as
+ * "&foo;" is kept literally instead of rejecting the scene, so text
+ * like "Tom & Jerry" that worked before entities were understood
+ * keeps working.
+ */
+std::string decode_entities(const std::string_view in) {
+    std::string out;
+    out.reserve(in.size());
+
+    size_t i = 0;
+    while (i < in.size()) {
+        if (in[i] != '&') {
+            out.push_back(in[i++]);
+            continue;
+        }
+
+        const size_t semi = in.find(';', i + 1);
+        // Longest reference worth decoding is "&#x10FFFF;" (10 chars).
+        if (semi == std::string_view::npos || semi - i > 10) {
+            out.push_back(in[i++]);
+            continue;
+        }
+
+        const std::string_view name = in.substr(i + 1, semi - i - 1);
+        if (name == "lt") {
+            out.push_back('<');
+        } else if (name == "gt") {
+            out.push_back('>');
+        } else if (name == "amp") {
+            out.push_back('&');
+        } else if (name == "quot") {
+            out.push_back('"');
+        } else if (name == "apos") {
+            out.push_back('\'');
+        } else if (name.size() > 1 && name[0] == '#') {
+            const bool hex = name[1] == 'x' || name[1] == 'X';
+            const std::string_view digits = name.substr(hex ? 2 : 1);
+            std::uint32_t cp = 0;
+            const auto [ptr, ec] = std::from_chars(digits.data(), digits.data() + digits.size(), cp, hex ? 16 : 10);
+            const bool valid = !digits.empty() && ec == std::errc{} && ptr == digits.data() + digits.size() && cp > 0 &&
+                               cp <= 0x10FFFF && (cp < 0xD800 || cp > 0xDFFF);
+            if (!valid) {
+                out.push_back(in[i++]); // not a usable reference: keep it literally
+                continue;
+            }
+            append_utf8(out, cp);
+        } else {
+            out.push_back(in[i++]); // unknown entity: keep it literally
+            continue;
+        }
+        i = semi + 1;
+    }
+    return out;
+}
+
+/**
+ * @brief Escapes text for writing back into a *.ui.xml file.
+ *
+ * The inverse of decode_entities. Without it, a value containing a
+ * '"' was written unquoted-safe and cut short at that quote the next
+ * time the file was read (e.g. by the serialized scene the runtime
+ * loads after Asset_Reference_Serialization).
+ *
+ * @param in Decoded text.
+ * @param in_attribute true for an attribute value, which also needs
+ * '"' escaped.
+ */
+std::string escape_xml(const std::string_view in, const bool in_attribute) {
+    std::string out;
+    out.reserve(in.size());
+    for (const char c : in) {
+        switch (c) {
+        case '&':
+            out += "&amp;";
+            break;
+        case '<':
+            out += "&lt;";
+            break;
+        case '>':
+            out += "&gt;";
+            break;
+        case '"':
+            if (in_attribute) {
+                out += "&quot;";
+                break;
+            }
+            out.push_back(c);
+            break;
+        default:
+            out.push_back(c);
+            break;
+        }
+    }
+    return out;
+}
+} // namespace
 
 bool Tokenizer::is_ui_xml_file(const std::string& path) {
     try {
@@ -61,6 +211,70 @@ std::vector<Token> Tokenizer::tokenize(const std::string& path) {
 
     std::vector<Token> tokens;
     size_t i = 0;
+    const std::string_view view(src);
+
+    // Every malformed-input path ends here, with a position, instead of
+    // looping forever: the attribute loop used to stop advancing on any
+    // character it did not expect (an XML comment was enough), so a
+    // single typo hung whatever loaded the scene.
+    const auto fail = [&](const size_t at, const std::string& what) {
+        const std::string err = "Tokenizer::tokenize - '" + path + "', " + position_of(view, at) + ": " + what;
+        LOG(err);
+        throw std::runtime_error(err);
+    };
+
+    // Line/column of each tag, tracked incrementally: tags are visited
+    // in increasing order, so the whole file is scanned once rather
+    // than once per tag (position_of is only for error messages).
+    size_t pos_cursor = 0;
+    size_t pos_line = 1;
+    size_t pos_column = 1;
+    const auto stamp = [&](Token& token, const size_t at) {
+        for (; pos_cursor < at && pos_cursor < view.size(); ++pos_cursor) {
+            if (view[pos_cursor] == '\n') {
+                ++pos_line;
+                pos_column = 1;
+            } else {
+                ++pos_column;
+            }
+        }
+        token.line = pos_line;
+        token.column = pos_column;
+    };
+
+    // Skips a comment, a processing instruction (<?xml ... ?>) or a
+    // declaration (<!DOCTYPE ...>) starting at at; returns false if
+    // there is none there.
+    const auto skip_markup = [&](size_t& at) {
+        if (starts_with_at(view, at, "<!--")) {
+            const size_t end = view.find("-->", at + 4);
+            if (end == std::string_view::npos) {
+                fail(at, "unterminated comment");
+            }
+            at = end + 3;
+            return true;
+        }
+        if (starts_with_at(view, at, "<![CDATA[")) {
+            fail(at, "CDATA sections are not supported (use &lt; &gt; &amp; instead)");
+        }
+        if (starts_with_at(view, at, "<?")) {
+            const size_t end = view.find("?>", at + 2);
+            if (end == std::string_view::npos) {
+                fail(at, "unterminated processing instruction");
+            }
+            at = end + 2;
+            return true;
+        }
+        if (starts_with_at(view, at, "<!")) {
+            const size_t end = view.find('>', at + 2);
+            if (end == std::string_view::npos) {
+                fail(at, "unterminated declaration");
+            }
+            at = end + 1;
+            return true;
+        }
+        return false;
+    };
 
     while (i < src.size()) {
         // ---------- TEXT ----------
@@ -70,14 +284,20 @@ std::vector<Token> Tokenizer::tokenize(const std::string& path) {
                 ++i;
             }
 
-            std::string text(src.substr(start, i - start));
+            std::string text = decode_entities(view.substr(start, i - start));
             if (!text.empty()) {
                 tokens.push_back(Token{TokenType::Text, std::move(text), {}});
             }
             continue;
         }
 
+        // ---------- COMMENT / PROLOG / DECLARATION ----------
+        if (skip_markup(i)) {
+            continue;
+        }
+
         // ---------- TAG ----------
+        const size_t tag_start = i;
         ++i; // skip '<'
         skip_ws(src, i);
 
@@ -95,9 +315,13 @@ std::vector<Token> Tokenizer::tokenize(const std::string& path) {
         }
 
         std::string tagName(src.substr(nameStart, i - nameStart));
+        if (tagName.empty()) {
+            fail(tag_start, "expected a tag name after '<'");
+        }
 
         Token token;
         token.name = std::move(tagName);
+        stamp(token, tag_start);
 
         // ---------- CLOSE TAG ----------
         if (isClosing) {
@@ -105,8 +329,10 @@ std::vector<Token> Tokenizer::tokenize(const std::string& path) {
             while (i < src.size() && src[i] != '>') {
                 ++i;
             }
-            if (i < src.size())
-                ++i;
+            if (i >= src.size()) {
+                fail(tag_start, "unterminated closing tag </" + token.name + ">");
+            }
+            ++i;
 
             token.type = TokenType::CloseTag;
             tokens.push_back(std::move(token));
@@ -114,9 +340,12 @@ std::vector<Token> Tokenizer::tokenize(const std::string& path) {
         }
 
         // ---------- ATTRIBUTES ----------
-        while (i < src.size()) {
+        while (true) {
             skip_ws(src, i);
 
+            if (i >= src.size()) {
+                fail(tag_start, "unterminated tag <" + token.name + ">");
+            }
             if (src[i] == '/' || src[i] == '>') {
                 break;
             }
@@ -128,6 +357,9 @@ std::vector<Token> Tokenizer::tokenize(const std::string& path) {
             }
 
             std::string attrName(src.substr(attrNameStart, i - attrNameStart));
+            if (attrName.empty()) {
+                fail(i, std::string("unexpected character '") + src[i] + "' in <" + token.name + ">");
+            }
             skip_ws(src, i);
 
             if (i < src.size() && src[i] == '=') {
@@ -138,36 +370,48 @@ std::vector<Token> Tokenizer::tokenize(const std::string& path) {
             // attribute value
             std::string attrValue;
             if (i < src.size() && src[i] == '"') {
+                const size_t quote = i;
                 ++i;
                 size_t valueStart = i;
                 while (i < src.size() && src[i] != '"') {
                     ++i;
                 }
-                attrValue = std::string(src.substr(valueStart, i - valueStart));
-                if (i < src.size())
-                    ++i;
+                if (i >= src.size()) {
+                    fail(quote, "unterminated value of attribute '" + attrName + "'");
+                }
+                attrValue = decode_entities(view.substr(valueStart, i - valueStart));
+                ++i;
             }
 
             token.attributes.emplace(std::move(attrName), std::move(attrValue));
         }
 
         // ---------- TAG END ----------
-        if (i < src.size() && src[i] == '/') {
+        if (src[i] == '/') {
             ++i; // skip '/'
-            if (i < src.size() && src[i] == '>')
-                ++i;
+            if (i >= src.size() || src[i] != '>') {
+                fail(i, "expected '>' after '/' in <" + token.name + ">");
+            }
+            ++i;
             token.type = TokenType::SelfCloseTag;
         } else {
-            if (i < src.size() && src[i] == '>')
-                ++i;
+            ++i; // skip '>'
             token.type = TokenType::OpenTag;
             // If it is <Text>, parse the content into the “text” attribute
             if (token.name == "Text") {
-                size_t textStart = i;
-                while (i < src.size() && src[i] != '<') {
-                    ++i;
+                // Collected piece by piece so a comment inside the
+                // text is dropped instead of ending it.
+                std::string text_content;
+                while (i < src.size()) {
+                    if (src[i] == '<') {
+                        if (starts_with_at(view, i, "<!--")) {
+                            skip_markup(i);
+                            continue;
+                        }
+                        break;
+                    }
+                    text_content.push_back(src[i++]);
                 }
-                std::string text_content = src.substr(textStart, i - textStart);
 
                 // Normalization: removing indents and hyphenations
                 size_t first = text_content.find_first_not_of(" \t\n\r");
@@ -178,7 +422,8 @@ std::vector<Token> Tokenizer::tokenize(const std::string& path) {
                     text_content.clear();
                 }
 
-                token.attributes.emplace("inner_text", std::move(text_content));
+                // Decoded after trimming, so &#32; at either end survives.
+                token.attributes.emplace("inner_text", decode_entities(text_content));
 
                 // now i points to the closing tag '<'
             }
@@ -208,13 +453,14 @@ void Tokenizer::save_tokens(const std::string& path, const std::vector<Token>& t
     for (const auto& token : tokens) {
         switch (token.type) {
         case TokenType::Text:
-            file << token.name; // for text, the field name contains the text itself
+            // for text, the field name contains the text itself
+            file << escape_xml(token.name, false);
             break;
 
         case TokenType::OpenTag:
             file << "<" << token.name;
             for (const auto& [attrName, attrValue] : token.attributes) {
-                file << " " << attrName << "=\"" << attrValue << "\"";
+                file << " " << attrName << "=\"" << escape_xml(attrValue, true) << "\"";
             }
             file << ">";
             break;
@@ -226,7 +472,7 @@ void Tokenizer::save_tokens(const std::string& path, const std::vector<Token>& t
         case TokenType::SelfCloseTag:
             file << "<" << token.name;
             for (const auto& [attrName, attrValue] : token.attributes) {
-                file << " " << attrName << "=\"" << attrValue << "\"";
+                file << " " << attrName << "=\"" << escape_xml(attrValue, true) << "\"";
             }
             file << "/>";
             break;

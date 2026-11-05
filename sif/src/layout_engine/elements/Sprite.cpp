@@ -44,7 +44,8 @@ void Sprite::append_render_items(rnd::RenderFrame& frame, const rnd::FrameContex
     item->src_rect = resolve_src_rect();
     item->tint = tint;
 
-    frame.temp_items.push_back(std::move(item));
+    // Layer comes from the enclosing LayerScope (see UIElement::render).
+    frame.submit(std::move(item));
 }
 
 void Sprite::set_record_id(const intrnl::RecordID record_id) { record_id_ = record_id; }

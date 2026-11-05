@@ -28,9 +28,6 @@ public:
     intrnl::Color fill_color;
     intrnl::Color border_color;
     int border_width = 0;
-
-private:
-    static float resolve(const intrnl::Size& s, float avail);
 };
 
 } // namespace sif::ui

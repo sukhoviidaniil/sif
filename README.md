@@ -28,14 +28,17 @@ repository keeps `sfml-system`, `sfml-window`, `sfml-graphics`, `sfml-audio` and
 sif/                     everything that IS sif
   include/sif/
     asset/                AssetRegistry, AssetRecord, AssetHandle, per-type asset interfaces
-    audio/                AudioPlayer interface
+    audio/                AudioPlayer interface (voices, buses, fades), Null_AudioPlayer
     diagnostics/          Logger, include-cycle analysis (PlantUML export)
-    event/                Event_Bus, Observer, Event_Store, event definitions
+    event/                Event_Bus, Observer, Event_Store, event definitions (98 keys),
+                          Scripted_Event_Collector
     internal/             GUID, RecordID, Rect, Color, Size, Random, Delta_Timer
     io/                   JSON helpers
-    layout_engine/        Tokenizer -> Parser -> UIFactory -> UIElement tree
+    layout_engine/        Tokenizer -> Parser -> SceneComposer -> UIFactory -> UIElement tree
+                          (SceneLoader runs it all), InputRouter
     math/                 Vector, Matrix, Vector2, Point2, DirectedGraph
-    render/               RenderFrame, RenderNode visitor tree, Renderer interface,
+    render/               RenderFrame (+ paint layers and clipping: LayerScope, ClipScope),
+                          RenderNode visitor tree, Renderer interface, RecordingRenderer,
                           Camera (normalized world [-1,1] -> pixels), RB_Config
   src/                    implementations
   test/                   self-registering test suite (no external framework, target sif_tests)
@@ -43,11 +46,12 @@ sif/                     everything that IS sif
                           and Asset_Reference_Serialization live in sif/ itself - no SFML)
   backends/               sif_sfml: the reference SFML backend (renderer, audio player,
                           event collector, one asset loader per asset type) plus the
-                          CPU-only headless variant and the Graphics_Factory that
-                          switches between them by ast::RB_Type
+                          headless backend (CPU-only asset loaders; the engine's
+                          RecordingRenderer, Scripted_Event_Collector and Null_AudioPlayer)
+                          and the Graphics_Factory that switches between them by ast::RB_Type
 
 app/                      sif_demo - a *consumer* of sif, not part of it (like an
-                          "examples/" folder in most libraries): four windowed demos
+                          "examples/" folder in most libraries): seven windowed demos
                           plus the headless verification run, linking sif_sfml
 
 cmake/GetSFML.cmake       finds/fetches SFML 2.6 for sif's own targets only (see below)
@@ -154,6 +158,30 @@ Two command-line tools turn those into what the runtime consumes:
 Authoring files stay human-readable (`asset_name="DemoBall"`); the runtime only ever sees
 stable numeric GUIDs, so renaming an asset cannot silently break a scene.
 
+Scene files (`*.ui.xml`) are UTF-8 and may contain comments (`<!-- -->`), an `<?xml ?>`
+prolog and the XML entities `&lt; &gt; &amp; &quot; &apos;` / `&#NNN;` (a bare `&` is kept as
+text). Malformed markup is reported with its file, line and column. Sizes are written
+`PX|n`, `PERCENT|n` (0–100 of the space the parent offers) or `AUTO|0`; `padding` and `margin`
+apply to every container, including `VBox`/`HBox`/`Menu`.
+
+An asset that failed to load stays `Failed` (so code calling `request()` every frame cannot
+hammer a broken file); `AssetRegistry::retry(guid)` re-queues it explicitly.
+
+Loaded assets stay in memory until released: `AssetRegistry::release(guid)` drops one (safe
+while it is in use - data is shared, so a playing voice keeps its sound), and asset groups
+unload a whole scene or level at once without touching what another active group still
+needs:
+
+```cpp
+asset::AssetRegistry& registry = asset::AssetRegistry::instance();
+{
+    asset::AssetRegistry::GroupCapture capture(registry, "level_1"); // collects every request()
+    level_ui = ui::SceneLoader::load("data/bin/scenes/level_1.ui.xml");
+}
+// ... later, leaving the level:
+registry.release_group("level_1");
+```
+
 Supported asset types: `Font`, `SpriteSingle`, `SpriteAtlas`, `SpriteGrid`,
 `PrimitiveAnimation`, `Sound`.
 
@@ -174,10 +202,13 @@ Requires `-DSIF_BUILD_DEMO_APP=ON` (see above; off by default).
 | id | what it shows |
 |----|---------------|
 | `sprites`   | `SpriteSingle`, `SpriteAtlas` addressed by record **name**, `SpriteGrid` addressed by flat record **id** — all through one `ui::Sprite` element |
-| `animation` | one `PrimitiveAnimation` asset driving four independent cursors (0.5x / 1x / 2.5x / paused); `SPACE` pauses the 4th, `S` restarts all |
-| `sound`     | three `Sound` assets through `audio::AudioPlayer`; `1` blip, `2` looping chime toggle, `3` thud, `↑`/`↓` master volume — bars are driven by real voice state, not by the key press |
+| `animation` | one `PrimitiveAnimation` asset driving four independent cursors (0.5x / 1x / 2.5x / paused); `SPACE` pauses the 4th, `R` restarts all |
+| `sound`     | three `Sound` assets through `audio::AudioPlayer`; `1` blip, `2` looping chime toggle, `3` thud, `↑`/`↓` master volume; on the chime: `SPACE` pause, `←`/`→` pan, `W`/`S` pitch, `D` fade out — bars are driven by real voice state, not by the key press |
 | `all`       | everything at once, synchronised by the animation cursor: a sound fires when the animation wraps, the atlas icon advances on the same beat, the tile strip lights up with the current frame |
-| `headless`  | no window, no audio device: loads every asset, checks geometry and timing, exits non-zero on failure (this is what CI runs) |
+| `layers`    | overlapping UI: cards overlapping in an `HBox` (raise one with a click or `1`/`2`/`3` via `z_index`), `Overlay` badges and captions, a pause dialog declared *first* in the file but drawn on top via `layer="Modal"` that blocks clicks to the cards (`SPACE` toggles it), and a `Tooltip`-layer label above everything; the status line shows what each click actually hit |
+| `widgets`   | input routing: a `Menu` driven by mouse or arrows/Tab + `Enter`, a click counter (`Button::on_click`), a disabled button, a wrapped paragraph with ellipsis, and an event log in a `ScrollView` (wheel, `follow_end`); uses `<Style>`/`class` and an `<Include>` |
+| `world`     | a `WorldView`: world objects placed in world units under a moving, zooming `Camera` (arrows, `W`/`S`, `D` resets), culling, clicks mapped back to world coordinates, a HUD on the `Popup` layer |
+| `headless`  | no window, no audio device: loads every asset, checks geometry and timing, builds every demo scene in strict mode, lays out the `layers` scene and checks overlap, paint order and click routing, drives every demo through `App` for 30 frames on the headless backend, loads and unloads a scene's asset group; exits non-zero on failure (this is what CI runs) |
 
 `ESC` closes any windowed demo.
 
@@ -193,10 +224,110 @@ in any `*Tests.cpp`, with nothing to wire up elsewhere.
 ```
 
 Covered: asset registry queueing/concurrency/stale-attempt handling, `Rect` arithmetic,
-animation frame timing (looping and non-looping), UI element lookup/menu behaviour, the
+animation frame timing (looping and non-looping), UI element lookup/menu behaviour, UI
+layering (`Overlay` placement, `z_index`, `layer`, `LayerScope`, draw order, hit testing,
+the new XML attributes and their error handling), the tokenizer (comments, entities,
+escaping round trips, malformed input reported with line:column), `PERCENT` sizes and
+`VBox`/`HBox` padding/margin/own size/justify, retrying failed assets, scene validation
+(schemas, positions, strict mode), styles and includes, text layout (alignment, wrapping,
+ellipsis), clipping and `ScrollView`, input routing (hover, click, focus, keyboard, wheel,
+bubbling, modal blocking), `WorldView`, asset release and groups, the headless backend
+(recording renderer, scripted input, null audio incl. buses, fades, pause and pitch), the
+key list, the
 `Sprite`/`Animation` elements' render output, parser error handling, singleton identity,
 and the `Camera` projection (all three aspect policies, zoom, centring, sub-viewports,
 y-axis flip, round-tripping and culling).
+
+## UI layers and overlapping
+
+The layout engine used to give every element its own slot - `VBox`/`HBox` line children
+up, and nothing could be drawn over anything else on purpose. Overlap is now expressed at
+three levels, each solving a different problem:
+
+| Mechanism | Scope | Use it for |
+|---|---|---|
+| `<Overlay>` container | its children | children sharing one box: a background with a label, a badge on an icon, a caption over an image |
+| `z_index="N"` | siblings | which of two overlapping siblings is on top (higher = drawn later); ties keep document order |
+| `layer="Name\|N"` | the whole frame | a subtree that must cover everything on lower layers wherever it is declared: dialogs, tooltips |
+
+Named layers (`rnd::layer`) are `Background` (-100), `Content` (0, the default), `Popup` (100),
+`Modal` (200) and `Tooltip` (300); any integer works too (`layer="150"`). A layer is
+inherited by the whole subtree until a descendant sets its own.
+
+Inside an `<Overlay>`, each child places itself with attributes it carries (attached
+properties, read only by the `Overlay` - like `flex` is read only by a `LinearLayout`):
+`h_align` / `v_align` (`Start|Center|End|Stretch`), `margin` (`"a"` or `"x|y"`, inset from
+the box) and `offset` (`"a"` or `"x|y"`, shift applied after alignment - also how a child is
+positioned absolutely or made to stick out of its parent). Nothing is clipped.
+
+```xml
+<Overlay width="PX|128" height="PX|128">
+    <Sprite asset_name="DemoBadge" h_align="Stretch" v_align="Stretch"/>
+    <Rectangle fill_color="230|50|60" width="PX|36" height="PX|36"
+               h_align="End" v_align="Start" offset="12|-12"/>
+</Overlay>
+```
+
+Every element also understands `visible="true|false"` (hides the whole subtree - e.g. a
+dialog that starts hidden) and `hit_testable="true|false"` (makes the element itself
+transparent to clicks; its children stay clickable).
+
+How it works, and why it is shaped this way:
+
+- **Draw order is decided by the engine, not by the backend.** `RenderNode::layer` is stamped
+  by `RenderFrame::submit` from the current `rnd::LayerScope` (an RAII scope, like
+  `diag::LogScope`), and `RenderFrame::draw_order()` stable-sorts the frame by layer. A
+  backend only iterates `draw_order()`. When nothing sets a layer the order is exactly the
+  old "constant items, then temp items, in submission order", so existing scenes render
+  identically.
+- **One entry point per element.** `UIElement::render` is a non-virtual Template Method: it
+  applies `visible` and opens the element's `LayerScope`, then calls the virtual
+  `append_render_items`. Visibility and layering are therefore enforced once for every
+  element type, including ones added later (previously `ui::Text` ignored `visible`, and
+  hiding a container hid nothing).
+- **Clicks follow what is on screen.** `UIElement::element_at(point)` walks the tree in
+  exactly the paint order and returns what is drawn on top; `element_at<Button>(point)`
+  returns the button whose label was clicked, but `nullptr` when a modal panel covers it.
+  `ui::Menu::handle_click` uses it, and the demo app now forwards left clicks to demos
+  (`Demo::on_click`).
+
+A full example is `data/scenes/demo_layers.ui.xml` (`sif_demo layers`). What was audited,
+what has been done since and what is still open is in [`FEATURE_AUDIT.md`](FEATURE_AUDIT.md).
+
+## UI toolkit
+
+Beyond layout and layering, the UI engine covers what a game menu or HUD needs. Everything
+below is plain scene XML; see `data/scenes/demo_widgets.ui.xml` and `demo_world.ui.xml`.
+
+- **Input** - `ui::InputRouter` turns raw input into UI events on the tree: hover, press,
+  click (press and release over the same element), keyboard focus (click, `Tab`/`Shift+Tab`,
+  arrows while something is focused, `Enter`/`Space` to activate), wheel and text. Events
+  bubble from the element under the pointer (or the focused one) to its ancestors; a handler
+  can use an event and/or stop it. `Button::on_click` says what a button does; a `Menu`'s
+  selection follows clicks and focus. `App` gives input to the UI first and passes on only
+  what the UI did not use.
+- **Clipping and scrolling** - `clip="true"` cuts a subtree (drawing *and* clicking) at its
+  rect; `<ScrollView direction="Vertical|Horizontal|Both" scroll_step follow_end>` shows larger
+  content through a clipped viewport.
+- **Text** - `h_text_align`, `v_text_align`, `wrap`, `max_lines`, `ellipsis`, `line_spacing`;
+  UTF-8 throughout.
+- **Rows and columns** - `justify="Start|Center|End|SpaceBetween|SpaceAround|SpaceEvenly"`.
+- **Styles and includes** - `<Style name="title" color=... fontSize=.../>` and
+  `class="title"`; `<Include src="parts/panel.ui.xml" name=.../>`. Load scenes with
+  `ui::SceneLoader::load(path)`, which runs the whole pipeline.
+- **Validation** - unknown attributes are reported with file, line, column and a
+  "did you mean"; `UIFactory::set_strict(true)` (tests, CI, tooling) makes them errors.
+- **The world** - `<WorldView aspect zoom center>` places children by
+  `world_rect="x|y|w|h"` through its `rnd::Camera`, culls what is off-screen and maps clicks
+  back with `to_world()`.
+
+## Audio
+
+`audio::AudioPlayer::play(sound, PlayOptions)` takes volume, looping, a mixer bus
+(`Effects`, `Music`, `Interface`), pitch, pan and a fade-in; a playing voice can be paused,
+resumed, re-pitched, panned and faded (`fade_to`, `fade_out`). Loudness is voice x bus x
+master, so an options menu sets `set_bus_volume(Bus::Music, ...)` without touching any
+`play()` call. Fades advance in `update(dt)`, which `App` calls every frame.
 
 ## Coordinates
 
@@ -207,8 +338,9 @@ to a viewport, an aspect policy (`Stretch` / `Fit` / `Fill`), a zoom and a centr
 contains no graphics-library code and is unit-tested without a window.
 
 Note that the UI layout engine works directly in screen pixels — a HUD is authored
-against the window, not against the world. The two systems meet only where a scene draws
-both: world content goes through `Camera`, UI content does not.
+against the window, not against the world. The two systems meet in `ui::WorldView`: a UI
+element whose children are placed in world units (`world_rect`) through its own `Camera`,
+so world content and UI content share one tree, one paint order and one input router.
 
 ---
 
@@ -218,3 +350,7 @@ both: world content goes through `Camera`, UI content does not.
 SFML-consuming target explicitly disabled (**no SFML installed at all** on that machine),
 the other installs SFML, builds everything including the opt-in demo, and runs the
 headless asset + animation + sound verification.
+
+Line endings are stored exactly as written (`.gitattributes`: `* -text`): the repository
+mixes CRLF and LF files on purpose, and this keeps `core.autocrlf` on any machine from
+rewriting them.

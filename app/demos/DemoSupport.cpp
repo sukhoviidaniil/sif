@@ -15,6 +15,7 @@
 #include "sif/asset/AssetRegistry.h"
 #include "sif/asset/internal/AssetImporter.h"
 #include "sif/layout_engine/Parser.h"
+#include "sif/layout_engine/SceneComposer.h"
 #include "sif/layout_engine/Tokenizer.h"
 #include "sif/layout_engine/UIFactory.h"
 #include "sif/layout_engine/elements/Text.h"
@@ -42,12 +43,8 @@ const std::string& Paths::data_dir() { return data_dir_storage(); }
 std::string Paths::scene(const std::string& file) { return data_dir() + "bin/scenes/" + file; }
 
 std::unique_ptr<ui::UIElement> load_scene(const std::string& scene_file) {
-    const std::vector<ui::Token> tokens = ui::Tokenizer::tokenize(Paths::scene(scene_file));
-    const std::unique_ptr<ui::Node> node_root = ui::Parser::parse(tokens);
-    if (node_root == nullptr) {
-        throw std::runtime_error("Scene '" + scene_file + "' contains no root element");
-    }
-    return ui::UIFactory::instance().build(*node_root);
+    // The whole pipeline, includes and styles included.
+    return ui::SceneLoader::load(Paths::scene(scene_file));
 }
 
 intrnl::GUID guid_of(const std::string& asset_name) {
@@ -73,4 +70,6 @@ void Demo::on_start(Context& /*ctx*/) {}
 void Demo::update(Context& /*ctx*/, float /*dt*/) {}
 
 void Demo::on_key(Context& /*ctx*/, event::input::Key /*key*/) {}
+
+void Demo::on_click(Context& /*ctx*/, math::Vector2 /*point*/) {}
 } // namespace app::demo

@@ -18,6 +18,16 @@ set(SIF_TEST_SRC
     RectMathTests.cpp
     PrimitiveAnimationTests.cpp
     UIElementTests.cpp
+    LayerTests.cpp
+    LayoutFixTests.cpp
+    TokenizerTests.cpp
+    SceneValidationTests.cpp
+    TextLayoutTests.cpp
+    HeadlessBackendTests.cpp
+    ClipScrollTests.cpp
+    InputRouterTests.cpp
+    StyleIncludeTests.cpp
+    WorldViewTests.cpp
     SpriteAnimationElementTests.cpp
     CameraTests.cpp
     RegistryNamingTests.cpp

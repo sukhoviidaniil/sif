@@ -24,10 +24,10 @@ math::Vector2 Rectangle::measure(const math::Vector2& available) {
     math::Vector2 size{std::max(0.f, available.x), std::max(0.f, available.y)};
 
     if (width.type != intrnl::Size::Type::Auto)
-        size.x = resolve(width, available.x);
+        size.x = width.resolve(available.x);
 
     if (height.type != intrnl::Size::Type::Auto)
-        size.y = resolve(height, available.y);
+        size.y = height.resolve(available.y);
 
     const float bw = static_cast<float>(border_width) * 2.f;
     size.x += bw;
@@ -49,21 +49,14 @@ void Rectangle::append_render_items(rnd::RenderFrame& frame, const rnd::FrameCon
     item->border_color = border_color;
     item->border_width = border_width;
 
-    // temp_items, not constant_items: the two buckets are a *caching*
-    // distinction (rebuilt every frame vs. not), and the renderer
-    // happens to draw the constant ones first. Using them as a z-order
-    // means every animated entity is painted on top of every label -
-    // a pause overlay ends up underneath the bombs it is supposed to
-    // cover. Everything that participates in normal layering goes in
-    // one bucket, so draw order is submission order.
-    frame.temp_items.push_back(std::move(item));
-}
-
-float Rectangle::resolve(const intrnl::Size& s, const float avail) {
-    if (s.type == intrnl::Size::Type::Pixel)
-        return s.value;
-    if (s.type == intrnl::Size::Type::Percent)
-        return avail * s.value;
-    return avail;
+    // submit(), not constant_items: the two buckets are a *caching*
+    // distinction (rebuilt every frame vs. not), not a z-order. Using
+    // them as one meant every animated entity was painted on top of
+    // every label - a pause overlay ended up underneath the bombs it
+    // was supposed to cover. Covering is now expressed explicitly:
+    // submit() stamps the layer of the enclosing LayerScope, and
+    // within a layer draw order is submission order (see
+    // RenderFrame::draw_order).
+    frame.submit(std::move(item));
 }
 } // namespace sif::ui

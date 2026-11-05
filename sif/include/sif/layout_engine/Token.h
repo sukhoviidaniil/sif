@@ -9,6 +9,7 @@
  ***************************************************************/
 #ifndef RENDER_ENGINE_TOKEN_H
 #define RENDER_ENGINE_TOKEN_H
+#include <cstddef>
 #include <string>
 #include <unordered_map>
 
@@ -21,6 +22,11 @@ struct Token {
     std::string name;
 
     std::unordered_map<std::string, std::string> attributes;
+
+    /// 1-based position of the token's '<' in its file (0 = unknown,
+    /// e.g. a token built in code rather than read from a file).
+    std::size_t line = 0;
+    std::size_t column = 0;
 };
 } // namespace sif::ui
 

@@ -10,8 +10,73 @@
 #include "sif/layout_engine/elements/UIElement.h"
 
 #include <algorithm>
+#include <numeric>
+
+#include "sif/render/Layer.h"
 
 namespace sif::ui {
+namespace {
+/**
+ * @brief Best hit found so far by collect_hits.
+ */
+struct HitCandidate {
+    std::vector<UIElement*> path;
+    int layer = rnd::layer::Content;
+    std::size_t sequence = 0;
+    bool found = false;
+};
+
+/**
+ * @brief Walks the tree in exactly the order UIElement::render paints
+ * it and remembers the last-painted element under point.
+ *
+ * Mirroring the paint traversal (pre-order, children in
+ * paint_order(), invisible subtrees skipped, layers inherited) is the
+ * whole trick: "topmost under the cursor" then means precisely "drawn
+ * last at that pixel", with no second notion of depth to keep in sync.
+ */
+void collect_hits(UIElement& e, const math::Vector2& point, const int inherited_layer,
+                  const std::optional<intrnl::Rect>& inherited_clip, std::vector<UIElement*>& path, HitCandidate& best,
+                  std::size_t& sequence) {
+    if (!e.visible) {
+        return;
+    }
+    // Outside a clipping ancestor nothing in this subtree is visible,
+    // so nothing in it can be hit either.
+    if (inherited_clip.has_value() && !inherited_clip->contains(point.x, point.y)) {
+        return;
+    }
+
+    const int effective_layer = e.layer.value_or(inherited_layer);
+    const std::size_t own_sequence = sequence++;
+    path.push_back(&e);
+
+    const intrnl::Rect& r = e.result.rect;
+    if (e.hit_testable && r.width > 0.f && r.height > 0.f && r.contains(point.x, point.y)) {
+        // Higher layer always wins; on the same layer the element
+        // visited later was painted later, i.e. is on top.
+        if (!best.found || effective_layer > best.layer ||
+            (effective_layer == best.layer && own_sequence > best.sequence)) {
+            best.path = path;
+            best.layer = effective_layer;
+            best.sequence = own_sequence;
+            best.found = true;
+        }
+    }
+
+    std::optional<intrnl::Rect> clip = inherited_clip;
+    if (e.clip) {
+        clip = clip.has_value() ? clip->intersection(r) : r;
+    }
+
+    for (const std::size_t i : e.paint_order()) {
+        collect_hits(*e.children[i], point, effective_layer, clip, path, best, sequence);
+    }
+
+    path.pop_back();
+}
+} // namespace
+
 void UIElement::add(std::unique_ptr<UIElement> child) { children.push_back(std::move(child)); }
 
 math::Vector2 UIElement::measure(const math::Vector2& available) {
@@ -49,10 +114,62 @@ void UIElement::layout(const intrnl::Rect r) {
     }
 }
 
-void UIElement::append_render_items(rnd::RenderFrame& frame, const rnd::FrameContext& ctx) const {
-    for (const auto& c : children) {
-        c->append_render_items(frame, ctx);
+void UIElement::render(rnd::RenderFrame& frame, const rnd::FrameContext& ctx) const {
+    if (!visible) {
+        return;
     }
+
+    // Everything this subtree submits - own items and every
+    // descendant's - lands on this layer and inside this clip unless a
+    // descendant opens a scope of its own; the scopes restore the
+    // parent's layer and clip on the way out.
+    std::optional<rnd::LayerScope> layer_scope;
+    if (layer.has_value()) {
+        layer_scope.emplace(frame, *layer);
+    }
+    std::optional<rnd::ClipScope> clip_scope;
+    if (clip) {
+        clip_scope.emplace(frame, result.rect);
+    }
+
+    append_render_items(frame, ctx);
+}
+
+void UIElement::append_render_items(rnd::RenderFrame& frame, const rnd::FrameContext& ctx) const {
+    // Through render(), not append_render_items(): that is what makes
+    // a child's visible flag and layer apply to its whole subtree.
+    for (const std::size_t i : paint_order()) {
+        children[i]->render(frame, ctx);
+    }
+}
+
+bool UIElement::on_ui_event(UIEvent& e) { return event_handler ? event_handler(e) : false; }
+
+bool UIElement::can_focus() const { return focusable; }
+
+std::vector<std::size_t> UIElement::paint_order() const {
+    std::vector<std::size_t> order(children.size());
+    std::iota(order.begin(), order.end(), std::size_t{0});
+
+    // Stable, so equal z_index keeps document order and a tree that
+    // never sets z_index paints exactly as it did before z_index
+    // existed. The vector is tiny (one entry per direct child), which
+    // is negligible next to the render items allocated every frame.
+    std::stable_sort(order.begin(), order.end(), [this](const std::size_t a, const std::size_t b) {
+        return children[a]->z_index < children[b]->z_index;
+    });
+
+    return order;
+}
+
+std::vector<UIElement*> UIElement::hit_path(const math::Vector2& point) {
+    HitCandidate best;
+    std::vector<UIElement*> path;
+    std::size_t sequence = 0;
+
+    collect_hits(*this, point, rnd::layer::Content, std::nullopt, path, best, sequence);
+
+    return best.found ? best.path : std::vector<UIElement*>{};
 }
 
 void UIElement::update(const float dt) {
@@ -76,16 +193,8 @@ UIElement* UIElement::find_if(const std::function<bool(const UIElement&)>& predi
 math::Vector2 UIElement::resolve_size(const math::Vector2& available) const {
     math::Vector2 out;
 
-    auto resolve = [&](const intrnl::Size s, const float avail) {
-        if (s.type == intrnl::Size::Type::Pixel)
-            return s.value;
-        if (s.type == intrnl::Size::Type::Percent)
-            return avail * s.value;
-        return avail; // Auto
-    };
-
-    out.x = resolve(width, available.x);
-    out.y = resolve(height, available.y);
+    out.x = width.resolve(available.x);
+    out.y = height.resolve(available.y);
 
     out.x = std::clamp(out.x, min_size.x, max_size.x);
     out.y = std::clamp(out.y, min_size.y, max_size.y);

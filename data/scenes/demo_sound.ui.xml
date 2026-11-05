@@ -13,6 +13,6 @@
         active voices: 0
     </Text>
     <Text asset_name="Times" color="150|220|150" fontSize="18" height="PX|26" name="status">
-        1 - blip, 2 - chime (looping toggle), 3 - thud, 0 - stop all
+        1 blip, 2 chime loop, 3 thud, Up/Down master, chime: SPACE pause, Left/Right pan, W/S pitch, D fade out
     </Text>
 </VBox>

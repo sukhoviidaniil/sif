@@ -28,7 +28,7 @@ public:
     enum class Type {
         Auto,    ///< Size is determined automatically by layout rules
         Pixel,   ///< Absolute size in pixels
-        Percent, ///< Size relative to the parent (0–100)
+        Percent, ///< Size relative to the parent, in percent: 50 = half (0–100)
     };
 
     Type type = Type::Auto; ///< Size mode
@@ -46,6 +46,23 @@ public:
     Size(Type t, float v);
 
     explicit Size(std::string_view str);
+
+    /**
+     * @brief Resolves this size against the space the parent offers.
+     *
+     * The single definition of what a Size means, shared by every
+     * element (UIElement::resolve_size, Rectangle, Button, Overlay):
+     * Pixel is the value itself, Percent is that percentage of
+     * available (PERCENT|50 = half - it used to be multiplied
+     * directly, so PERCENT|50 meant fifty times the parent), and Auto
+     * takes all of available, which is how leaf elements fill their
+     * slot. Containers that size to their content check for Auto
+     * before calling this.
+     *
+     * @param available Space offered by the parent along this axis.
+     * @return Resolved length (not clamped to min/max).
+     */
+    [[nodiscard]] float resolve(float available) const;
 };
 } // namespace sif::intrnl
 

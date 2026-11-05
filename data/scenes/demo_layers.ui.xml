@@ -1,0 +1,61 @@
+<Overlay name="root">
+    <Overlay name="dialog" layer="Modal" visible="false" h_align="Stretch" v_align="Stretch">
+        <Rectangle name="dialog_backdrop" fill_color="0|0|0|170" h_align="Stretch" v_align="Stretch"/>
+        <Overlay name="dialog_panel" width="PX|520" height="PX|160" h_align="Center" v_align="Center">
+            <Rectangle fill_color="45|45|70" h_align="Stretch" v_align="Stretch"/>
+            <Text asset_name="Arial" color="240|240|255" fontSize="24" h_align="Center" v_align="Center">
+                Paused - the cards below cannot be clicked
+            </Text>
+        </Overlay>
+    </Overlay>
+
+    <VBox padding="16" spacing="12" h_align="Stretch" v_align="Stretch" name="content">
+        <Text asset_name="Arial" color="240|240|255" fontSize="26" height="PX|34" name="title">
+            Demo 5 - Layers: Overlay, z_index, layer and hit testing
+        </Text>
+
+        <Text asset_name="Arial" color="200|200|220" fontSize="18" height="PX|24">
+            Overlapping cards (HBox spacing -60): click a card or press 1/2/3 to bring it to the front
+        </Text>
+
+        <HBox spacing="-60" align="Center" name="cards">
+            <Rectangle name="card1" width="PX|200" height="PX|150" fill_color="210|90|90"/>
+            <Rectangle name="card2" width="PX|200" height="PX|150" fill_color="90|190|110"/>
+            <Rectangle name="card3" width="PX|200" height="PX|150" fill_color="90|120|220"/>
+        </HBox>
+
+        <Text asset_name="Arial" color="200|200|220" fontSize="18" height="PX|24">
+            Overlay: children share one box - a badge sticking out of a corner, a caption over an image
+        </Text>
+
+        <HBox spacing="48" align="Center" name="icons">
+            <Overlay name="badged_icon" width="PX|128" height="PX|128">
+                <Sprite asset_name="DemoBadge" h_align="Stretch" v_align="Stretch"/>
+                <Overlay name="badge" width="PX|36" height="PX|36" h_align="End" v_align="Start" offset="12|-12">
+                    <Rectangle fill_color="230|50|60" h_align="Stretch" v_align="Stretch"/>
+                    <Text asset_name="Arial" color="255|255|255" fontSize="20" h_align="Center" v_align="Center">3</Text>
+                </Overlay>
+            </Overlay>
+
+            <Overlay name="captioned_icon" width="PX|128" height="PX|128">
+                <Sprite asset_name="DemoIcons" record_name="gem" h_align="Stretch" v_align="Stretch"/>
+                <Rectangle fill_color="0|0|0|150" height="PX|30" h_align="Stretch" v_align="End"/>
+                <Text asset_name="Arial" color="255|255|255" fontSize="16" h_align="Center" v_align="End" margin="0|6">
+                    gem
+                </Text>
+            </Overlay>
+        </HBox>
+
+        <Text asset_name="Times" color="150|220|150" fontSize="18" height="PX|26" name="status">
+            loading...
+        </Text>
+        <Text asset_name="Arial" color="150|150|170" fontSize="16" height="PX|22">
+            SPACE - toggle the pause dialog (declared first, drawn on top via layer="Modal"), ESC - quit
+        </Text>
+    </VBox>
+
+    <Text name="tooltip" asset_name="Arial" color="255|230|140" fontSize="16" layer="Tooltip" hit_testable="false"
+          h_align="End" v_align="End" margin="12">
+        layer="Tooltip": drawn over everything, even the dialog
+    </Text>
+</Overlay>

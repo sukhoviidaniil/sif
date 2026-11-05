@@ -42,6 +42,27 @@ namespace {
         }
         std::chrono::milliseconds t_;
     };
+
+    /**
+     * @brief Fails its first load and succeeds every later one - a
+     * file that was missing the first time it was asked for.
+     */
+    class FlakyLoader : public asset::IAssetLoader {
+    public:
+        std::atomic<int> calls{0};
+    private:
+        void load_asset(asset::AssetRecord& record, const std::string&, const uint64_t token) override {
+            if (calls.fetch_add(1) == 0) {
+                throw std::runtime_error("not there yet");
+            }
+            record.set_data_if_current(token, std::make_shared<int>(7));
+        }
+    };
+
+    asset::AssetState state_of(const asset::AssetRegistry& reg, const intrnl::GUID id) {
+        const auto record = reg.get<int>(id).record().lock();
+        return record ? record->get_state() : asset::AssetState::NotRequested;
+    }
 }
 
 SIF_TEST(asset_registry_default_concurrency_is_two) {
@@ -177,4 +198,175 @@ SIF_TEST(on_ready_fires_later_for_a_pending_asset) {
 
     std::this_thread::sleep_for(150ms);
     SIF_CHECK(fired.load());
+}
+
+SIF_TEST(a_failed_asset_can_be_retried_explicitly) {
+    auto& reg = asset::AssetRegistry::instance();
+    reg.set_asset_dir("./");
+    reg.set_max_concurrent_loads(2);
+    auto loader = std::make_unique<FlakyLoader>();
+    FlakyLoader* flaky = loader.get();
+    reg.register_loader(asset::AssetType::Sound, std::move(loader));
+
+    const auto id = make_test_asset(reg, asset::AssetType::Sound);
+
+    reg.request(id);
+    SIF_CHECK(reg.wait_for_idle(5s));
+    SIF_CHECK(state_of(reg, id) == asset::AssetState::Failed);
+
+    // request() still never re-loads a failed asset on its own...
+    reg.request(id);
+    SIF_CHECK(reg.wait_for_idle(5s));
+    SIF_CHECK(flaky->calls.load() == 1);
+
+    // ...retry() does.
+    SIF_CHECK(reg.retry(id));
+    SIF_CHECK(reg.wait_for_idle(5s));
+    SIF_CHECK(state_of(reg, id) == asset::AssetState::Ready);
+    SIF_CHECK(reg.get<int>(id).ready() && *reg.get<int>(id).get() == 7);
+    SIF_CHECK(flaky->calls.load() == 2);
+
+    // Only a Failed asset is retried.
+    SIF_CHECK(!reg.retry(id));
+    SIF_CHECK(flaky->calls.load() == 2);
+
+    bool threw = false;
+    try {
+        (void)reg.retry(intrnl::GUID(0xFFFFFFF0u)); // never handed out by make_test_asset
+    } catch (const std::runtime_error&) {
+        threw = true;
+    }
+    SIF_CHECK(threw);
+}
+
+// =================================================================
+// Unloading and asset groups (audit 4.1)
+// =================================================================
+
+namespace {
+    /// @brief Counts loads; optionally slow, so a load can be caught in flight.
+    class CountingLoader : public asset::IAssetLoader {
+    public:
+        explicit CountingLoader(std::chrono::milliseconds t = 0ms) : t_(t) {}
+        std::atomic<int> loads{0};
+    private:
+        void load_asset(asset::AssetRecord& record, const std::string&, const uint64_t token) override {
+            ++loads;
+            std::this_thread::sleep_for(t_);
+            record.set_data_if_current(token, std::make_shared<int>(42));
+        }
+        std::chrono::milliseconds t_;
+    };
+
+    CountingLoader* install_counting_loader(asset::AssetRegistry& reg, std::chrono::milliseconds t = 0ms) {
+        auto loader = std::make_unique<CountingLoader>(t);
+        CountingLoader* raw = loader.get();
+        reg.register_loader(asset::AssetType::Sound, std::move(loader));
+        return raw;
+    }
+}
+
+SIF_TEST(release_drops_data_and_a_later_request_loads_again) {
+    auto& reg = asset::AssetRegistry::instance();
+    reg.set_max_concurrent_loads(2);
+    CountingLoader* loader = install_counting_loader(reg);
+    const auto id = make_test_asset(reg, asset::AssetType::Sound);
+
+    SIF_CHECK(!reg.release(id)); // never requested: nothing to release
+
+    reg.request(id);
+    SIF_CHECK(reg.wait_for_idle(5s));
+    const auto handle = reg.get<int>(id);
+    SIF_CHECK(handle.ready());
+
+    // Someone still holding the data (a playing voice does exactly this)
+    // keeps it alive across the release.
+    const std::shared_ptr<int> held = handle.lock();
+
+    SIF_CHECK(reg.release(id));
+    SIF_CHECK(reg.state_of(id) == asset::AssetState::NotRequested);
+    SIF_CHECK(!handle.ready() && handle.get() == nullptr);
+    SIF_CHECK(held != nullptr && *held == 42);
+
+    reg.request(id);
+    SIF_CHECK(reg.wait_for_idle(5s));
+    SIF_CHECK(handle.ready() && loader->loads.load() == 2);
+
+    bool threw = false;
+    try { (void)reg.release(intrnl::GUID(0xFFFFFFF1u)); } catch (const std::runtime_error&) { threw = true; }
+    SIF_CHECK(threw);
+}
+
+SIF_TEST(release_takes_a_queued_asset_off_the_queue_and_discards_a_load_in_flight) {
+    auto& reg = asset::AssetRegistry::instance();
+    reg.set_max_concurrent_loads(1);
+    CountingLoader* loader = install_counting_loader(reg, 80ms);
+
+    const auto loading = make_test_asset(reg, asset::AssetType::Sound);
+    const auto queued = make_test_asset(reg, asset::AssetType::Sound);
+    reg.request(loading);
+    reg.request(queued);
+    std::this_thread::sleep_for(20ms);
+    SIF_CHECK(reg.state_of(loading) == asset::AssetState::Loading);
+    SIF_CHECK(reg.state_of(queued) == asset::AssetState::Queued);
+
+    SIF_CHECK(reg.release(queued));
+    SIF_CHECK(reg.release(loading));
+    SIF_CHECK(reg.wait_for_idle(5s));
+
+    SIF_CHECK(loader->loads.load() == 1);                                 // the queued one never ran
+    SIF_CHECK(reg.state_of(loading) == asset::AssetState::NotRequested); // late result discarded
+    SIF_CHECK(!reg.get<int>(loading).ready());
+    reg.set_max_concurrent_loads(2);
+}
+
+SIF_TEST(release_group_keeps_assets_another_active_group_needs) {
+    auto& reg = asset::AssetRegistry::instance();
+    reg.set_max_concurrent_loads(4);
+    install_counting_loader(reg);
+
+    const auto level_only = make_test_asset(reg, asset::AssetType::Sound);
+    const auto shared = make_test_asset(reg, asset::AssetType::Sound);
+    const auto menu_only = make_test_asset(reg, asset::AssetType::Sound);
+    reg.add_to_group("test_level", level_only);
+    reg.add_to_group("test_level", shared);
+    reg.add_to_group("test_level", shared); // no duplicates
+    reg.add_to_group("test_menu", shared);
+    reg.add_to_group("test_menu", menu_only);
+    SIF_CHECK(reg.group_members("test_level").size() == 2);
+
+    const std::size_t before = reg.loaded_count();
+    reg.request_group("test_level");
+    reg.request_group("test_menu");
+    SIF_CHECK(reg.wait_for_idle(5s));
+    SIF_CHECK(reg.loaded_count() == before + 3);
+
+    SIF_CHECK(reg.release_group("test_level") == 1); // the shared asset stays for the menu
+    SIF_CHECK(reg.state_of(level_only) == asset::AssetState::NotRequested);
+    SIF_CHECK(reg.state_of(shared) == asset::AssetState::Ready);
+
+    SIF_CHECK(reg.release_group("test_menu") == 2);
+    SIF_CHECK(reg.state_of(shared) == asset::AssetState::NotRequested);
+    SIF_CHECK(reg.loaded_count() == before);
+    SIF_CHECK(reg.release_group("no_such_group") == 0);
+}
+
+SIF_TEST(group_capture_collects_everything_requested_inside_it) {
+    auto& reg = asset::AssetRegistry::instance();
+    install_counting_loader(reg);
+    const auto a = make_test_asset(reg, asset::AssetType::Sound);
+    const auto b = make_test_asset(reg, asset::AssetType::Sound);
+    const auto outside = make_test_asset(reg, asset::AssetType::Sound);
+    {
+        const asset::AssetRegistry::GroupCapture capture(reg, "test_scene");
+        reg.request(a);
+        reg.request(b);
+    }
+    reg.request(outside);
+    SIF_CHECK(reg.wait_for_idle(5s));
+
+    const auto members = reg.group_members("test_scene");
+    SIF_CHECK(members.size() == 2 && members[0] == a && members[1] == b);
+    SIF_CHECK(reg.release_group("test_scene") == 2);
+    SIF_CHECK(reg.state_of(outside) == asset::AssetState::Ready);
 }

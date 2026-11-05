@@ -1,0 +1,55 @@
+<VBox padding="16" spacing="10" name="root">
+    <Style name="button_label" asset_name="Arial" fontSize="18" h_text_align="Center" v_text_align="Center"/>
+    <Style name="heading" asset_name="Arial" color="200|200|220" fontSize="18" height="PX|24"/>
+    <Text asset_name="Arial" color="240|240|255" fontSize="26" height="PX|34">
+        Demo 6 - Widgets: input routing, ScrollView, text layout
+    </Text>
+
+    <HBox spacing="24" flex="1" align="Stretch" name="columns">
+        <VBox spacing="8" width="PX|330" name="left">
+            <Text class="heading">
+                Difficulty - click, or arrows + Enter:
+            </Text>
+            <Menu name="menu" spacing="6">
+                <Button id="1" name="easy" width="PX|300" height="PX|40">
+                    <Text class="button_label">Easy</Text>
+                </Button>
+                <Button id="2" name="normal" width="PX|300" height="PX|40" selected="true">
+                    <Text class="button_label">Normal</Text>
+                </Button>
+                <Button id="3" name="hard" width="PX|300" height="PX|40">
+                    <Text class="button_label">Hard</Text>
+                </Button>
+                <Button id="4" name="nightmare" width="PX|300" height="PX|40" enabled="false">
+                    <Text class="button_label" color="150|150|150">
+                        Nightmare (locked)
+                    </Text>
+                </Button>
+            </Menu>
+
+            <Button name="counter" width="PX|300" height="PX|40" unselected_color="60|90|60">
+                <Text class="button_label" name="counter_label">
+                    Click me
+                </Text>
+            </Button>
+
+            <Include src="parts/paragraph_panel.ui.xml" name="paragraph_panel"/>
+        </VBox>
+
+        <VBox spacing="6" flex="1" align="Stretch" name="right">
+            <Text class="heading">
+                Event log - mouse wheel scrolls it:
+            </Text>
+            <Overlay flex="1" name="log_frame">
+                <Rectangle fill_color="28|28|38" h_align="Stretch" v_align="Stretch"/>
+                <ScrollView name="log" h_align="Stretch" v_align="Stretch" padding="6" scroll_step="36" follow_end="true">
+                    <VBox spacing="4" align="Stretch" name="log_list"/>
+                </ScrollView>
+            </Overlay>
+        </VBox>
+    </HBox>
+
+    <Text asset_name="Times" color="150|220|150" fontSize="18" height="PX|26" name="status">
+        loading...
+    </Text>
+</VBox>

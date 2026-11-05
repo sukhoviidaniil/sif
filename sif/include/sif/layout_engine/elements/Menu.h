@@ -71,12 +71,27 @@ public:
     [[nodiscard]] std::optional<intrnl::RecordID> active_button_id() const;
 
     /**
-     * @brief Hit-tests point against every button and activates the one hit.
+     * @brief Hit-tests point and activates the button drawn on top there.
      *
-     * @return true if point was within some button's rect (which
-     * was then made the active one), false otherwise.
+     * Resolved through UIElement::element_at, so overlapping buttons
+     * pick the one actually on top (z_index / layer / document
+     * order), and an element covering a button blocks the click.
+     *
+     * @return true if the topmost thing under point was one of this
+     * menu's buttons (which was then made the active one), false
+     * otherwise.
      */
     bool handle_click(math::Vector2 point);
+
+    /**
+     * @brief Keeps the selection in step with input routed by ui::InputRouter.
+     *
+     * A Click on (or inside) one of the menu's enabled buttons, and
+     * keyboard focus arriving on one, make that button the active one -
+     * so a menu driven by the mouse and one driven by the arrow keys
+     * behave the same, without the game wiring either.
+     */
+    bool on_ui_event(UIEvent& e) override;
 
 protected:
     [[nodiscard]] bool horizontal() const override { return false; }

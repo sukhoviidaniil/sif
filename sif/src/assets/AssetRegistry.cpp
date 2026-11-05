@@ -8,6 +8,7 @@
  *       Unauthorized use, reproduction, or distribution is prohibited.
  ***************************************************************/
 
+#include <algorithm>
 #include <stdexcept>
 #include <thread>
 
@@ -91,6 +92,13 @@ void AssetRegistry::request(const intrnl::GUID id) {
 
         const std::shared_ptr<AssetRecord> record = rec->second;
 
+        // Inside a GroupCapture, every requested asset joins the
+        // innermost capturing group - also one that was requested before.
+        if (!capture_stack_.empty()) {
+            add_to_group_locked(capture_stack_.back(), id);
+            groups_[capture_stack_.back()].active = true;
+        }
+
         // If we have already requested (queued, loading, ready or
         // failed) it before, there is nothing left to do.
         if (record->get_state() != AssetState::NotRequested) {
@@ -117,6 +125,160 @@ void AssetRegistry::request(const intrnl::GUID id) {
     }
 
     try_start_next_load();
+}
+
+bool AssetRegistry::retry(const intrnl::GUID id) {
+    LOG_SCOPE();
+    {
+        std::lock_guard lock(mtx_);
+
+        const auto rec = by_guid_.find(id);
+        if (rec == by_guid_.end()) {
+            const std::string err = "AssetRegistry::retry - unknown GUID " + id.string();
+            LOG(err);
+            throw std::runtime_error(err);
+        }
+
+        const std::shared_ptr<AssetRecord> record = rec->second;
+        if (record->get_state() != AssetState::Failed) {
+            return false;
+        }
+
+        LOG("Retrying GUID: " + id.string());
+
+        // Back to the start of the life cycle (NotRequested is not a
+        // terminal state, so no completion callback fires for it);
+        // request() below then treats it as a first request.
+        record->set_data(nullptr);
+        record->set_state(AssetState::NotRequested);
+    }
+
+    // Outside the lock: request() takes mtx_ itself.
+    request(id);
+    return true;
+}
+
+bool AssetRegistry::release_locked(AssetRecord& record) {
+    const AssetState state = record.get_state();
+    if (state == AssetState::NotRequested) {
+        return false;
+    }
+    if (state == AssetState::Loading) {
+        // Invalidate the load in flight: whatever it writes later carries
+        // a stale token and is discarded (see AssetRecord::begin_attempt).
+        (void)record.begin_attempt();
+    }
+    // A Queued record is skipped when its turn comes (it is no longer
+    // Queued); nothing has to be dug out of the queue.
+    record.set_data(nullptr);
+    record.set_state(AssetState::NotRequested);
+    return true;
+}
+
+bool AssetRegistry::release(const intrnl::GUID id) {
+    std::lock_guard lock(mtx_);
+    const auto rec = by_guid_.find(id);
+    if (rec == by_guid_.end()) {
+        const std::string err = "AssetRegistry::release - unknown GUID " + id.string();
+        LOG(err);
+        throw std::runtime_error(err);
+    }
+    const bool released = release_locked(*rec->second);
+    if (released) {
+        LOG("Released GUID: " + id.string());
+    }
+    return released;
+}
+
+AssetState AssetRegistry::state_of(const intrnl::GUID id) const {
+    std::lock_guard lock(mtx_);
+    const auto rec = by_guid_.find(id);
+    if (rec == by_guid_.end()) {
+        throw std::runtime_error("AssetRegistry::state_of - unknown GUID " + id.string());
+    }
+    return rec->second->get_state();
+}
+
+std::size_t AssetRegistry::loaded_count() const {
+    std::lock_guard lock(mtx_);
+    std::size_t n = 0;
+    for (const auto& [guid, record] : by_guid_) {
+        n += record->get_state() == AssetState::Ready ? 1u : 0u;
+    }
+    return n;
+}
+
+void AssetRegistry::add_to_group_locked(const std::string& group, const intrnl::GUID id) {
+    std::vector<intrnl::GUID>& members = groups_[group].members;
+    if (std::find(members.begin(), members.end(), id) == members.end()) {
+        members.push_back(id);
+    }
+}
+
+void AssetRegistry::add_to_group(const std::string& group, const intrnl::GUID id) {
+    std::lock_guard lock(mtx_);
+    if (!by_guid_.contains(id)) {
+        throw std::runtime_error("AssetRegistry::add_to_group - unknown GUID " + id.string());
+    }
+    add_to_group_locked(group, id);
+}
+
+std::vector<intrnl::GUID> AssetRegistry::group_members(const std::string& group) const {
+    std::lock_guard lock(mtx_);
+    const auto it = groups_.find(group);
+    return it == groups_.end() ? std::vector<intrnl::GUID>{} : it->second.members;
+}
+
+void AssetRegistry::request_group(const std::string& group) {
+    std::vector<intrnl::GUID> members;
+    {
+        std::lock_guard lock(mtx_);
+        Group& g = groups_[group];
+        g.active = true;
+        members = g.members;
+    }
+    // Outside the lock: request() takes it itself.
+    for (const intrnl::GUID id : members) {
+        request(id);
+    }
+}
+
+std::size_t AssetRegistry::release_group(const std::string& group) {
+    std::lock_guard lock(mtx_);
+    const auto it = groups_.find(group);
+    if (it == groups_.end()) {
+        return 0;
+    }
+    it->second.active = false;
+
+    std::size_t released = 0;
+    for (const intrnl::GUID id : it->second.members) {
+        // Still needed by another active group (the menu's font, say)?
+        const bool shared = std::any_of(groups_.begin(), groups_.end(), [&](const auto& entry) {
+            return entry.second.active && std::find(entry.second.members.begin(), entry.second.members.end(), id) !=
+                                              entry.second.members.end();
+        });
+        if (shared) {
+            continue;
+        }
+        const auto rec = by_guid_.find(id);
+        if (rec != by_guid_.end() && release_locked(*rec->second)) {
+            ++released;
+        }
+    }
+    LOG("Released group '" + group + "': " + std::to_string(released) + " asset(s)");
+    return released;
+}
+
+AssetRegistry::GroupCapture::GroupCapture(AssetRegistry& registry, std::string group) : registry_(registry) {
+    std::lock_guard lock(registry_.mtx_);
+    registry_.groups_[group].active = true;
+    registry_.capture_stack_.push_back(std::move(group));
+}
+
+AssetRegistry::GroupCapture::~GroupCapture() {
+    std::lock_guard lock(registry_.mtx_);
+    registry_.capture_stack_.pop_back();
 }
 
 data::AssetMetaData AssetRegistry::meta_of(const intrnl::GUID id) const {
@@ -156,6 +318,9 @@ void AssetRegistry::try_start_next_load() {
         }
 
         const std::shared_ptr<AssetRecord> record = rec->second;
+        if (record->get_state() != AssetState::Queued) {
+            continue; // released (or re-queued and already started) while it waited
+        }
         const AssetType type = record->get_meta().type;
 
         const auto ld = loaders_.find(type);
@@ -238,6 +403,10 @@ void AssetRegistry::pump(const std::chrono::milliseconds budget) {
             }
 
             record = rec->second;
+            if (record->get_state() != AssetState::Queued) {
+                record.reset();
+                continue; // released while it waited for the frame loop
+            }
             const auto ld = loaders_.find(record->get_meta().type);
             if (ld == loaders_.end()) {
                 record->set_state(AssetState::Failed);

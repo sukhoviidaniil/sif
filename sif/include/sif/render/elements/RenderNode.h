@@ -10,6 +10,8 @@
 #ifndef RENDER_ENGINE_RENDERNODE_H
 #define RENDER_ENGINE_RENDERNODE_H
 
+#include <optional>
+
 #include "sif/internal/Rect.h"
 
 namespace sif::rnd {
@@ -43,6 +45,27 @@ struct RenderNode {
 
     /// Element dimensions
     intrnl::Rect rect{};
+
+    /**
+     * @brief Paint layer this item belongs to (see rnd::layer).
+     *
+     * Higher layers are drawn over lower ones; within one layer the
+     * submission order is kept. Normally stamped by
+     * RenderFrame::submit from the current LayerScope rather than set
+     * by hand, so an element never needs to know which layer its
+     * ancestors put it on.
+     */
+    int layer = 0;
+
+    /**
+     * @brief Screen-space rect this item is clipped to (nullopt = not clipped).
+     *
+     * Stamped by RenderFrame::submit from the current ClipScope, the
+     * same way layer is, so an element never needs to know which
+     * ancestor clips it. A backend draws only the part of the item that
+     * lies inside it; an empty clip means the item is not visible at all.
+     */
+    std::optional<intrnl::Rect> clip;
 };
 } // namespace sif::rnd
 

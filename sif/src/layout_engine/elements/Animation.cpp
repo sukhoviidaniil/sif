@@ -42,8 +42,9 @@ void Animation::append_render_items(rnd::RenderFrame& frame, const rnd::FrameCon
     item->tint = tint;
 
     // Animated frames change every tick, so they belong in the
-    // per-frame bucket rather than the "constant" one.
-    frame.temp_items.push_back(std::move(item));
+    // per-frame bucket rather than the "constant" one - which is the
+    // bucket submit() fills, stamped with the enclosing layer.
+    frame.submit(std::move(item));
 }
 
 void Animation::update(const float dt) {

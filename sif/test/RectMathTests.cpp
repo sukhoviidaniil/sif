@@ -59,3 +59,12 @@ SIF_TEST(matrix_of_rect_supports_arithmetic_and_indexing) {
     SIF_CHECK(transposed.cols() == 2);
     SIF_CHECK(transposed(0, 1) == sum(1, 0));
 }
+
+SIF_TEST(rect_contains_includes_its_edges) {
+    const intrnl::Rect r(10, 20, 30, 40);
+    SIF_CHECK(r.contains(10, 20));
+    SIF_CHECK(r.contains(40, 60));
+    SIF_CHECK(r.contains(25, 30));
+    SIF_CHECK(!r.contains(9.9f, 30));
+    SIF_CHECK(!r.contains(25, 60.1f));
+}

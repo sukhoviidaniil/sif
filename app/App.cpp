@@ -18,6 +18,7 @@
 #include "sif/asset/AssetRegistry.h"
 #include "sif/diagnostics/Logger.h"
 #include "sif/event/events/input_Keyboard.h"
+#include "sif/event/events/input_Mouse.h"
 #include "sif/event/events/window.hpp"
 #include "sif/internal/Delta_Timer.h"
 #include "sif/render/FrameContext.h"
@@ -57,6 +58,7 @@ App::App(std::shared_ptr<event::Event_Bus> bus, const ast::RB_Config& render_con
     if (root_ == nullptr) {
         throw std::runtime_error("App: demo '" + demo_->id() + "' produced an empty UI tree");
     }
+    input_ = std::make_unique<ui::InputRouter>(*root_);
 }
 
 App::~App() = default;
@@ -69,22 +71,43 @@ void App::handle_event(const event::EventConcept& ev) {
         return;
     }
 
+    // Escape quits whatever the UI thinks of it.
+    if (ev.type() == std::type_index(typeid(event::input::KeyPressed)) &&
+        static_cast<const event::input::KeyPressed*>(ev.data())->key == event::input::Key::Escape) {
+        running_ = false;
+        return;
+    }
+
+    // Input goes to the UI first (hover, clicks, focus, wheel - see
+    // ui::InputRouter); whatever it used is not passed on to the demo,
+    // the same way a click on a button should not also fire a gun.
+    if (input_->handle(ev)) {
+        return;
+    }
+
+    // Left clicks go to the demo as a point in layout coordinates;
+    // what was clicked is the demo's question to ask the tree
+    // (UIElement::element_at), not App's.
+    if (ev.type() == std::type_index(typeid(event::input::Mouse_ButtonPressed))) {
+        const auto& pressed = *static_cast<const event::input::Mouse_ButtonPressed*>(ev.data());
+        if (pressed.button == event::input::MouseButton::Left) {
+            demo::Context ctx{*root_, *audio_, total_seconds_, input_.get()};
+            demo_->on_click(ctx, {static_cast<float>(pressed.x), static_cast<float>(pressed.y)});
+        }
+        return;
+    }
+
     if (ev.type() != std::type_index(typeid(event::input::KeyPressed))) {
         return;
     }
 
     const auto& pressed = *static_cast<const event::input::KeyPressed*>(ev.data());
 
-    if (pressed.key == event::input::Key::Escape) {
-        running_ = false;
-        return;
-    }
-
-    demo::Context ctx{*root_, *audio_, total_seconds_};
+    demo::Context ctx{*root_, *audio_, total_seconds_, input_.get()};
     demo_->on_key(ctx, pressed.key);
 }
 
-void App::run() {
+void App::run(const std::size_t max_frames) {
     if (collector_ == nullptr || renderer_ == nullptr || audio_ == nullptr) {
         const std::string err = "App::run - the backend was not fully created";
         LOG(err);
@@ -92,7 +115,7 @@ void App::run() {
     }
 
     {
-        demo::Context ctx{*root_, *audio_, 0.f};
+        demo::Context ctx{*root_, *audio_, 0.f, input_.get()};
         demo_->on_start(ctx);
     }
 
@@ -100,7 +123,8 @@ void App::run() {
     // not get charged for all of the start-up time.
     intrnl::Delta_Timer::instance().tick();
 
-    while (running_) {
+    std::size_t frames = 0;
+    while (running_ && (max_frames == 0 || frames++ < max_frames)) {
         const float delta = intrnl::Delta_Timer::instance().tick();
         total_seconds_ += delta;
 
@@ -114,12 +138,13 @@ void App::run() {
         // demo" symptom this fixes.
         asset::AssetRegistry::instance().pump();
 
-        demo::Context ctx{*root_, *audio_, total_seconds_};
+        demo::Context ctx{*root_, *audio_, total_seconds_, input_.get()};
 
         // 1. Time-based state: animation cursors, button
         //    transitions, demo logic.
         root_->update(delta);
         demo_->update(ctx, delta);
+        audio_->update(delta); // fades
 
         // 2. Layout against the current window size, so a resize
         //    re-flows the UI instead of stretching it.
@@ -130,7 +155,9 @@ void App::run() {
         // 3. Collect and submit this frame's draw list.
         rnd::RenderFrame frame;
         const rnd::FrameContext frame_ctx(true);
-        root_->append_render_items(frame, frame_ctx);
+        // render(), not append_render_items(): it is what applies the
+        // root's own visible flag and layer before descending.
+        root_->render(frame, frame_ctx);
         renderer_->render(frame);
 
         // 4. Input for the next frame.
@@ -148,4 +175,5 @@ void App::run() {
     // would ever reproduce on purpose.
     asset::AssetRegistry::instance().wait_for_idle();
 }
+const rnd::Renderer& App::renderer() const { return *renderer_; }
 } // namespace app

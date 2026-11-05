@@ -58,8 +58,19 @@ namespace sif::headless {
          * as such so nobody mistakes it for layout-accurate.
          */
         [[nodiscard]] math::Vector2 measure_text(const std::string& str, unsigned int size) const override {
+            // Characters, not bytes: str is UTF-8, so counting bytes
+            // made every non-ASCII string (Cyrillic: two bytes a
+            // letter) twice as wide as its ASCII equivalent. A byte
+            // starts a character unless it is a continuation byte
+            // (10xxxxxx).
+            std::size_t characters = 0;
+            for (const char c : str) {
+                if ((static_cast<unsigned char>(c) & 0xC0u) != 0x80u) {
+                    ++characters;
+                }
+            }
             return {
-                static_cast<float>(str.size()) * static_cast<float>(size) * 0.55f,
+                static_cast<float>(characters) * static_cast<float>(size) * 0.55f,
                 static_cast<float>(size) * 1.2f
             };
         }

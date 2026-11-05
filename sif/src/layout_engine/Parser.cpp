@@ -25,6 +25,8 @@ std::unique_ptr<Node> Parser::parse(const std::vector<Token>& tokens) {
             auto node = std::make_unique<Node>();
             node->tag = t.name;
             node->attributes = t.attributes;
+            node->line = t.line;
+            node->column = t.column;
 
             Node* raw = node.get();
 

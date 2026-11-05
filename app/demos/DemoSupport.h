@@ -39,7 +39,8 @@ struct Paths {
  * @brief Tokenizes, parses and builds a serialized *.ui.xml scene.
  *
  * The whole authoring pipeline in one call: Tokenizer -> Parser ->
- * UIFactory, exactly as a game would do it.
+ * SceneComposer -> UIFactory (ui::SceneLoader), exactly as a game
+ * would do it.
  */
 [[nodiscard]] std::unique_ptr<sif::ui::UIElement> load_scene(const std::string& scene_file);
 

@@ -20,6 +20,7 @@
 #include "SFML/Graphics/Font.hpp"
 #include "SFML/Graphics/Text.hpp"
 #include "SFML/Graphics/Texture.hpp"
+#include "SFML/System/String.hpp"
 #include "SFML/Audio/SoundBuffer.hpp"
 
 #include "sif/asset/internal/Font.h"
@@ -67,6 +68,20 @@ namespace sif::sfml {
     // Font
     // ---------------------------------------------------------------
 
+    /**
+     * @brief Converts engine text (UTF-8, as stored in *.ui.xml) to sf::String.
+     *
+     * sf::String's std::string constructor decodes through the current
+     * C++ locale, not UTF-8, so every byte of a multi-byte character
+     * became a glyph of its own and a Cyrillic word rendered as boxes
+     * (two per letter). Every place that hands engine text to SFML -
+     * drawing and measuring alike - goes through this one function, so
+     * the measured size always matches what is drawn.
+     */
+    inline sf::String utf8_string(const std::string& str) {
+        return sf::String::fromUtf8(str.begin(), str.end());
+    }
+
     class SFMLFontAsset final : public asset::Font {
     public:
         explicit SFMLFontAsset(sf::Font font) : font_(std::move(font)) {}
@@ -83,7 +98,7 @@ namespace sif::sfml {
         [[nodiscard]] math::Vector2 measure_text(const std::string& str, unsigned int size) const override {
             sf::Text text;
             text.setFont(font_);
-            text.setString(str);
+            text.setString(utf8_string(str));
             text.setCharacterSize(size);
             const sf::FloatRect bounds = text.getLocalBounds();
             return {bounds.width, bounds.height};

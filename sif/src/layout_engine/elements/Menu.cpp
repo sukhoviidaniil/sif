@@ -10,6 +10,8 @@
 
 #include "sif/layout_engine/elements/Menu.h"
 
+#include <algorithm>
+
 namespace sif::ui {
 void Menu::add(std::unique_ptr<UIElement> child) {
     if (auto* button = dynamic_cast<Button*>(child.get())) {
@@ -63,13 +65,51 @@ std::optional<intrnl::RecordID> Menu::active_button_id() const {
     return std::nullopt;
 }
 
-bool Menu::handle_click(const math::Vector2 point) {
-    for (Button* b : buttons_) {
-        if (b->contains(point)) {
-            set_active(b->id);
-            return true;
+namespace {
+/// @brief True if target is root or one of its descendants.
+bool within(const UIElement& root, const UIElement* target) {
+    if (&root == target) {
+        return true;
+    }
+    return std::any_of(root.children.begin(), root.children.end(),
+                       [target](const std::unique_ptr<UIElement>& c) { return within(*c, target); });
+}
+} // namespace
+
+bool Menu::on_ui_event(UIEvent& e) {
+    if ((e.type == UIEventType::Click || e.type == UIEventType::FocusIn) && e.target != nullptr) {
+        for (Button* b : buttons_) {
+            if (b->enabled && within(*b, e.target)) {
+                set_active(b->id);
+                if (e.type == UIEventType::Click) {
+                    e.handled = true;
+                }
+                break;
+            }
         }
     }
-    return false;
+    return UIElement::on_ui_event(e);
+}
+
+bool Menu::handle_click(const math::Vector2 point) {
+    // Ask the paint order, not the button list: with overlapping
+    // buttons (z_index, an Overlay or negative spacing inside the
+    // menu) the first button in the list whose rect contains the
+    // point is not necessarily the one drawn on top, and a non-button
+    // element painted over a button must block the click instead of
+    // passing it through. Hidden buttons are also no longer clickable,
+    // since element_at skips invisible subtrees.
+    Button* hit = element_at<Button>(point);
+    if (hit == nullptr) {
+        return false;
+    }
+    // A Button nested inside some other child of the menu is not one
+    // of the menu's own (see add()), so it does not take part in the
+    // menu's single selection.
+    if (std::find(buttons_.begin(), buttons_.end(), hit) == buttons_.end()) {
+        return false;
+    }
+    set_active(hit->id);
+    return true;
 }
 } // namespace sif::ui

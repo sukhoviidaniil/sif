@@ -31,6 +31,8 @@ public:
     intrnl::Align align = intrnl::Align::Start;
     /// @brief Spacing between consecutive children.
     float spacing = 0.f;
+    /// @brief Distribution of leftover space along the main axis.
+    intrnl::Justify justify = intrnl::Justify::Start;
 
 protected:
     /**
@@ -45,9 +47,13 @@ protected:
     /**
      * @brief Measures the desired size of the layout.
      *
-     * Accumulates the sizes of visible children along the main axis
-     * and takes the maximum along the cross axis. Spacing between
-     * children is included in the measurement.
+     * Accumulates the sizes of visible children (plus their margins)
+     * along the main axis and takes the maximum along the cross axis.
+     * Spacing between children and the layout's own padding are
+     * included; an explicit width/height (PX/PERCENT) overrides the
+     * content size on that axis. The main-axis content size is capped
+     * at the available space: the layout never claims more than it was
+     * offered, even when its children overflow it.
      *
      * @param available Available space from the parent.
      * @return Desired size of the layout.
@@ -57,8 +63,9 @@ protected:
     /**
      * @brief Lays out children within the assigned rectangle.
      *
-     * Calculates positions and sizes for each child, taking into
-     * account fixed and flexible elements, alignment, and spacing.
+     * Calculates positions and sizes for each child inside the
+     * padded content box, taking into account fixed and flexible
+     * elements, each child's margin, alignment, and spacing.
      *
      * @param r Final rectangle assigned by the parent layout.
      */

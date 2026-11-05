@@ -86,6 +86,25 @@ struct Rect {
     bool operator==(const Rect& other) const;
     bool operator!=(const Rect& other) const;
 
+    // ========== Queries ==========
+
+    /**
+     * @brief True if the point (px, py) lies inside the rect, edges included.
+     *
+     * The one hit-test primitive shared by ui::Button::contains and
+     * ui::UIElement::element_at, so "is this point on the element" has
+     * a single definition.
+     */
+    [[nodiscard]] bool contains(float px, float py) const;
+
+    /**
+     * @brief The overlap of this rect and other.
+     *
+     * Width/height are 0 (never negative) when they do not overlap, so
+     * the result is always a valid, possibly empty, rect.
+     */
+    [[nodiscard]] Rect intersection(const Rect& other) const;
+
     // ========== Output to stream ==========
 
     /**

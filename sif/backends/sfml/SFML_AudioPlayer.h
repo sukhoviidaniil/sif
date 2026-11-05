@@ -10,7 +10,9 @@
 #ifndef RENDER_ENGINE_SFML_SFML_AUDIOPLAYER_H
 #define RENDER_ENGINE_SFML_SFML_AUDIOPLAYER_H
 
+#include <array>
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include "SFML/Audio/Sound.hpp"
@@ -36,9 +38,10 @@ namespace sif::sfml {
         explicit SFML_AudioPlayer(std::size_t max_voices = 32);
         ~SFML_AudioPlayer() override;
 
+        using audio::AudioPlayer::play; // keep play(sound, volume, loop) visible
+
         audio::VoiceId play(const asset::AssetHandle<asset::Sound>& sound,
-                            float volume = 1.f,
-                            bool loop = false) override;
+                            const audio::PlayOptions& options) override;
 
         void stop(audio::VoiceId voice) override;
         void stop_all() override;
@@ -49,19 +52,50 @@ namespace sif::sfml {
         void set_master_volume(float volume) override;
         [[nodiscard]] float master_volume() const override;
 
+        void set_volume(audio::VoiceId voice, float volume) override;
+        void set_pitch(audio::VoiceId voice, float pitch) override;
+        void set_pan(audio::VoiceId voice, float pan) override;
+        void pause(audio::VoiceId voice) override;
+        void resume(audio::VoiceId voice) override;
+        [[nodiscard]] bool is_paused(audio::VoiceId voice) const override;
+        void fade_to(audio::VoiceId voice, float target, float seconds) override;
+        void fade_out(audio::VoiceId voice, float seconds) override;
+
+        void set_bus_volume(audio::Bus bus, float volume) override;
+        [[nodiscard]] float bus_volume(audio::Bus bus) const override;
+
+        void update(float dt) override;
+
     private:
         struct Voice {
             audio::VoiceId id = audio::invalid_voice;
             std::unique_ptr<sf::Sound> sound;
             std::shared_ptr<void> keep_alive; ///< Owns the buffer while it plays
+            float volume = 1.f;               ///< The voice's own volume, before bus and master
+            audio::Bus bus = audio::Bus::Effects;
+            std::optional<audio::Fade> fade;
         };
 
         void reap_finished();
+
+        /// @brief The voice with this id, or nullptr.
+        Voice* find(audio::VoiceId voice);
+        [[nodiscard]] const Voice* find(audio::VoiceId voice) const;
+
+        /**
+         * @brief Pushes voice x bus x master into sf::Sound.
+         *
+         * The one place a voice's loudness is computed - it used to be
+         * set to master x 100 on every master change, which silently
+         * threw away each voice's own volume.
+         */
+        void apply_gain(Voice& v) const;
 
         std::vector<Voice> voices_;
         std::size_t max_voices_;
         audio::VoiceId next_id_ = 1;
         float master_volume_ = 1.f;
+        std::array<float, audio::bus_count> bus_volumes_{1.f, 1.f, 1.f};
     };
 }
 

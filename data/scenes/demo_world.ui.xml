@@ -1,0 +1,25 @@
+<Overlay name="root">
+    <Style name="hud" asset_name="Arial" color="235|235|245" fontSize="18" height="PX|24"/>
+
+    <WorldView name="world" aspect="Fit" h_align="Stretch" v_align="Stretch">
+        <Rectangle fill_color="26|46|38" world_rect="-1|-1|2|2"/>
+        <Rectangle fill_color="40|70|56" world_rect="-1|0.55|2|0.45"/>
+        <Sprite asset_name="DemoTiles" record_id="0" world_rect="-0.95|0.62|0.2|0.2"/>
+        <Sprite asset_name="DemoTiles" record_id="1" world_rect="-0.71|0.62|0.2|0.2"/>
+        <Sprite asset_name="DemoTiles" record_id="2" world_rect="-0.47|0.62|0.2|0.2"/>
+        <Sprite asset_name="DemoTiles" record_id="3" world_rect="-0.23|0.62|0.2|0.2"/>
+        <Sprite asset_name="DemoTiles" record_id="4" world_rect="0.01|0.62|0.2|0.2"/>
+        <Sprite asset_name="DemoTiles" record_id="5" world_rect="0.25|0.62|0.2|0.2"/>
+        <Sprite asset_name="DemoTiles" record_id="6" world_rect="0.49|0.62|0.2|0.2"/>
+        <Sprite asset_name="DemoTiles" record_id="7" world_rect="0.73|0.62|0.2|0.2"/>
+        <Sprite asset_name="DemoBadge" world_rect="-0.85|-0.85|0.4|0.4" name="badge"/>
+        <Sprite asset_name="DemoIcons" record_name="gem" world_rect="2.2|-0.2|0.3|0.3" name="far_gem"/>
+        <Animation asset_name="DemoBall" world_rect="-0.12|-0.12|0.24|0.24" name="ball"/>
+    </WorldView>
+
+    <VBox layer="Popup" padding="12" spacing="2" hit_testable="false" name="hud">
+        <Text class="hud" fontSize="24" height="PX|30">Demo 7 - WorldView: the UI looking into the world through a Camera</Text>
+        <Text class="hud" name="status">loading...</Text>
+        <Text class="hud" color="160|200|160">arrows - move the camera, W/S - zoom, D - reset, click - world coordinates</Text>
+    </VBox>
+</Overlay>

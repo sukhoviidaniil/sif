@@ -16,7 +16,9 @@
 
 #include "sif/audio/AudioPlayer.h"
 #include "sif/event/events/input_Keyboard.h"
+#include "sif/layout_engine/InputRouter.h"
 #include "sif/layout_engine/elements/UIElement.h"
+#include "sif/math/Vector2.h"
 
 namespace app::demo {
 /**
@@ -32,14 +34,16 @@ struct Context {
     sif::ui::UIElement& root;
     sif::audio::AudioPlayer& audio;
     float total_seconds = 0.f;
+    /// Routes input into root (focus, hover, clicks); null when not available.
+    sif::ui::InputRouter* input = nullptr;
 };
 
 /**
  * @brief One self-contained scenario shown by the demo application.
  *
  * Template Method: App owns the frame loop and calls these hooks at
- * fixed points (build_ui, then on_start, then update/on_key every
- * frame), so every demo shares the exact same asset-loading,
+ * fixed points (build_ui, then on_start, then update/on_key/on_click
+ * every frame), so every demo shares the exact same asset-loading,
  * layout, render and input path. A bug that only reproduces in one
  * demo is therefore a bug in that demo's content, not in how it was
  * driven.
@@ -71,6 +75,15 @@ public:
 
     /// @brief Called for every key press that is not a global shortcut.
     virtual void on_key(Context& ctx, sif::event::input::Key key);
+
+    /**
+     * @brief Called for every left mouse button press.
+     *
+     * point is in layout coordinates (the renderer keeps one window
+     * pixel equal to one layout unit, also after a resize), so it can
+     * be handed straight to UIElement::element_at.
+     */
+    virtual void on_click(Context& ctx, sif::math::Vector2 point);
 };
 
 /// @brief Ids of every registered demo, in menu order.

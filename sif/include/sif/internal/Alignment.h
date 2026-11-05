@@ -24,6 +24,23 @@ enum class Align {
     End,    ///< Align to the end of the available space
     Stretch ///< Stretch to fill the available space
 };
+
+/**
+ * @brief How a linear layout distributes leftover main-axis space.
+ *
+ * Align positions children across the axis they are stacked along;
+ * Justify decides where the space left over *along* that axis goes.
+ * It only has an effect when there is leftover space, i.e. when no
+ * child has flex (flex children already take all of it).
+ */
+enum class Justify {
+    Start,        ///< Pack children at the start (the historical behaviour)
+    Center,       ///< Pack children in the middle
+    End,          ///< Pack children at the end
+    SpaceBetween, ///< First and last child touch the edges, equal gaps in between
+    SpaceAround,  ///< Equal space around every child (half a gap at each edge)
+    SpaceEvenly   ///< Equal gaps between children and at both edges
+};
 } // namespace sif::intrnl
 
 #endif // RENDER_ENGINE_ALIGNMENT_H

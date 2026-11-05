@@ -10,6 +10,7 @@
 
 #include "sif/internal/Rect.h"
 
+#include <algorithm>
 #include <ostream>
 
 namespace sif::intrnl {
@@ -88,6 +89,18 @@ bool Rect::operator==(const Rect& other) const {
 }
 
 bool Rect::operator!=(const Rect& other) const { return !(*this == other); }
+
+Rect Rect::intersection(const Rect& other) const {
+    const float left = std::max(x, other.x);
+    const float top = std::max(y, other.y);
+    const float right = std::min(x + width, other.x + other.width);
+    const float bottom = std::min(y + height, other.y + other.height);
+    return {left, top, std::max(0.f, right - left), std::max(0.f, bottom - top)};
+}
+
+bool Rect::contains(const float px, const float py) const {
+    return px >= x && px <= x + width && py >= y && py <= y + height;
+}
 
 std::ostream& operator<<(std::ostream& os, const Rect& rect) {
     os << "(" << rect.x << ", " << rect.y << ", " << rect.width << ", " << rect.height << ")";

@@ -10,6 +10,7 @@
 #ifndef RENDER_ENGINE_APP_H
 #define RENDER_ENGINE_APP_H
 
+#include <cstddef>
 #include <memory>
 
 #include "demos/Demo.h"
@@ -18,6 +19,7 @@
 #include "sif/event/Event_Bus.h"
 #include "sif/event/Event_Collector.h"
 #include "sif/event/Observer.h"
+#include "sif/layout_engine/InputRouter.h"
 #include "sif/layout_engine/elements/UIElement.h"
 #include "sif/render/RB_Config.h"
 #include "sif/render/Renderer.h"
@@ -50,8 +52,15 @@ public:
      * (animation cursors, button transitions, demo logic) is scaled
      * by the measured delta from the Stopwatch singleton, and the
      * only throttling used is the backend's frame-rate cap.
+     *
+     * @param max_frames Stop after this many frames (0 = until closed).
+     * A frame limit is what lets the headless backend - which has no
+     * window to close - drive the very same loop in CI.
      */
-    void run();
+    void run(std::size_t max_frames = 0);
+
+    /// @brief The renderer this App draws through (e.g. to inspect a RecordingRenderer).
+    [[nodiscard]] const sif::rnd::Renderer& renderer() const;
 
 private:
     /// @brief Routes one collected event to the bus or to the demo.
@@ -66,6 +75,7 @@ private:
 
     std::unique_ptr<demo::Demo> demo_;
     std::unique_ptr<sif::ui::UIElement> root_;
+    std::unique_ptr<sif::ui::InputRouter> input_; ///< Routes input into root_ (built right after it)
 
     float total_seconds_ = 0.f;
 };

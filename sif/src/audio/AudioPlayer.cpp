@@ -12,4 +12,11 @@
 
 namespace sif::audio {
 AudioPlayer::~AudioPlayer() = default;
+
+VoiceId AudioPlayer::play(const asset::AssetHandle<asset::Sound>& sound, const float volume, const bool loop) {
+    PlayOptions options;
+    options.volume = volume;
+    options.loop = loop;
+    return play(sound, options);
 }
+} // namespace sif::audio

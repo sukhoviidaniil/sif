@@ -10,6 +10,8 @@
 #ifndef RENDER_ENGINE_BUTTON_H
 #define RENDER_ENGINE_BUTTON_H
 
+#include <functional>
+
 #include "UIElement.h"
 #include "sif/internal/Color.h"
 #include "sif/internal/RecordID.h"
@@ -37,12 +39,17 @@ enum class ButtonState { Unselected, Selected };
  * blends unselected_color/selected_color by that factor - so the
  * button visibly eases between states instead of snapping.
  *
+ * On top of that, interaction state set by ui::InputRouter is drawn as
+ * a modifier of the current colour: lighter while hovered, darker while
+ * pressed, disabled_color while not enabled, and a focus_color outline
+ * while it has keyboard focus.
+ *
  * Each Button carries its own id (UIElement::id), which is how a
  * containing ui::Menu identifies and activates a specific button.
  */
 class Button : public UIElement {
 public:
-    Button() = default;
+    Button();
 
     math::Vector2 measure(const math::Vector2& available) override;
     void append_render_items(rnd::RenderFrame& frame, const rnd::FrameContext& ctx) const override;
@@ -78,6 +85,43 @@ public:
     void unselect();
 
     [[nodiscard]] bool is_selected() const;
+
+    // ===== Input (see ui::InputRouter) =====
+
+    /**
+     * @brief Runs on_click, if the button is enabled.
+     *
+     * What a Click UIEvent - a mouse click, or Enter/Space while the
+     * button has focus - triggers. Callable directly too, e.g. for a
+     * gamepad "confirm".
+     */
+    void activate();
+
+    /**
+     * @brief A Click activates the button (and is marked handled), then
+     * keeps bubbling so a containing Menu can react to it as well.
+     */
+    bool on_ui_event(UIEvent& e) override;
+
+    /// @brief Focusable only while enabled.
+    [[nodiscard]] bool can_focus() const override;
+
+    /**
+     * @brief What the button does (Command pattern).
+     *
+     * The button only knows *that* it was activated; what that means is
+     * a callable the game installs, so one Button class serves every
+     * menu entry.
+     */
+    std::function<void(Button&)> on_click;
+
+    /// @brief A disabled button ignores clicks, cannot take focus and draws in disabled_color.
+    bool enabled = true;
+
+    intrnl::Color disabled_color = intrnl::Color(55, 55, 60);
+
+    /// @brief Outline drawn while the button has keyboard focus.
+    intrnl::Color focus_color = intrnl::Color(255, 255, 255);
 
     /// @brief How long the smooth Selected<->Unselected transition takes, in seconds.
     float transition_duration_seconds = 0.15f;

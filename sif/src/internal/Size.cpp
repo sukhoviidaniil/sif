@@ -25,6 +25,18 @@ Size Size::percent(float v) { return {Type::Percent, v}; }
 
 Size::Size(const Type t, const float v) : type(t), value(v) {}
 
+float Size::resolve(const float available) const {
+    switch (type) {
+    case Type::Pixel:
+        return value;
+    case Type::Percent:
+        return available * value / 100.f;
+    case Type::Auto:
+    default:
+        return available;
+    }
+}
+
 Size::Size(std::string_view str) {
     const auto sep = str.find('|');
     if (sep == std::string_view::npos) {

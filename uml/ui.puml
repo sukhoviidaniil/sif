@@ -18,8 +18,14 @@ package rb <<Render Backend>> {
             class Text
             class Ractangle
             class Sprite
+            class Overlay
+            class ScrollView
+            class WorldView
         }
         class UIFactory
+        class SceneComposer
+        class InputRouter
+        dataclass UIEvent
         dataclass Node
         class Parser
         enum Token
@@ -32,7 +38,8 @@ serialized_configuration --> rb.ui.Tokenizer #line:green;text:green : consumed b
 rb.ui.Tokenizer --> rb.ui.Token #line:green;text:green : make
 rb.ui.Token --> rb.ui.Parser #line:green;text:green : consumed by
 rb.ui.Parser --> rb.ui.Node #line:green;text:green : make
-rb.ui.Node --> rb.ui.UIFactory #line:green;text:green : consumed by
+rb.ui.Node --> rb.ui.SceneComposer #line:green;text:green : includes, styles
+rb.ui.SceneComposer --> rb.ui.UIFactory #line:green;text:green : consumed by
 rb.ui.UIFactory --> rb.ui.elements.UIElement #line:green;text:green : make
 rb.ui.UIFactory --> rb.rgst.AssetRegistry #line:green;text:green : requests asset
 
@@ -40,6 +47,11 @@ rb.ui.elements.UIElement <|-- rb.ui.elements.LinearLayout
 rb.ui.elements.UIElement <|-- rb.ui.elements.Text
 rb.ui.elements.UIElement <|-- rb.ui.elements.Ractangle
 rb.ui.elements.UIElement <|-- rb.ui.elements.Sprite
+rb.ui.elements.UIElement <|-- rb.ui.elements.Overlay
+rb.ui.elements.UIElement <|-- rb.ui.elements.ScrollView
+rb.ui.elements.UIElement <|-- rb.ui.elements.WorldView
+rb.ui.InputRouter --> rb.ui.UIEvent : makes
+rb.ui.UIEvent --> rb.ui.elements.UIElement : bubbles up
 
 rb.ui.elements.LinearLayout <|.. rb.ui.elements.VBox
 rb.ui.elements.LinearLayout <|.. rb.ui.elements.HBox
@@ -58,6 +70,16 @@ package rb {
             note left of LinearLayout
                 All branches will be in one row
             end note
+            note left of ScrollView
+                Clipped viewport onto larger content; scrolls by wheel.
+            end note
+            note left of WorldView
+                Children placed in world units through a Camera.
+            end note
+            note left of Overlay
+                All branches share one box and are drawn over each other.
+                Each child places itself (h_align, v_align, margin, offset).
+            end note
         }
 
         note left of Tokenizer
@@ -68,6 +90,12 @@ package rb {
         end note
         note left of UIFactory
             Breaks down node by node, filling in the user interface tree
+        end note
+        note left of SceneComposer
+            Resolves <Include> and <Style>/class before building
+        end note
+        note left of InputRouter
+            Raw input -> hover, press, click, focus, wheel events
         end note
     }
 }

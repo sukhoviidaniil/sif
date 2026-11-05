@@ -14,7 +14,9 @@
 #include <condition_variable>
 #include <mutex>
 #include <queue>
+#include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "AssetHandle.h"
 #include "internal/AssetRecord.h"
@@ -87,6 +89,100 @@ public:
     void request(intrnl::GUID id);
 
     /**
+     * @brief Requests a failed asset again.
+     *
+     * request() deliberately ignores an asset in any state but
+     * NotRequested, so code that calls it every frame cannot hammer a
+     * broken file - but that also meant an asset that failed once
+     * (a file that was missing, locked or still being written) could
+     * never be loaded until restart. retry() is the explicit way back:
+     * a Failed record is reset to NotRequested and requested again,
+     * queued exactly like a first request (same criticality, same
+     * concurrency limit). Every load takes a new attempt token, so
+     * nothing the failed attempt might still write can land on the
+     * new one.
+     *
+     * @return true if the asset was Failed and has been re-queued;
+     * false (and nothing happens) in any other state - use request()
+     * for an asset that was never requested.
+     * @throws std::runtime_error if id is not registered.
+     */
+    bool retry(intrnl::GUID id);
+
+    // ========== Unloading ==========
+
+    /**
+     * @brief Drops the registry's copy of an asset's data.
+     *
+     * The record goes back to NotRequested, so a later request() loads
+     * it again. Safe while the asset is in use: data is shared, so a
+     * voice that is still playing keeps its sound alive until it ends,
+     * and handles simply report not-ready (renderers skip the item) until
+     * the asset is requested again. An asset still queued is taken off
+     * the queue; one still loading has its load invalidated (its result
+     * is discarded when it arrives - see AssetRecord's attempt guard).
+     * Call it from the thread that renders, between frames.
+     *
+     * @return true if there was anything to release (it was not already
+     * NotRequested).
+     * @throws std::runtime_error if id is not registered.
+     */
+    bool release(intrnl::GUID id);
+
+    /// @brief Current state of an asset.
+    /// @throws std::runtime_error if id is not registered.
+    [[nodiscard]] AssetState state_of(intrnl::GUID id) const;
+
+    /// @brief Number of assets currently Ready (i.e. holding data).
+    [[nodiscard]] std::size_t loaded_count() const;
+
+    // ========== Asset groups ==========
+    //
+    // A group is a named set of assets that are loaded and unloaded
+    // together - typically everything one scene or level uses. An asset
+    // may be in several groups; release_group() only unloads assets that
+    // no other *active* group (one requested and not yet released) still
+    // needs, so leaving the level never unloads the font the menu uses.
+
+    /// @brief Adds an asset to a group (creating the group if needed).
+    void add_to_group(const std::string& group, intrnl::GUID id);
+
+    /// @brief The group's members, in the order they were added.
+    [[nodiscard]] std::vector<intrnl::GUID> group_members(const std::string& group) const;
+
+    /// @brief Requests every member and marks the group active.
+    void request_group(const std::string& group);
+
+    /**
+     * @brief Marks the group inactive and releases every member no other
+     * active group contains.
+     *
+     * @return How many assets were released.
+     */
+    std::size_t release_group(const std::string& group);
+
+    /**
+     * @brief RAII: while alive, every request() also adds the asset to a group.
+     *
+     * The way to collect "everything this scene uses" without listing
+     * it by hand: wrap the scene load (UI elements request their assets
+     * while being built) and the group fills itself; it is active from
+     * then on, and release_group() unloads the scene later. Captures
+     * nest; the innermost one receives the requests.
+     */
+    class GroupCapture {
+    public:
+        GroupCapture(AssetRegistry& registry, std::string group);
+        ~GroupCapture();
+
+        GroupCapture(const GroupCapture&) = delete;
+        GroupCapture& operator=(const GroupCapture&) = delete;
+
+    private:
+        AssetRegistry& registry_;
+    };
+
+    /**
      * @brief Returns a copy of the metadata registered for an asset.
      *
      * @throws std::runtime_error if no asset with that GUID exists.
@@ -154,6 +250,17 @@ private:
     /// @brief Caller must hold mtx_.
     bool uniq_GUID_locked(const intrnl::GUID& guid) const;
 
+    /// @brief Caller must hold mtx_.
+    void add_to_group_locked(const std::string& group, intrnl::GUID id);
+
+    /// @brief Caller must hold mtx_; returns whether there was anything to release.
+    bool release_locked(AssetRecord& record);
+
+    struct Group {
+        std::vector<intrnl::GUID> members;
+        bool active = false;
+    };
+
     /**
      * @brief Starts background loads for queued assets while there
      * is spare capacity (active_loads_ < max_concurrent_loads_).
@@ -198,9 +305,11 @@ private:
 
     /// Loads that pump() must run; see IAssetLoader::runs_on_main_thread.
     std::queue<intrnl::GUID> main_thread_queue_;
-    size_t active_loads_ = 0;                 ///< Number of loads currently in flight
-    size_t max_concurrent_loads_ = 2;         ///< Configurable cap on simultaneous loads
-    mutable std::condition_variable idle_cv_; ///< Signalled whenever a load finishes
+    std::unordered_map<std::string, Group> groups_; ///< Named asset groups (see add_to_group)
+    std::vector<std::string> capture_stack_;        ///< Active GroupCaptures, innermost last
+    size_t active_loads_ = 0;                       ///< Number of loads currently in flight
+    size_t max_concurrent_loads_ = 2;               ///< Configurable cap on simultaneous loads
+    mutable std::condition_variable idle_cv_;       ///< Signalled whenever a load finishes
 };
 } // namespace sif::asset
 

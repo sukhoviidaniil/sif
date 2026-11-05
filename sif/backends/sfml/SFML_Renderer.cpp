@@ -13,6 +13,9 @@
 #include "SFML/Graphics/RectangleShape.hpp"
 #include "SFML/Graphics/Sprite.hpp"
 #include "SFML/Graphics/Text.hpp"
+#include "SFML/Graphics/View.hpp"
+
+#include <optional>
 
 #include "SFMLAssets.h"
 
@@ -22,6 +25,26 @@ namespace sif::sfml {
     namespace {
         sf::Color to_sfml(const intrnl::Color& c) {
             return {c.r, c.g, c.b, c.a};
+        }
+
+        /**
+         * @brief A view that shows exactly `clip` of `full`, drawn into
+         * the same pixels: SFML's way of scissoring.
+         *
+         * The view rect and the viewport describe the same area (one in
+         * layout units, one as a fraction of the window), so whatever is
+         * drawn keeps its position and scale and everything outside the
+         * clip simply falls outside the viewport.
+         */
+        sf::View clip_view(const sf::View& full, const intrnl::Rect& clip) {
+            const sf::Vector2f size = full.getSize();
+            const float left = full.getCenter().x - size.x * 0.5f;
+            const float top = full.getCenter().y - size.y * 0.5f;
+
+            sf::View view(sf::FloatRect(clip.x, clip.y, clip.width, clip.height));
+            view.setViewport(sf::FloatRect((clip.x - left) / size.x, (clip.y - top) / size.y,
+                                           clip.width / size.x, clip.height / size.y));
+            return view;
         }
     }
 
@@ -83,11 +106,41 @@ namespace sif::sfml {
 
     void SFML_Renderer::render(const rnd::RenderFrame &graph) {
         window_.clear(to_sfml(clear_color));
-        for (const auto& item : graph.constant_items) {
+        // draw_order(), not the two buckets one after another: which
+        // item covers which is decided by RenderNode::layer, and that
+        // decision belongs to the engine (RenderFrame), not to every
+        // backend reimplementing the same stable sort.
+        //
+        // Clipped items are drawn through a view restricted to their
+        // clip rect (see clip_view); the view is switched only when the
+        // clip actually changes, so a run of items in one scroll view
+        // costs one switch, not one per item.
+        const sf::View full = window_.getView();
+        const sf::Vector2f full_size = full.getSize();
+        const intrnl::Rect screen{full.getCenter().x - full_size.x * 0.5f,
+                                  full.getCenter().y - full_size.y * 0.5f,
+                                  full_size.x, full_size.y};
+        std::optional<intrnl::Rect> active;
+
+        for (const rnd::RenderNode* item : graph.draw_order()) {
+            if (item->clip != active) {
+                if (item->clip.has_value()) {
+                    window_.setView(clip_view(full, item->clip->intersection(screen)));
+                } else {
+                    window_.setView(full);
+                }
+                active = item->clip;
+            }
+            if (active.has_value()) {
+                const intrnl::Rect visible = active->intersection(screen);
+                if (visible.width <= 0.f || visible.height <= 0.f) {
+                    continue; // clipped away entirely
+                }
+            }
             item->accept(*this);
         }
-        for (const auto& item : graph.temp_items) {
-            item->accept(*this);
+        if (active.has_value()) {
+            window_.setView(full);
         }
         window_.display();
     }
@@ -133,7 +186,7 @@ namespace sif::sfml {
 
         sf::Text text;
         text.setFont(sfml_font->font());
-        text.setString(r.text);
+        text.setString(utf8_string(r.text)); // UTF-8, see SFMLAssets.h
         text.setFillColor(to_sfml(r.color));
 
         const intrnl::Rect& rect = r.rect;

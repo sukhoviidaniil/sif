@@ -11,9 +11,12 @@ circle data
 package rb <<Render Backend>> {
     dataclass Context
     interface Renderer
+    class RecordingRenderer
 
     package rnd <<Render>>{
         dataclass RenderFrame
+        class LayerScope
+        class ClipScope
         abstract class RenderNode
         class Text
         class Ractangle
@@ -32,6 +35,9 @@ rb.rnd.RenderNode <|-- rb.rnd.Text
 rb.rnd.RenderNode <|-- rb.rnd.Ractangle
 rb.rnd.RenderNode <|-- rb.rnd.Sprite
 rb.rnd.RenderFrame *-- rb.rnd.RenderNode
+rb.rnd.LayerScope --> rb.rnd.RenderFrame : sets current layer
+rb.rnd.ClipScope --> rb.rnd.RenderFrame : sets current clip
+rb.Renderer <|.. rb.RecordingRenderer
 
 rb.assets.AssetHandle --* rb.rnd.Text
 rb.assets.AssetHandle --* rb.rnd.Sprite
@@ -50,7 +56,15 @@ package rb  {
     package rnd{
         note left of RenderFrame
             Assembly nodes for interpretation by the renderer.
-            May have several render levels.
+            Every node carries a layer; draw_order() is a stable
+            sort by layer, so higher layers cover lower ones.
+        end note
+        note left of ClipScope
+            RAII: the clip rect submit() stamps; nested clips intersect.
+        end note
+        note left of LayerScope
+            RAII: the layer submit() stamps on new nodes,
+            restored when the scope ends.
         end note
     }
 }

@@ -26,23 +26,26 @@ intrnl::Color blend(const intrnl::Color& a, const intrnl::Color& b, const float 
     };
     return {lerp(a.r, b.r), lerp(a.g, b.g), lerp(a.b, b.b), lerp(a.a, b.a)};
 }
+
+/// @brief Moves each channel of c a fraction t of the way towards `to` (alpha kept).
+intrnl::Color shade(const intrnl::Color& c, const std::uint8_t to, const float t) {
+    const auto mix = [to, t](const std::uint8_t from) {
+        return static_cast<std::uint8_t>(static_cast<float>(from) +
+                                         (static_cast<float>(to) - static_cast<float>(from)) * t);
+    };
+    return {mix(c.r), mix(c.g), mix(c.b), c.a};
+}
 } // namespace
+
+Button::Button() { focusable = true; }
 
 math::Vector2 Button::measure(const math::Vector2& available) {
     math::Vector2 size{std::max(0.f, available.x), std::max(0.f, available.y)};
 
-    const auto resolve = [](const intrnl::Size& s, const float avail) {
-        if (s.type == intrnl::Size::Type::Pixel)
-            return s.value;
-        if (s.type == intrnl::Size::Type::Percent)
-            return avail * s.value;
-        return avail;
-    };
-
     if (width.type != intrnl::Size::Type::Auto)
-        size.x = resolve(width, available.x);
+        size.x = width.resolve(available.x);
     if (height.type != intrnl::Size::Type::Auto)
-        size.y = resolve(height, available.y);
+        size.y = height.resolve(available.y);
 
     size.x = std::clamp(size.x, min_size.x, max_size.x);
     size.y = std::clamp(size.y, min_size.y, max_size.y);
@@ -56,16 +59,29 @@ void Button::append_render_items(rnd::RenderFrame& frame, const rnd::FrameContex
 
     auto item = std::make_unique<rnd::Rectangle>();
     item->rect = result.rect;
-    item->color = blend(unselected_color, selected_color, transition_);
+    intrnl::Color color = blend(unselected_color, selected_color, transition_);
+    if (!enabled) {
+        color = disabled_color;
+    } else if (pressed) {
+        color = shade(color, 0, 0.25f);
+    } else if (hovered) {
+        color = shade(color, 255, 0.2f);
+    }
+    item->color = color;
+    if (focused) {
+        item->border_width = 2;
+        item->border_color = focus_color;
+    }
 
-    // temp_items, not constant_items: the two buckets are a *caching*
-    // distinction (rebuilt every frame vs. not), and the renderer
-    // happens to draw the constant ones first. Using them as a z-order
-    // means every animated entity is painted on top of every label -
-    // a pause overlay ends up underneath the bombs it is supposed to
-    // cover. Everything that participates in normal layering goes in
-    // one bucket, so draw order is submission order.
-    frame.temp_items.push_back(std::move(item));
+    // submit(), not constant_items: the two buckets are a *caching*
+    // distinction (rebuilt every frame vs. not), not a z-order. Using
+    // them as one meant every animated entity was painted on top of
+    // every label - a pause overlay ended up underneath the bombs it
+    // was supposed to cover. Covering is now expressed explicitly:
+    // submit() stamps the layer of the enclosing LayerScope, and
+    // within a layer draw order is submission order (see
+    // RenderFrame::draw_order).
+    frame.submit(std::move(item));
 
     // Buttons are leaf elements as far as rendering goes, but still
     // let any (unusual) children render themselves.
@@ -86,10 +102,7 @@ void Button::update(const float dt) {
     UIElement::update(dt);
 }
 
-bool Button::contains(const math::Vector2 point) const {
-    const intrnl::Rect& r = result.rect;
-    return point.x >= r.x && point.x <= r.x + r.width && point.y >= r.y && point.y <= r.y + r.height;
-}
+bool Button::contains(const math::Vector2 point) const { return result.rect.contains(point.x, point.y); }
 
 bool Button::handle_click(const math::Vector2 point) {
     if (!contains(point)) {
@@ -102,6 +115,22 @@ bool Button::handle_click(const math::Vector2 point) {
     }
     return true;
 }
+
+void Button::activate() {
+    if (enabled && on_click) {
+        on_click(*this);
+    }
+}
+
+bool Button::on_ui_event(UIEvent& e) {
+    if (e.type == UIEventType::Click && enabled) {
+        activate();
+        e.handled = true;
+    }
+    return UIElement::on_ui_event(e);
+}
+
+bool Button::can_focus() const { return focusable && enabled; }
 
 void Button::select() { state_ = ButtonState::Selected; }
 

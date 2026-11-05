@@ -20,22 +20,13 @@ namespace sif::sfml {
             using K = sf::Keyboard::Key;
             using I = event::input::Key;
 
+            // Generated from the engine's own key list (SIF_KEYS), whose
+            // names are SFML's: every engine key is mapped, and a key
+            // added to the list is mapped here without touching this file.
             switch (k) {
-                case K::W:      return I::W;
-                case K::A:      return I::A;
-                case K::S:      return I::S;
-                case K::D:      return I::D;
-                case K::Escape: return I::Escape;
-                case K::Enter:  return I::Enter;
-                case K::Space:  return I::Space;
-                case K::Left:   return I::Left;
-                case K::Right:  return I::Right;
-                case K::Up:     return I::Up;
-                case K::Down:   return I::Down;
-                case K::Num1:   return I::Num1;
-                case K::Num2:   return I::Num2;
-                case K::Num3:   return I::Num3;
-                case K::Backspace: return I::Backspace;
+#define SIF_SFML_KEY(name) case K::name: return I::name;
+                SIF_KEYS(SIF_SFML_KEY)
+#undef SIF_SFML_KEY
                 default:        return I::Unknown;
             }
         }
